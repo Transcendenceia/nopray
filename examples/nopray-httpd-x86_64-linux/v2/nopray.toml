@@ -1,0 +1,177 @@
+[app]
+name = "nopray-httpd"
+version = "2.0.0"
+standard = "DMCS-1.1"
+tier = "L2"
+exposure = "internet"
+description = "SSR HTTP/1.1 reference server designed to run behind a reverse proxy (Caddy/Nginx) on loopback with a 13-syscall seccomp filter and systemd sandbox."
+
+[target]
+isa = "x86-64"
+os = "linux"
+format = "elf64"
+base = 0x400000
+entry = "_start"
+output = "nopray-httpd"
+file_size = 0xa000
+state_register = "r15"
+state_base = 0x40a000
+
+[syscalls]
+allow = ["read", "write", "close", "fstat", "openat", "sendfile", "socket", "setsockopt", "bind", "listen", "accept", "rt_sigaction", "exit"]
+
+[[segment]]
+name = "text"
+vaddr = 0x400000
+offset = 0x0
+file_size = 0xa000
+mem_size = 0xa000
+perms = "r-x"
+align = 0x1000
+
+[[segment]]
+name = "bss"
+vaddr = 0x40a000
+offset = 0x0
+file_size = 0x0
+mem_size = 0x30000
+perms = "rw-"
+align = 0x1000
+
+[[slot]]
+name = "elf_header"
+kind = "header"
+vaddr = 0x400000
+size = 0xb0
+file = "slots/0000_elf_header.hex"
+purpose = "ELF header and program headers"
+
+[[slot]]
+name = "write_all"
+kind = "code"
+vaddr = 0x4000b0
+size = 0x20
+file = "slots/00b0_write_all.hex"
+purpose = "write(fd, buf, len) until everything is sent"
+[slot.contract]
+inputs = ["rdi: fd", "rsi: buffer", "rdx: length"]
+clobbers = ["rax", "rcx", "r11", "rsi", "rdx"]
+
+[[slot]]
+name = "strlen"
+kind = "code"
+vaddr = 0x4000d0
+size = 0x10
+file = "slots/00d0_strlen.hex"
+purpose = "Length of the NUL-terminated string at rdi (result in rax)"
+[slot.contract]
+inputs = ["rdi: string"]
+outputs = ["rax: length"]
+clobbers = ["rax"]
+
+[[slot]]
+name = "exit_failure"
+kind = "code"
+vaddr = 0x4000e0
+size = 0x20
+file = "slots/00e0_exit_failure.hex"
+purpose = "exit(1): startup failure path (socket/bind/listen errors)"
+[slot.contract]
+noreturn = true
+
+[[slot]]
+name = "_start"
+kind = "code"
+vaddr = 0x400100
+size = 0x1b0
+file = "slots/0100__start.hex"
+purpose = "r15 = state; ignore SIGPIPE (rt_sigaction); socket, SO_REUSEADDR, bind 127.0.0.1:18950, listen; accept loop: read request, handle_request, close"
+
+[[slot]]
+name = "handle_request"
+kind = "code"
+vaddr = 0x4002b0
+size = 0x300
+file = "slots/02b0_handle_request.hex"
+purpose = "Parse method (GET/HEAD, else 405) and route: / /live /silent -> render_page; /healthz /deck-idle /styles.css -> embedded bodies; /assets /docs /downloads /content/site.txt -> path checks, openat, fstat, serve_file; else 400/404"
+
+[[slot]]
+name = "mime_type"
+kind = "code"
+vaddr = 0x4005b0
+size = 0xe0
+file = "slots/05b0_mime_type.hex"
+purpose = "Map the file extension to a Content-Type string (rsi) and length (rcx)"
+
+[[slot]]
+name = "utoa"
+kind = "code"
+vaddr = 0x400690
+size = 0x30
+file = "slots/0690_utoa.hex"
+purpose = "Unsigned rax -> decimal ASCII at rdi (advances rdi)"
+
+[[slot]]
+name = "strcpy_bounded"
+kind = "code"
+vaddr = 0x4006c0
+size = 0x20
+file = "slots/06c0_strcpy_bounded.hex"
+purpose = "Append the NUL-terminated string at rsi to rdi, never writing past 0x437000"
+
+[[slot]]
+name = "html_escape"
+kind = "code"
+vaddr = 0x4006e0
+size = 0x70
+file = "slots/06e0_html_escape.hex"
+purpose = "Copy rcx bytes from rsi to rdi escaping & < > \" ; bounded by 0x437000"
+
+[[slot]]
+name = "send_buffer"
+kind = "code"
+vaddr = 0x400750
+size = 0x60
+file = "slots/0750_send_buffer.hex"
+purpose = "Send status line + headers + Content-Length, then the in-memory body unless the request is HEAD"
+
+[[slot]]
+name = "serve_file"
+kind = "code"
+vaddr = 0x4007b0
+size = 0x90
+file = "slots/07b0_serve_file.hex"
+purpose = "Send headers, then sendfile() loop for the opened file unless HEAD; close the file"
+
+[[slot]]
+name = "render_page"
+kind = "code"
+vaddr = 0x400840
+size = 0x100
+file = "slots/0840_render_page.hex"
+purpose = "Build the page in RAM: shell + mode (gate/live/silent), read content/site.txt (<= 32 KiB), compile_site, footer, send_buffer"
+
+[[slot]]
+name = "compile_site"
+kind = "code"
+vaddr = 0x400940
+size = 0x180
+file = "slots/0940_compile_site.hex"
+purpose = "Compile the site.txt tag lines (H1, LD, S1, TR, DO, YT, ...) into HTML5, escaping all text"
+
+[[slot]]
+name = "emit_youtube"
+kind = "code"
+vaddr = 0x400ac0
+size = 0x140
+file = "slots/0ac0_emit_youtube.hex"
+purpose = "Emit the YouTube embed: sanitise the id to [-_A-Za-z0-9]{1,15}, default ASO_zypdnsQ"
+
+[[slot]]
+name = "rodata"
+kind = "rodata"
+vaddr = 0x400c00
+size = 0x9400
+file = "slots/0c00_rodata.hex"
+purpose = "HTTP response templates, site.txt path, MIME table, healthz JSON, embedded HTML shell and CSS"
+

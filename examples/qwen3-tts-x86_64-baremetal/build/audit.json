@@ -1,0 +1,724 @@
+{
+  "app": "nopray-qwen-tts",
+  "version": "1.0.0",
+  "isa": "x86-64",
+  "tier": "L3",
+  "exposure": "local",
+  "size": 32768,
+  "sha256": "014256c393b5d6d8103bd665cd4a4c82c1d3c103284640070b8e5afc6fecf319",
+  "reference": "examples/qwen3-tts-x86_64-baremetal/build/nopray-qwen-tts.elf",
+  "findings": [
+    {
+      "severity": "info",
+      "code": "R000",
+      "message": "examples/qwen3-tts-x86_64-baremetal/build/nopray-qwen-tts.elf is byte-identical to the map (32768 bytes)"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "io_drivers",
+      "addr": "0x100405",
+      "message": "local call to 0x100415; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "io_drivers",
+      "addr": "0x10040f",
+      "message": "local call to 0x100415; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C013",
+      "slot": "io_drivers",
+      "addr": "0x100623",
+      "message": "hlt (trap / privileged / exception-raising instruction)"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "qwen3_layer",
+      "addr": "0x10230a",
+      "message": "local call to 0x10203e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "qwen3_layer",
+      "addr": "0x1023bd",
+      "message": "local call to 0x10206f; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "qwen3_layer",
+      "addr": "0x10255b",
+      "message": "local call to 0x102093; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "talker_cp",
+      "addr": "0x103264",
+      "message": "local call to 0x103028; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "talker_cp",
+      "addr": "0x103338",
+      "message": "local call to 0x103028; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x104221",
+      "message": "local call to 0x10408e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x1042d6",
+      "message": "local call to 0x10408e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x10430a",
+      "message": "local call to 0x10408e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x10433e",
+      "message": "local call to 0x10408e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x104417",
+      "message": "local call to 0x104039; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x1044da",
+      "message": "local call to 0x10406a; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x104543",
+      "message": "local call to 0x10408e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x1045be",
+      "message": "local call to 0x10408e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x1045e8",
+      "message": "local call to 0x10408e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x104632",
+      "message": "local call to 0x10408e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_xfmr",
+      "addr": "0x1046d2",
+      "message": "local call to 0x10408e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_vocoder",
+      "addr": "0x1050d2",
+      "message": "local call to 0x10538e; consider a label for the map"
+    },
+    {
+      "severity": "info",
+      "code": "C016",
+      "slot": "decoder_vocoder",
+      "addr": "0x10524d",
+      "message": "local call to 0x10538e; consider a label for the map"
+    }
+  ],
+  "slots": [
+    {
+      "name": "elf32_hdr",
+      "kind": "header",
+      "vaddr": "0x100000",
+      "size": 256,
+      "used": 140,
+      "sha256": "89e2121a55c2a071403cd0936056965df5c30946cdc2e3575fa731b47ff100c7",
+      "purpose": "ELF32 header, two W^X PT_LOAD program headers, and 12-byte Multiboot 1 header at +0x80",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "boot32",
+      "kind": "code",
+      "vaddr": "0x100100",
+      "size": 256,
+      "used": 209,
+      "sha256": "8b1084b909db74d4f61df76fb0d9931df577d0b6c3c234a920fc9cac7ce521f3",
+      "purpose": "32-bit Multiboot 1 entry: zeroes BSS, builds 0..4 GiB 2 MiB huge-page identity map, enables PAE/LME/PG, loads GDT64 and far-jumps to boot64",
+      "coverage": "full",
+      "instructions": 48,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [
+        "boot64"
+      ],
+      "data_refs": [
+        "data_zero",
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "cr0",
+        "cr3",
+        "cr4",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 48,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "boot64",
+      "kind": "code",
+      "vaddr": "0x100200",
+      "size": 512,
+      "used": 158,
+      "sha256": "d049ee1e9aa23428c5d5341bdd606bdf9d6cc2781c720b6cb6b1357c678ecd43",
+      "purpose": "64-bit Long Mode entry: loads data segments, sets RSP/R15, enables SSE/AVX2/FMA/F16C (XCR0=7, MXCSR), initializes UARTs, calibrates PIT TSC, locates Multiboot initrd, calls tts_main, powers off",
+      "coverage": "full",
+      "instructions": 46,
+      "calls": [
+        "pit_calibrate_tsc",
+        "tts_main",
+        "uart_init"
+      ],
+      "called_by": [],
+      "jumps_to": [
+        "poweroff"
+      ],
+      "data_refs": [
+        "data_zero",
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "cr0",
+        "cr4",
+        "ds",
+        "es",
+        "fs",
+        "gs",
+        "r15",
+        "rax",
+        "rbx",
+        "rcx",
+        "rdx",
+        "rsi",
+        "rsp",
+        "ss"
+      ],
+      "state_reads": [
+        "mb_info",
+        "mb_magic"
+      ],
+      "state_writes": [
+        "arena_base",
+        "tsc_per_ms",
+        "weights_base",
+        "weights_size"
+      ],
+      "indirect_branches": 0,
+      "intents": 46,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "io_drivers",
+      "kind": "code",
+      "vaddr": "0x100400",
+      "size": 1024,
+      "used": 550,
+      "sha256": "84171ca5d014eaa6035ed8aa11161f86531a9430835dd2c0af09b2959e6b2d5f",
+      "purpose": "Bare-metal hardware drivers: COM1 (0x3F8) telemetry serial, COM2 (0x2F8) raw binary WAV stream, PIT Channel 2 TSC calibration, isa-debug-exit / ACPI S5 poweroff",
+      "coverage": "full",
+      "instructions": 383,
+      "calls": [],
+      "called_by": [
+        "boot64",
+        "decoder_vocoder",
+        "talker_cp",
+        "tts_main"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r8",
+        "rax",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 114,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "tts_main",
+      "kind": "code",
+      "vaddr": "0x100800",
+      "size": 1024,
+      "used": 362,
+      "sha256": "eec53e3a21ee4466daaae86e0ba0fcbd6e895db62c33e249486ce4d064ec9298",
+      "purpose": "Main bare-metal Qwen3-TTS entry: runs Talker 28L + Code Predictor 5L + Speech Tokenizer 12Hz V2 Decoder + BigVGAN Vocoder, logs PIT timings on COM1, streams 24kHz S16LE WAV on COM2",
+      "coverage": "full",
+      "instructions": 93,
+      "calls": [
+        "com1_put_hex64",
+        "com1_put_u64",
+        "com1_putc",
+        "com1_puts",
+        "com2_write",
+        "run_decoder_vocoder",
+        "run_talker_cp"
+      ],
+      "called_by": [
+        "boot64"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r12",
+        "r13",
+        "r14",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "arena_base",
+        "tsc_per_ms",
+        "weights_base",
+        "weights_size"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 93,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "rodata",
+      "kind": "rodata",
+      "vaddr": "0x100c00",
+      "size": 1024,
+      "used": 580,
+      "sha256": "6df0d9a72589774c64da568d817a76666eabf4f595a8bae0df7820917bf5cb5f",
+      "purpose": "64-bit GDT, GDTR pointer, MXCSR constant, telemetry strings, and FP16 test vector",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [
+        "boot32",
+        "boot64",
+        "decoder_vocoder",
+        "decoder_xfmr",
+        "math_avx2",
+        "qwen3_layer",
+        "talker_cp",
+        "tts_main"
+      ],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "math_avx2",
+      "kind": "code",
+      "vaddr": "0x101000",
+      "size": 4096,
+      "used": 1683,
+      "sha256": "bc6a5fc8e10390df0075738566aeb06603efee2e518582f6e9673528037d1b03",
+      "purpose": "Core AVX2+FMA+F16C neural math primitives: gemv_q8_0s, gemv_f16, rmsnorm, layernorm, expf_ymm0, sin2_ymm0, silu_mul, gelu_inplace, softmax_inplace, rope_apply, dequant_q8_row, dequant_f16_row, vec_add_inplace, snakebeta_channel",
+      "coverage": "full",
+      "instructions": 408,
+      "calls": [],
+      "called_by": [
+        "decoder_vocoder",
+        "decoder_xfmr",
+        "qwen3_layer",
+        "talker_cp"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r10",
+        "r11",
+        "r8",
+        "r9",
+        "rax",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp",
+        "zmm0",
+        "zmm1",
+        "zmm10",
+        "zmm2",
+        "zmm3",
+        "zmm4",
+        "zmm5",
+        "zmm6",
+        "zmm7",
+        "zmm8",
+        "zmm9"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 408,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "qwen3_layer",
+      "kind": "code",
+      "vaddr": "0x102000",
+      "size": 4096,
+      "used": 1394,
+      "sha256": "1353f47f53eb6de03d4559a28dcbdfc4f8f730952a3d96625e91c734fec15037",
+      "purpose": "Unified Qwen3 Transformer layer (RMSNorm, Q/K/V Q8_0S GEMV, QK-Norm, RoPE, KV-cache, GQA Attention, SwiGLU MLP) serving both Talker 28L and Code Predictor 5L",
+      "coverage": "full",
+      "instructions": 321,
+      "calls": [
+        "rmsnorm",
+        "rope_apply",
+        "silu_mul",
+        "softmax_inplace",
+        "vec_add_inplace"
+      ],
+      "called_by": [
+        "decoder_vocoder",
+        "decoder_xfmr",
+        "talker_cp"
+      ],
+      "jumps_to": [
+        "gemv_q8_0s"
+      ],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r8",
+        "r9",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp",
+        "zmm0",
+        "zmm1"
+      ],
+      "state_reads": [
+        "arena_base",
+        "weights_base"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 321,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "talker_cp",
+      "kind": "code",
+      "vaddr": "0x103000",
+      "size": 4096,
+      "used": 1008,
+      "sha256": "c10b2f17993999919a7952bc03c33f9a44dbee15ee0b9029811be28513082ed3",
+      "purpose": "Talker 28L + Code Predictor 5L autoregressive synthesis loop with suppression mask and repetition_penalty=1.05",
+      "coverage": "full",
+      "instructions": 227,
+      "calls": [
+        "com1_putc",
+        "dir_lookup",
+        "qwen3_forward_token",
+        "qwen3_gemv_tid",
+        "rmsnorm",
+        "vec_add_inplace"
+      ],
+      "called_by": [
+        "tts_main"
+      ],
+      "jumps_to": [
+        "dequant_q8_row"
+      ],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r8",
+        "r9",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp",
+        "zmm0",
+        "zmm1",
+        "zmm2",
+        "zmm3"
+      ],
+      "state_reads": [
+        "arena_base",
+        "weights_base"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 227,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "decoder_xfmr",
+      "kind": "code",
+      "vaddr": "0x104000",
+      "size": 4096,
+      "used": 1790,
+      "sha256": "cd465b56bd0157592d9015b3ed42a99324f6b53d55b9f46632a89ee9168041ed",
+      "purpose": "Speech Tokenizer 12Hz V2 Decoder Part 1: 16-group RVQ lookup, causal pre_conv, input_proj, 8-layer sliding-window=72 causal Pre-Transformer, final norm and output_proj",
+      "coverage": "full",
+      "instructions": 419,
+      "calls": [
+        "conv1d_causal_tid",
+        "dir_lookup",
+        "rmsnorm",
+        "rope_apply",
+        "silu_mul",
+        "softmax_inplace",
+        "vec_add_inplace"
+      ],
+      "called_by": [
+        "decoder_vocoder"
+      ],
+      "jumps_to": [
+        "gemv_f16"
+      ],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r8",
+        "r9",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp",
+        "zmm0",
+        "zmm1"
+      ],
+      "state_reads": [
+        "arena_base"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 419,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "decoder_vocoder",
+      "kind": "code",
+      "vaddr": "0x105000",
+      "size": 8192,
+      "used": 3582,
+      "sha256": "7d96458a599d614a9f9344702867fcdb0a850964a9a89e1b5d8fc9c4c86b6a44",
+      "purpose": "Speech Tokenizer 12Hz V2 Decoder Part 2: AVX2+FMA+F16C tiled Conv1d/ConvTranspose1d, DWConv, 2x ConvNeXt Upsample, 4-stage BigVGAN (rates 8,5,4,3) + SnakeBeta + S16LE PCM conversion",
+      "coverage": "full",
+      "instructions": 861,
+      "calls": [
+        "com1_putc",
+        "dir_lookup",
+        "gelu_inplace",
+        "layernorm",
+        "run_decoder_xfmr",
+        "snakebeta_channel",
+        "transpose_2d",
+        "vec_add_inplace"
+      ],
+      "called_by": [
+        "decoder_xfmr",
+        "tts_main"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r8",
+        "r9",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp",
+        "zmm0",
+        "zmm1",
+        "zmm10",
+        "zmm11",
+        "zmm14",
+        "zmm15",
+        "zmm2",
+        "zmm3",
+        "zmm4",
+        "zmm5",
+        "zmm6",
+        "zmm7",
+        "zmm8",
+        "zmm9"
+      ],
+      "state_reads": [
+        "arena_base"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 861,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "data_zero",
+      "kind": "data",
+      "vaddr": "0x10c000",
+      "size": 4096,
+      "used": 1,
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7",
+      "purpose": "Initialised writable state page (4 KiB); remainder of data_bss segment is zeroed BSS (page tables + BSP stack)",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [
+        "boot32",
+        "boot64"
+      ],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    }
+  ],
+  "syscall_sites": [],
+  "syscall_set": []
+}

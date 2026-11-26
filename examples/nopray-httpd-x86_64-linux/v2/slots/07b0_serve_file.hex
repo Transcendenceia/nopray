@@ -1,0 +1,44 @@
+# nopray slot `serve_file` · code · vaddr 0x4007b0 · size 0x90 · used 136 bytes
+# purpose: Send headers, then sendfile() loop for the opened file unless HEAD; close the file
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# serve_file:
+49 89 f0           # 0x004007b0  mov r8,rsi
+41 89 c9           # 0x004007b3  mov r9d,ecx
+bf 00 a4 40 00     # 0x004007b6  mov edi,0x40a400
+be 60 0c 40 00     # 0x004007bb  mov esi,0x400c60
+e8 fb fe ff ff     # 0x004007c0  call 0x4006c0  → strcpy_bounded
+4c 89 c6           # 0x004007c5  mov rsi,r8
+44 89 c9           # 0x004007c8  mov ecx,r9d
+f3 a4              # 0x004007cb  rep movsb [rdi],[rsi]
+be 40 0d 40 00     # 0x004007cd  mov esi,0x400d40
+e8 e9 fe ff ff     # 0x004007d2  call 0x4006c0  → strcpy_bounded
+49 8b 47 10        # 0x004007d7  mov rax,[r15+0x10]
+e8 b0 fe ff ff     # 0x004007db  call 0x400690  → utoa
+c7 07 0d 0a 0d 0a  # 0x004007e0  mov dword ptr [rdi],0xa0d0a0d
+48 83 c7 04        # 0x004007e6  add rdi,4
+48 89 fa           # 0x004007ea  mov rdx,rdi
+be 00 a4 40 00     # 0x004007ed  mov esi,0x40a400
+48 29 f2           # 0x004007f2  sub rdx,rsi
+41 8b 7f 04        # 0x004007f5  mov edi,[r15+4]
+e8 b2 f8 ff ff     # 0x004007f9  call 0x4000b0  → write_all
+41 83 7f 0c 00     # 0x004007fe  cmp dword ptr [r15+0xc],0
+75 27              # 0x00400803  jne 0x40082c
+4d 8b 67 10        # 0x00400805  mov r12,[r15+0x10]
+4d 85 e4           # 0x00400809  test r12,r12
+7e 1e              # 0x0040080c  jle 0x40082c
+b8 28 00 00 00     # 0x0040080e  mov eax,0x28
+41 8b 7f 04        # 0x00400813  mov edi,[r15+4]
+41 8b 77 08        # 0x00400817  mov esi,[r15+8]
+31 d2              # 0x0040081b  xor edx,edx
+4d 89 e2           # 0x0040081d  mov r10,r12
+0f 05              # 0x00400820  syscall  ; sendfile
+48 85 c0           # 0x00400822  test rax,rax
+7e 05              # 0x00400825  jle 0x40082c
+49 29 c4           # 0x00400827  sub r12,rax
+eb dd              # 0x0040082a  jmp 0x400809
+41 8b 7f 08        # 0x0040082c  mov edi,[r15+8]
+b8 03 00 00 00     # 0x00400830  mov eax,3
+0f 05              # 0x00400835  syscall  ; close
+c3                 # 0x00400837  ret

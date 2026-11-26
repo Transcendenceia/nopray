@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-26",
+  "cpu": "AMD Ryzen 7 5825U (8C/16T Zen 3, AVX2+FMA+F16C)",
+  "model": "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice",
+  "prompt": "Hola Marlon, esto es código máquina puro con nopray, sin Linux y sin compilador.",
+  "speaker": "serena",
+  "language": "Spanish",
+  "nopray_baremetal_kvm": {
+    "elf_bytes": 32768,
+    "elf_sha256": "014256c393b5d6d8103bd665cd4a4c82c1d3c103284640070b8e5afc6fecf319",
+    "slots": 12,
+    "authored_bytes": 11457,
+    "decoded_instructions": 2806,
+    "audit_errors": 0,
+    "audit_warnings": 0,
+    "guest_linux_syscalls": 0,
+    "weights_bytes": 1118485120,
+    "vcpus": 1,
+    "frames": 80,
+    "samples": 153600,
+    "duration_s": 6.4,
+    "wav_bytes": 307244,
+    "wav_vs_numpy_ref_cos": 0.9999999994150369,
+    "wav_vs_numpy_ref_snr_db": 89.318,
+    "wav_exact_i16_samples": "153359/153600",
+    "runs": [
+      {"run": 1, "talker_ms": 15463, "dec_ms": 25753, "total_ms": 41216, "wall_ms": 53038, "user_s": 43.27, "sys_s": 9.67, "peak_rss_mib": 2429.0, "rtf_synth": 6.44, "rtf_cold": 8.29},
+      {"run": 2, "talker_ms": 15759, "dec_ms": 27071, "total_ms": 42830, "wall_ms": 54268, "user_s": 43.48, "sys_s": 10.66, "peak_rss_mib": 2452.4, "rtf_synth": 6.69, "rtf_cold": 8.48}
+    ]
+  },
+  "official_qwen_tts_pytorch": {
+    "venv_bytes": 1441812125,
+    "model_safetensors_bytes": 2498389752,
+    "cold_import_load_linux_syscalls": 134879,
+    "configs": {
+      "1t_float32": {"threads": 1, "dtype": "float32", "frames": 84, "duration_s": 6.72, "cold_start_s": 16.876, "talker_cp_s": 46.084, "decoder_s": 18.414, "synth_total_s": 64.497, "cold_to_wav_s": 81.419, "rtf_synth": 9.598, "rtf_cold": 12.116, "peak_rss_mib": 5636.9},
+      "1t_bfloat16": {"threads": 1, "dtype": "bfloat16", "frames": 81, "duration_s": 6.48, "cold_start_s": 10.253, "talker_cp_s": 61.117, "decoder_s": 400.746, "synth_total_s": 461.864, "cold_to_wav_s": 472.135, "rtf_synth": 71.275, "rtf_cold": 72.86, "peak_rss_mib": 3072.8},
+      "8t_float32": {"threads": 8, "dtype": "float32", "frames": 84, "duration_s": 6.72, "cold_start_s": 9.343, "talker_cp_s": 47.522, "decoder_s": 6.631, "synth_total_s": 54.153, "cold_to_wav_s": 63.511, "rtf_synth": 8.058, "rtf_cold": 9.451, "peak_rss_mib": 5647.6},
+      "8t_bfloat16": {"threads": 8, "dtype": "bfloat16", "frames": 81, "duration_s": 6.48, "cold_start_s": 8.794, "talker_cp_s": 24.675, "decoder_s": 386.847, "synth_total_s": 411.523, "cold_to_wav_s": 420.354, "rtf_synth": 63.507, "rtf_cold": 64.869, "peak_rss_mib": 3058.9}
+    }
+  }
+}

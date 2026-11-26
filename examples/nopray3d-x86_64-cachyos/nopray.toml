@@ -1,0 +1,151 @@
+[app]
+name = "nopray3d"
+version = "1.0.0"
+standard = "DMCS-1.1"
+tier = "L2"
+exposure = "local"
+description = "8,192-byte real-time 3D raycaster (Reference #002): SSE2 + x87, 5 procedural materials, minimap, W^X."
+
+[target]
+isa = "x86-64"
+os = "linux"
+format = "elf64"
+base = 0x400000
+entry = "_start"
+output = "nopray3d"
+file_size = 0x2000
+state_register = "r15"
+state_base = 0x404000
+
+[[segment]]
+name = "text"
+vaddr = 0x400000
+offset = 0x0
+file_size = 0x2000
+mem_size = 0x2000
+perms = "r-x"
+align = 0x1000
+
+[[segment]]
+name = "bss"
+vaddr = 0x404000
+offset = 0x0
+file_size = 0x0
+mem_size = 0x100000
+perms = "rw-"
+align = 0x1000
+
+[syscalls]
+allow = ["read", "write", "poll", "socket", "connect", "exit"]
+
+[[slot]]
+name = "elf_header"
+kind = "header"
+vaddr = 0x400000
+size = 0xb0
+file = "slots/0000_elf_header.hex"
+purpose = "ELF64 header + PT_LOAD r-x (0x400000) + PT_LOAD rw- (0x404000, 1 MiB)"
+
+[[slot]]
+name = "read_exact"
+kind = "code"
+vaddr = 0x4000b0
+size = 0x20
+file = "slots/00b0_read_exact.hex"
+purpose = "read(fd, buf, len) until complete"
+[slot.contract]
+inputs = ["rdi: fd", "rsi: buffer", "rdx: length"]
+clobbers = ["rax", "rcx", "r11", "rsi", "rdx"]
+
+[[slot]]
+name = "write_all"
+kind = "code"
+vaddr = 0x4000d0
+size = 0x20
+file = "slots/00d0_write_all.hex"
+purpose = "write(fd, buf, len) until complete"
+[slot.contract]
+inputs = ["rdi: fd", "rsi: buffer", "rdx: length"]
+clobbers = ["rax", "rcx", "r11", "rsi", "rdx"]
+
+[[slot]]
+name = "exit_clean"
+kind = "code"
+vaddr = 0x4000f0
+size = 0x10
+file = "slots/00f0_exit_clean.hex"
+purpose = "exit(0)"
+[slot.contract]
+noreturn = true
+
+[[slot]]
+name = "_start"
+kind = "code"
+vaddr = 0x400100
+size = 0x240
+file = "slots/0100__start.hex"
+purpose = "r15 = state; X11 connect + handshake; CreateWindow 640x360; WM_NAME, WM_NORMAL_HINTS, CreateGC, MapWindow; initial pose"
+
+[[slot]]
+name = "main_loop"
+kind = "code"
+vaddr = 0x400340
+size = 0x180
+file = "slots/0340_main_loop.hex"
+purpose = "~60 FPS loop: poll(fd,0) drains held keys, poll(fd,16ms) paces frames"
+
+[[slot]]
+name = "update_player"
+kind = "code"
+vaddr = 0x4004c0
+size = 0x200
+file = "slots/04c0_update_player.hex"
+purpose = "x87 fsincos camera, 16:9 plane, autopilot tour or WASD/arrows, sliding collision"
+
+[[slot]]
+name = "render_3d"
+kind = "code"
+vaddr = 0x4006c0
+size = 0x440
+file = "slots/06c0_render_3d.hex"
+purpose = "DDA raycaster over 640 columns in SSE2 double: sky/floor, 5 procedural materials, N/S shading, distance fog"
+
+[[slot]]
+name = "fill_rect"
+kind = "code"
+vaddr = 0x400b00
+size = 0x40
+file = "slots/0b00_fill_rect.hex"
+purpose = "fill_rect with rep stosd on a 640x4 stride"
+
+[[slot]]
+name = "draw_glyph"
+kind = "code"
+vaddr = 0x400b40
+size = 0xc0
+file = "slots/0b40_draw_glyph.hex"
+purpose = "draw_glyph from the 5x7 HUD font"
+
+[[slot]]
+name = "draw_hud"
+kind = "code"
+vaddr = 0x400c00
+size = 0x280
+file = "slots/0c00_draw_hud.hex"
+purpose = "Crosshair, NOPRAY 3D badge, 80x80 color minimap with player and view vector"
+
+[[slot]]
+name = "blit_x11"
+kind = "code"
+vaddr = 0x400e80
+size = 0x180
+file = "slots/0e80_blit_x11.hex"
+purpose = "Flicker-free X11 PutImage in 4 strips of 640x90"
+
+[[slot]]
+name = "rodata"
+kind = "rodata"
+vaddr = 0x401000
+size = 0x1000
+file = "slots/1000_rodata.hex"
+purpose = "sockaddr_un, WM_SIZE_HINTS, 24 IEEE-754 constants (ABS_MASK at 0x401100), palette, key table, 16x16 map, 5x7 font"

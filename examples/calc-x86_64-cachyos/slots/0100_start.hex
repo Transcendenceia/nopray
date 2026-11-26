@@ -1,0 +1,115 @@
+# nopray slot `_start` · code · vaddr 0x400100 · size 0x1f0 · used 488 bytes
+# purpose: r15 = state; connect /tmp/.X11-unix/X0; X11 handshake; CreateWindow 320x440, WM_NAME, WM_NORMAL_HINTS, CreateGC, MapWindow; first render
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# _start:
+41 bf 00 20 40 00        # 0x00400100  mov r15d,0x402000
+b8 29 00 00 00           # 0x00400106  mov eax,0x29
+bf 01 00 00 00           # 0x0040010b  mov edi,1
+be 01 00 00 00           # 0x00400110  mov esi,1
+31 d2                    # 0x00400115  xor edx,edx
+0f 05                    # 0x00400117  syscall  ; socket
+85 c0                    # 0x00400119  test eax,eax
+78 c3                    # 0x0040011b  js 0x4000e0  → exit_clean
+41 89 47 28              # 0x0040011d  mov [r15+0x28],eax
+89 c7                    # 0x00400121  mov edi,eax
+b8 2a 00 00 00           # 0x00400123  mov eax,0x2a
+be 00 0c 40 00           # 0x00400128  mov esi,0x400c00  → rodata
+ba 14 00 00 00           # 0x0040012d  mov edx,0x14
+0f 05                    # 0x00400132  syscall  ; connect
+85 c0                    # 0x00400134  test eax,eax
+78 a8                    # 0x00400136  js 0x4000e0  → exit_clean
+41 8b 7f 28              # 0x00400138  mov edi,[r15+0x28]
+be 14 0c 40 00           # 0x0040013c  mov esi,0x400c14
+ba 0c 00 00 00           # 0x00400141  mov edx,0xc
+e8 65 ff ff ff           # 0x00400146  call 0x4000b0  → write_all
+41 8b 7f 28              # 0x0040014b  mov edi,[r15+0x28]
+be 00 22 40 00           # 0x0040014f  mov esi,0x402200
+ba 08 00 00 00           # 0x00400154  mov edx,8
+e8 22 ff ff ff           # 0x00400159  call 0x400080  → read_exact
+bb 00 22 40 00           # 0x0040015e  mov ebx,0x402200
+80 3b 01                 # 0x00400163  cmp byte ptr [rbx],1
+0f 85 74 ff ff ff        # 0x00400166  jne 0x4000e0  → exit_clean
+0f b7 53 06              # 0x0040016c  movzx edx,word ptr [rbx+6]
+c1 e2 02                 # 0x00400170  shl edx,2
+41 8b 7f 28              # 0x00400173  mov edi,[r15+0x28]
+be 08 22 40 00           # 0x00400177  mov esi,0x402208
+e8 ff fe ff ff           # 0x0040017c  call 0x400080  → read_exact
+8b 43 0c                 # 0x00400181  mov eax,[rbx+0xc]
+41 89 47 2c              # 0x00400184  mov [r15+0x2c],eax
+0f b7 43 18              # 0x00400188  movzx eax,word ptr [rbx+0x18]
+83 c0 03                 # 0x0040018c  add eax,3
+83 e0 fc                 # 0x0040018f  and eax,0xfffffffc
+0f b6 4b 1d              # 0x00400192  movzx ecx,byte ptr [rbx+0x1d]
+c1 e1 03                 # 0x00400196  shl ecx,3
+01 c8                    # 0x00400199  add eax,ecx
+48 8d 5c 03 28           # 0x0040019b  lea rbx,[rbx+rax+0x28]
+8b 03                    # 0x004001a0  mov eax,[rbx]
+41 89 47 30              # 0x004001a2  mov [r15+0x30],eax
+8b 43 20                 # 0x004001a6  mov eax,[rbx+0x20]
+41 89 47 34              # 0x004001a9  mov [r15+0x34],eax
+0f b6 43 26              # 0x004001ad  movzx eax,byte ptr [rbx+0x26]
+41 89 47 38              # 0x004001b1  mov [r15+0x38],eax
+bb 00 21 40 00           # 0x004001b5  mov ebx,0x402100
+c7 03 01 18 0a 00        # 0x004001ba  mov dword ptr [rbx],0xa1801
+41 8a 47 38              # 0x004001c0  mov al,[r15+0x38]
+88 43 01                 # 0x004001c4  mov [rbx+1],al
+41 8b 47 2c              # 0x004001c7  mov eax,[r15+0x2c]
+ff c0                    # 0x004001cb  inc eax
+89 43 04                 # 0x004001cd  mov [rbx+4],eax
+41 8b 47 30              # 0x004001d0  mov eax,[r15+0x30]
+89 43 08                 # 0x004001d4  mov [rbx+8],eax
+c7 43 0c 64 00 64 00     # 0x004001d7  mov dword ptr [rbx+0xc],0x640064
+c7 43 10 40 01 b8 01     # 0x004001de  mov dword ptr [rbx+0x10],0x1b80140
+c7 43 14 00 00 01 00     # 0x004001e5  mov dword ptr [rbx+0x14],0x10000
+41 8b 47 34              # 0x004001ec  mov eax,[r15+0x34]
+89 43 18                 # 0x004001f0  mov [rbx+0x18],eax
+c7 43 1c 02 08 00 00     # 0x004001f3  mov dword ptr [rbx+0x1c],0x802
+c7 43 20 25 18 18 00     # 0x004001fa  mov dword ptr [rbx+0x20],0x181825
+c7 43 24 0d 80 00 00     # 0x00400201  mov dword ptr [rbx+0x24],0x800d
+41 8b 7f 28              # 0x00400208  mov edi,[r15+0x28]
+48 89 de                 # 0x0040020c  mov rsi,rbx
+ba 28 00 00 00           # 0x0040020f  mov edx,0x28
+e8 97 fe ff ff           # 0x00400214  call 0x4000b0  → write_all
+c7 03 12 00 09 00        # 0x00400219  mov dword ptr [rbx],0x90012
+c7 43 08 27 00 00 00     # 0x0040021f  mov dword ptr [rbx+8],0x27
+c7 43 0c 1f 00 00 00     # 0x00400226  mov dword ptr [rbx+0xc],0x1f
+c7 43 10 08 00 00 00     # 0x0040022d  mov dword ptr [rbx+0x10],8
+c7 43 14 0b 00 00 00     # 0x00400234  mov dword ptr [rbx+0x14],0xb
+41 8b 7f 28              # 0x0040023b  mov edi,[r15+0x28]
+48 89 de                 # 0x0040023f  mov rsi,rbx
+ba 18 00 00 00           # 0x00400242  mov edx,0x18
+e8 64 fe ff ff           # 0x00400247  call 0x4000b0  → write_all
+41 8b 7f 28              # 0x0040024c  mov edi,[r15+0x28]
+be 20 0c 40 00           # 0x00400250  mov esi,0x400c20
+ba 0c 00 00 00           # 0x00400255  mov edx,0xc
+e8 51 fe ff ff           # 0x0040025a  call 0x4000b0  → write_all
+c7 03 12 00 18 00        # 0x0040025f  mov dword ptr [rbx],0x180012
+c7 43 08 28 00 00 00     # 0x00400265  mov dword ptr [rbx+8],0x28
+c7 43 0c 29 00 00 00     # 0x0040026c  mov dword ptr [rbx+0xc],0x29
+c7 43 10 20 00 00 00     # 0x00400273  mov dword ptr [rbx+0x10],0x20
+c7 43 14 12 00 00 00     # 0x0040027a  mov dword ptr [rbx+0x14],0x12
+41 8b 7f 28              # 0x00400281  mov edi,[r15+0x28]
+48 89 de                 # 0x00400285  mov rsi,rbx
+ba 18 00 00 00           # 0x00400288  mov edx,0x18
+e8 1e fe ff ff           # 0x0040028d  call 0x4000b0  → write_all
+41 8b 7f 28              # 0x00400292  mov edi,[r15+0x28]
+be 30 0c 40 00           # 0x00400296  mov esi,0x400c30
+ba 48 00 00 00           # 0x0040029b  mov edx,0x48
+e8 0b fe ff ff           # 0x004002a0  call 0x4000b0  → write_all
+c7 03 37 00 04 00        # 0x004002a5  mov dword ptr [rbx],0x40037
+41 8b 47 2c              # 0x004002ab  mov eax,[r15+0x2c]
+ff c0                    # 0x004002af  inc eax
+89 43 08                 # 0x004002b1  mov [rbx+8],eax
+89 43 14                 # 0x004002b4  mov [rbx+0x14],eax
+ff c0                    # 0x004002b7  inc eax
+89 43 04                 # 0x004002b9  mov [rbx+4],eax
+c7 43 0c 00 00 00 00     # 0x004002bc  mov dword ptr [rbx+0xc],0
+c7 43 10 08 00 02 00     # 0x004002c3  mov dword ptr [rbx+0x10],0x20008
+41 8b 7f 28              # 0x004002ca  mov edi,[r15+0x28]
+48 89 de                 # 0x004002ce  mov rsi,rbx
+ba 18 00 00 00           # 0x004002d1  mov edx,0x18
+e8 d5 fd ff ff           # 0x004002d6  call 0x4000b0  → write_all
+41 c7 47 24 ff ff ff ff  # 0x004002db  mov dword ptr [r15+0x24],0xffffffff
+e8 78 06 00 00           # 0x004002e3  call 0x400960  → render_and_blit

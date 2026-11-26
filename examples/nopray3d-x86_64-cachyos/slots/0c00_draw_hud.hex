@@ -1,0 +1,114 @@
+# nopray slot `draw_hud` · code · vaddr 0x400c00 · size 0x280 · used 464 bytes
+# purpose: Crosshair, NOPRAY 3D badge, 80x80 color minimap with player and view vector
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# draw_hud:
+53                       # 0x00400c00  push rbx
+55                       # 0x00400c01  push rbp
+41 54                    # 0x00400c02  push r12
+41 55                    # 0x00400c04  push r13
+41 56                    # 0x00400c06  push r14
+bf 3b 01 00 00           # 0x00400c08  mov edi,0x13b
+be b4 00 00 00           # 0x00400c0d  mov esi,0xb4
+ba 0b 00 00 00           # 0x00400c12  mov edx,0xb
+b9 01 00 00 00           # 0x00400c17  mov ecx,1
+41 b8 af e2 f9 00        # 0x00400c1c  mov r8d,0xf9e2af
+e8 d9 fe ff ff           # 0x00400c22  call 0x400b00  → fill_rect
+bf 40 01 00 00           # 0x00400c27  mov edi,0x140
+be af 00 00 00           # 0x00400c2c  mov esi,0xaf
+ba 01 00 00 00           # 0x00400c31  mov edx,1
+b9 0b 00 00 00           # 0x00400c36  mov ecx,0xb
+41 b8 af e2 f9 00        # 0x00400c3b  mov r8d,0xf9e2af
+e8 ba fe ff ff           # 0x00400c41  call 0x400b00  → fill_rect
+bf 0c 00 00 00           # 0x00400c46  mov edi,0xc
+be 0c 00 00 00           # 0x00400c4b  mov esi,0xc
+ba 80 00 00 00           # 0x00400c50  mov edx,0x80
+b9 1a 00 00 00           # 0x00400c55  mov ecx,0x1a
+41 b8 1b 11 11 00        # 0x00400c5a  mov r8d,0x11111b
+e8 9b fe ff ff           # 0x00400c60  call 0x400b00  → fill_rect
+bf 0c 00 00 00           # 0x00400c65  mov edi,0xc
+be 0c 00 00 00           # 0x00400c6a  mov esi,0xc
+ba 03 00 00 00           # 0x00400c6f  mov edx,3
+b9 1a 00 00 00           # 0x00400c74  mov ecx,0x1a
+41 b8 42 c2 f5 00        # 0x00400c79  mov r8d,0xf5c242
+e8 7c fe ff ff           # 0x00400c7f  call 0x400b00  → fill_rect
+31 db                    # 0x00400c84  xor ebx,ebx
+6b fb 0c                 # 0x00400c86  imul edi,ebx,0xc
+83 c7 16                 # 0x00400c89  add edi,0x16
+be 12 00 00 00           # 0x00400c8c  mov esi,0x12
+89 da                    # 0x00400c91  mov edx,ebx
+b9 02 00 00 00           # 0x00400c93  mov ecx,2
+41 b8 af e2 f9 00        # 0x00400c98  mov r8d,0xf9e2af
+e8 9d fe ff ff           # 0x00400c9e  call 0x400b40  → draw_glyph
+ff c3                    # 0x00400ca3  inc ebx
+83 fb 09                 # 0x00400ca5  cmp ebx,9
+7c dc                    # 0x00400ca8  jl 0x400c86
+41 83 7f 40 00           # 0x00400caa  cmp dword ptr [r15+0x40],0
+0f 84 12 01 00 00        # 0x00400caf  je 0x400dc7
+bf 1c 02 00 00           # 0x00400cb5  mov edi,0x21c
+be 0c 00 00 00           # 0x00400cba  mov esi,0xc
+ba 58 00 00 00           # 0x00400cbf  mov edx,0x58
+b9 58 00 00 00           # 0x00400cc4  mov ecx,0x58
+41 b8 5a 47 45 00        # 0x00400cc9  mov r8d,0x45475a
+e8 2c fe ff ff           # 0x00400ccf  call 0x400b00  → fill_rect
+bf 1e 02 00 00           # 0x00400cd4  mov edi,0x21e
+be 0e 00 00 00           # 0x00400cd9  mov esi,0xe
+ba 54 00 00 00           # 0x00400cde  mov edx,0x54
+b9 54 00 00 00           # 0x00400ce3  mov ecx,0x54
+41 b8 17 0e 0d 00        # 0x00400ce8  mov r8d,0xd0e17
+e8 0d fe ff ff           # 0x00400cee  call 0x400b00  → fill_rect
+31 db                    # 0x00400cf3  xor ebx,ebx
+0f b6 83 00 12 40 00     # 0x00400cf5  movzx eax,byte ptr [rbx+0x401200]
+85 c0                    # 0x00400cfc  test eax,eax
+74 30                    # 0x00400cfe  je 0x400d30
+44 8b 04 85 40 11 40 00  # 0x00400d00  mov r8d,[rax*4+0x401140]
+89 d8                    # 0x00400d08  mov eax,ebx
+83 e0 0f                 # 0x00400d0a  and eax,0xf
+6b f8 05                 # 0x00400d0d  imul edi,eax,5
+81 c7 20 02 00 00        # 0x00400d10  add edi,0x220
+89 d8                    # 0x00400d16  mov eax,ebx
+c1 e8 04                 # 0x00400d18  shr eax,4
+6b f0 05                 # 0x00400d1b  imul esi,eax,5
+83 c6 10                 # 0x00400d1e  add esi,0x10
+ba 04 00 00 00           # 0x00400d21  mov edx,4
+b9 04 00 00 00           # 0x00400d26  mov ecx,4
+e8 d0 fd ff ff           # 0x00400d2b  call 0x400b00  → fill_rect
+ff c3                    # 0x00400d30  inc ebx
+81 fb 00 01 00 00        # 0x00400d32  cmp ebx,0x100
+7c bb                    # 0x00400d38  jl 0x400cf5
+bb 20 11 40 00           # 0x00400d3a  mov ebx,0x401120
+f2 41 0f 10 07           # 0x00400d3f  movsd xmm0,[r15]
+f2 0f 59 03              # 0x00400d44  mulsd xmm0,[rbx]
+f2 0f 2c f8              # 0x00400d48  cvttsd2si edi,xmm0
+81 c7 1f 02 00 00        # 0x00400d4c  add edi,0x21f
+f2 41 0f 10 4f 08        # 0x00400d52  movsd xmm1,[r15+8]
+f2 0f 59 0b              # 0x00400d58  mulsd xmm1,[rbx]
+f2 0f 2c f1              # 0x00400d5c  cvttsd2si esi,xmm1
+83 c6 0f                 # 0x00400d60  add esi,0xf
+ba 03 00 00 00           # 0x00400d63  mov edx,3
+b9 03 00 00 00           # 0x00400d68  mov ecx,3
+41 b8 ff ff ff 00        # 0x00400d6d  mov r8d,0xffffff
+e8 88 fd ff ff           # 0x00400d73  call 0x400b00  → fill_rect
+f2 41 0f 10 47 18        # 0x00400d78  movsd xmm0,[r15+0x18]
+f2 0f 59 43 a0           # 0x00400d7e  mulsd xmm0,[rbx-0x60]
+f2 41 0f 58 07           # 0x00400d83  addsd xmm0,[r15]
+f2 0f 59 03              # 0x00400d88  mulsd xmm0,[rbx]
+f2 0f 2c f8              # 0x00400d8c  cvttsd2si edi,xmm0
+81 c7 1f 02 00 00        # 0x00400d90  add edi,0x21f
+f2 41 0f 10 4f 20        # 0x00400d96  movsd xmm1,[r15+0x20]
+f2 0f 59 4b a0           # 0x00400d9c  mulsd xmm1,[rbx-0x60]
+f2 41 0f 58 4f 08        # 0x00400da1  addsd xmm1,[r15+8]
+f2 0f 59 0b              # 0x00400da7  mulsd xmm1,[rbx]
+f2 0f 2c f1              # 0x00400dab  cvttsd2si esi,xmm1
+83 c6 0f                 # 0x00400daf  add esi,0xf
+ba 02 00 00 00           # 0x00400db2  mov edx,2
+b9 02 00 00 00           # 0x00400db7  mov ecx,2
+41 b8 af e2 f9 00        # 0x00400dbc  mov r8d,0xf9e2af
+e8 39 fd ff ff           # 0x00400dc2  call 0x400b00  → fill_rect
+41 5e                    # 0x00400dc7  pop r14
+41 5d                    # 0x00400dc9  pop r13
+41 5c                    # 0x00400dcb  pop r12
+5d                       # 0x00400dcd  pop rbp
+5b                       # 0x00400dce  pop rbx
+c3                       # 0x00400dcf  ret

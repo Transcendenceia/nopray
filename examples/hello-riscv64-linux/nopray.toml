@@ -1,0 +1,63 @@
+[app]
+name = "hello-riscv64"
+version = "1.0.0"
+standard = "DMCS-1.1"
+tier = "L2"
+exposure = "local"
+description = "Minimal RV64I Linux program: write(1, msg, 18); exit(0). Uncompressed 32-bit instructions only; one r-x PT_LOAD and a non-executable stack."
+
+[target]
+isa = "riscv64"
+os = "linux"
+format = "elf64"
+base = 0x400000
+entry = "_start"
+output = "hello-riscv64"
+file_size = 0x180
+
+[[segment]]
+name = "text"
+vaddr = 0x400000
+offset = 0x0
+file_size = 0x180
+mem_size = 0x180
+perms = "r-x"
+align = 0x10000
+
+[syscalls]
+allow = ["write", "exit"]
+
+[provenance]
+authored_by = "Angie (AI agent)"
+method = "Every byte written as hex by hand from the RISC-V unprivileged ISA encoding tables; nopray only laid out and decoded."
+date = "2026-11-24"
+
+[[slot]]
+name = "elf_header"
+kind = "header"
+vaddr = 0x400000
+size = 0x100
+file = "slots/0000_elf_header.hex"
+purpose = "ELF64 header (EM_RISCV, e_flags 0 = no RVC, soft-float ABI) + PT_LOAD r-x + PT_GNU_STACK rw-"
+
+[[slot]]
+name = "_start"
+kind = "code"
+vaddr = 0x400100
+size = 0x40
+file = "slots/0100_start.hex"
+purpose = "write(1, msg, 18) then exit(0)"
+[slot.contract]
+noreturn = true
+
+[[slot]]
+name = "rodata"
+kind = "rodata"
+vaddr = 0x400140
+size = 0x40
+file = "slots/0140_rodata.hex"
+purpose = "Message bytes"
+[[slot.label]]
+name = "msg"
+offset = 0x0
+note = "\"NOPRAY riscv64 OK\\n\", 18 bytes"

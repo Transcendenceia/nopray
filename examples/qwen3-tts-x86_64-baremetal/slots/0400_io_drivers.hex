@@ -1,0 +1,405 @@
+# nopray slot `io_drivers` · code · vaddr 0x100400 · size 0x400 · used 550 bytes
+# purpose: Bare-metal hardware drivers: COM1 (0x3F8) telemetry serial, COM2 (0x2F8) raw binary WAV stream, PIT Channel 2 TSC calibration, isa-debug-exit / ACPI S5 poweroff
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# uart_init:
+#
+# io_drivers:
+ba f8 03 00 00     # 0x00100400  mov edx,0x3f8  #= mov edx, 0x3f8
+e8 0b 00 00 00     # 0x00100405  call 0x100415  #= call 0x100415
+ba f8 02 00 00     # 0x0010040a  mov edx,0x2f8  #= mov edx, 0x2f8
+e8 01 00 00 00     # 0x0010040f  call 0x100415  #= call 0x100415
+c3                 # 0x00100414  ret  #= ret
+83 c2 01           # 0x00100415  add edx,1  #= add edx, 1
+30 c0              # 0x00100418  xor al,al  #= xor al, al
+ee                 # 0x0010041a  out dx,al  #= out dx, al
+83 c2 02           # 0x0010041b  add edx,2  #= add edx, 2
+b0 80              # 0x0010041e  mov al,0x80  #= mov al, 0x80
+ee                 # 0x00100420  out dx,al  #= out dx, al
+83 ea 03           # 0x00100421  sub edx,3  #= sub edx, 3
+b0 01              # 0x00100424  mov al,1  #= mov al, 1
+ee                 # 0x00100426  out dx,al  #= out dx, al
+83 c2 01           # 0x00100427  add edx,1  #= add edx, 1
+30 c0              # 0x0010042a  xor al,al  #= xor al, al
+ee                 # 0x0010042c  out dx,al  #= out dx, al
+83 c2 02           # 0x0010042d  add edx,2  #= add edx, 2
+b0 03              # 0x00100430  mov al,3  #= mov al, 3
+ee                 # 0x00100432  out dx,al  #= out dx, al
+83 ea 01           # 0x00100433  sub edx,1  #= sub edx, 1
+b0 c7              # 0x00100436  mov al,0xc7  #= mov al, 0xc7
+ee                 # 0x00100438  out dx,al  #= out dx, al
+83 c2 02           # 0x00100439  add edx,2  #= add edx, 2
+b0 0b              # 0x0010043c  mov al,0xb  #= mov al, 0xb
+ee                 # 0x0010043e  out dx,al  #= out dx, al
+c3                 # 0x0010043f  ret  #= ret
+#
+# com1_putc:
+50                 # 0x00100440  push rax  #= push rax
+ba fd 03 00 00     # 0x00100441  mov edx,0x3fd  #= mov edx, 0x3fd
+ec                 # 0x00100446  in al,dx  #= in al, dx
+a8 20              # 0x00100447  test al,0x20  #= test al, 0x20
+74 fb              # 0x00100449  je 0x100446  #= jz 0x100446
+58                 # 0x0010044b  pop rax  #= pop rax
+ba f8 03 00 00     # 0x0010044c  mov edx,0x3f8  #= mov edx, 0x3f8
+ee                 # 0x00100451  out dx,al  #= out dx, al
+c3                 # 0x00100452  ret  #= ret
+90                 # 0x00100453  nop
+90                 # 0x00100454  nop
+90                 # 0x00100455  nop
+90                 # 0x00100456  nop
+90                 # 0x00100457  nop
+90                 # 0x00100458  nop
+90                 # 0x00100459  nop
+90                 # 0x0010045a  nop
+90                 # 0x0010045b  nop
+90                 # 0x0010045c  nop
+90                 # 0x0010045d  nop
+90                 # 0x0010045e  nop
+90                 # 0x0010045f  nop
+#
+# com1_puts:
+8a 07              # 0x00100460  mov al,[rdi]  #= mov al, [rdi]
+84 c0              # 0x00100462  test al,al  #= test al, al
+74 0a              # 0x00100464  je 0x100470  #= jz 0x100470
+e8 d5 ff ff ff     # 0x00100466  call 0x100440  → com1_putc  #= call com1_putc
+48 ff c7           # 0x0010046b  inc rdi  #= inc rdi
+eb f0              # 0x0010046e  jmp 0x100460  → com1_puts  #= jmp 0x100460
+c3                 # 0x00100470  ret  #= ret
+90                 # 0x00100471  nop
+90                 # 0x00100472  nop
+90                 # 0x00100473  nop
+90                 # 0x00100474  nop
+90                 # 0x00100475  nop
+90                 # 0x00100476  nop
+90                 # 0x00100477  nop
+90                 # 0x00100478  nop
+90                 # 0x00100479  nop
+90                 # 0x0010047a  nop
+90                 # 0x0010047b  nop
+90                 # 0x0010047c  nop
+90                 # 0x0010047d  nop
+90                 # 0x0010047e  nop
+90                 # 0x0010047f  nop
+90                 # 0x00100480  nop
+90                 # 0x00100481  nop
+90                 # 0x00100482  nop
+90                 # 0x00100483  nop
+90                 # 0x00100484  nop
+90                 # 0x00100485  nop
+90                 # 0x00100486  nop
+90                 # 0x00100487  nop
+90                 # 0x00100488  nop
+90                 # 0x00100489  nop
+90                 # 0x0010048a  nop
+90                 # 0x0010048b  nop
+90                 # 0x0010048c  nop
+90                 # 0x0010048d  nop
+90                 # 0x0010048e  nop
+90                 # 0x0010048f  nop
+#
+# com1_put_hex64:
+b9 10 00 00 00     # 0x00100490  mov ecx,0x10  #= mov ecx, 0x10
+48 c1 c7 04        # 0x00100495  rol rdi,4  #= rol rdi, 4
+89 f8              # 0x00100499  mov eax,edi  #= mov eax, edi
+24 0f              # 0x0010049b  and al,0xf  #= and al, 0xf
+3c 0a              # 0x0010049d  cmp al,0xa  #= cmp al, 0xa
+72 04              # 0x0010049f  jb 0x1004a5  #= jb 0x1004a5
+04 57              # 0x001004a1  add al,0x57  #= add al, 0x57
+eb 02              # 0x001004a3  jmp 0x1004a7  #= jmp 0x1004a7
+04 30              # 0x001004a5  add al,0x30  #= add al, 0x30
+e8 94 ff ff ff     # 0x001004a7  call 0x100440  → com1_putc  #= call com1_putc
+ff c9              # 0x001004ac  dec ecx  #= dec ecx
+75 e5              # 0x001004ae  jne 0x100495  #= jnz 0x100495
+c3                 # 0x001004b0  ret  #= ret
+90                 # 0x001004b1  nop
+90                 # 0x001004b2  nop
+90                 # 0x001004b3  nop
+90                 # 0x001004b4  nop
+90                 # 0x001004b5  nop
+90                 # 0x001004b6  nop
+90                 # 0x001004b7  nop
+90                 # 0x001004b8  nop
+90                 # 0x001004b9  nop
+90                 # 0x001004ba  nop
+90                 # 0x001004bb  nop
+90                 # 0x001004bc  nop
+90                 # 0x001004bd  nop
+90                 # 0x001004be  nop
+90                 # 0x001004bf  nop
+90                 # 0x001004c0  nop
+90                 # 0x001004c1  nop
+90                 # 0x001004c2  nop
+90                 # 0x001004c3  nop
+90                 # 0x001004c4  nop
+90                 # 0x001004c5  nop
+90                 # 0x001004c6  nop
+90                 # 0x001004c7  nop
+90                 # 0x001004c8  nop
+90                 # 0x001004c9  nop
+90                 # 0x001004ca  nop
+90                 # 0x001004cb  nop
+90                 # 0x001004cc  nop
+90                 # 0x001004cd  nop
+90                 # 0x001004ce  nop
+90                 # 0x001004cf  nop
+90                 # 0x001004d0  nop
+90                 # 0x001004d1  nop
+90                 # 0x001004d2  nop
+90                 # 0x001004d3  nop
+90                 # 0x001004d4  nop
+90                 # 0x001004d5  nop
+90                 # 0x001004d6  nop
+90                 # 0x001004d7  nop
+90                 # 0x001004d8  nop
+90                 # 0x001004d9  nop
+90                 # 0x001004da  nop
+90                 # 0x001004db  nop
+90                 # 0x001004dc  nop
+90                 # 0x001004dd  nop
+90                 # 0x001004de  nop
+90                 # 0x001004df  nop
+#
+# com1_put_u64:
+48 89 f8           # 0x001004e0  mov rax,rdi  #= mov rax, rdi
+31 c9              # 0x001004e3  xor ecx,ecx  #= xor ecx, ecx
+41 b8 0a 00 00 00  # 0x001004e5  mov r8d,0xa  #= mov r8d, 0xa
+31 d2              # 0x001004eb  xor edx,edx  #= xor edx, edx
+49 f7 f0           # 0x001004ed  div r8  #= div r8
+80 c2 30           # 0x001004f0  add dl,0x30  #= add dl, 0x30
+52                 # 0x001004f3  push rdx  #= push rdx
+ff c1              # 0x001004f4  inc ecx  #= inc ecx
+48 85 c0           # 0x001004f6  test rax,rax  #= test rax, rax
+75 f0              # 0x001004f9  jne 0x1004eb  #= jnz 0x1004eb
+58                 # 0x001004fb  pop rax  #= pop rax
+e8 3f ff ff ff     # 0x001004fc  call 0x100440  → com1_putc  #= call com1_putc
+ff c9              # 0x00100501  dec ecx  #= dec ecx
+75 f6              # 0x00100503  jne 0x1004fb  #= jnz 0x1004fb
+c3                 # 0x00100505  ret  #= ret
+90                 # 0x00100506  nop
+90                 # 0x00100507  nop
+90                 # 0x00100508  nop
+90                 # 0x00100509  nop
+90                 # 0x0010050a  nop
+90                 # 0x0010050b  nop
+90                 # 0x0010050c  nop
+90                 # 0x0010050d  nop
+90                 # 0x0010050e  nop
+90                 # 0x0010050f  nop
+90                 # 0x00100510  nop
+90                 # 0x00100511  nop
+90                 # 0x00100512  nop
+90                 # 0x00100513  nop
+90                 # 0x00100514  nop
+90                 # 0x00100515  nop
+90                 # 0x00100516  nop
+90                 # 0x00100517  nop
+90                 # 0x00100518  nop
+90                 # 0x00100519  nop
+90                 # 0x0010051a  nop
+90                 # 0x0010051b  nop
+90                 # 0x0010051c  nop
+90                 # 0x0010051d  nop
+90                 # 0x0010051e  nop
+90                 # 0x0010051f  nop
+90                 # 0x00100520  nop
+90                 # 0x00100521  nop
+90                 # 0x00100522  nop
+90                 # 0x00100523  nop
+90                 # 0x00100524  nop
+90                 # 0x00100525  nop
+90                 # 0x00100526  nop
+90                 # 0x00100527  nop
+90                 # 0x00100528  nop
+90                 # 0x00100529  nop
+90                 # 0x0010052a  nop
+90                 # 0x0010052b  nop
+90                 # 0x0010052c  nop
+90                 # 0x0010052d  nop
+90                 # 0x0010052e  nop
+90                 # 0x0010052f  nop
+90                 # 0x00100530  nop
+90                 # 0x00100531  nop
+90                 # 0x00100532  nop
+90                 # 0x00100533  nop
+90                 # 0x00100534  nop
+90                 # 0x00100535  nop
+90                 # 0x00100536  nop
+90                 # 0x00100537  nop
+90                 # 0x00100538  nop
+90                 # 0x00100539  nop
+90                 # 0x0010053a  nop
+90                 # 0x0010053b  nop
+90                 # 0x0010053c  nop
+90                 # 0x0010053d  nop
+90                 # 0x0010053e  nop
+90                 # 0x0010053f  nop
+#
+# com2_write:
+48 89 f1           # 0x00100540  mov rcx,rsi  #= mov rcx, rsi
+48 89 fe           # 0x00100543  mov rsi,rdi  #= mov rsi, rdi
+ba e9 00 00 00     # 0x00100546  mov edx,0xe9  #= mov edx, 0xe9
+fc                 # 0x0010054b  cld  #= cld
+f3 6e              # 0x0010054c  rep outsb dx,[rsi]  #= rep outsb dx, byte ptr [rsi]
+c3                 # 0x0010054e  ret  #= ret
+90                 # 0x0010054f  nop
+90                 # 0x00100550  nop
+90                 # 0x00100551  nop
+90                 # 0x00100552  nop
+90                 # 0x00100553  nop
+90                 # 0x00100554  nop
+90                 # 0x00100555  nop
+90                 # 0x00100556  nop
+90                 # 0x00100557  nop
+90                 # 0x00100558  nop
+90                 # 0x00100559  nop
+90                 # 0x0010055a  nop
+90                 # 0x0010055b  nop
+90                 # 0x0010055c  nop
+90                 # 0x0010055d  nop
+90                 # 0x0010055e  nop
+90                 # 0x0010055f  nop
+90                 # 0x00100560  nop
+90                 # 0x00100561  nop
+90                 # 0x00100562  nop
+90                 # 0x00100563  nop
+90                 # 0x00100564  nop
+90                 # 0x00100565  nop
+90                 # 0x00100566  nop
+90                 # 0x00100567  nop
+90                 # 0x00100568  nop
+90                 # 0x00100569  nop
+90                 # 0x0010056a  nop
+90                 # 0x0010056b  nop
+90                 # 0x0010056c  nop
+90                 # 0x0010056d  nop
+90                 # 0x0010056e  nop
+90                 # 0x0010056f  nop
+90                 # 0x00100570  nop
+90                 # 0x00100571  nop
+90                 # 0x00100572  nop
+90                 # 0x00100573  nop
+90                 # 0x00100574  nop
+90                 # 0x00100575  nop
+90                 # 0x00100576  nop
+90                 # 0x00100577  nop
+90                 # 0x00100578  nop
+90                 # 0x00100579  nop
+90                 # 0x0010057a  nop
+90                 # 0x0010057b  nop
+90                 # 0x0010057c  nop
+90                 # 0x0010057d  nop
+90                 # 0x0010057e  nop
+90                 # 0x0010057f  nop
+#
+# pit_calibrate_tsc:
+90                 # 0x00100580  nop
+90                 # 0x00100581  nop
+90                 # 0x00100582  nop
+e4 61              # 0x00100583  in al,0x61  #= in al, 0x61
+24 fd              # 0x00100585  and al,0xfd  #= and al, 0xfd
+0c 01              # 0x00100587  or al,1  #= or al, 1
+e6 61              # 0x00100589  out 0x61,al  #= out 0x61, al
+b0 b0              # 0x0010058b  mov al,0xb0  #= mov al, 0xb0
+e6 43              # 0x0010058d  out 0x43,al  #= out 0x43, al
+b0 9c              # 0x0010058f  mov al,0x9c  #= mov al, 0x9c
+e6 42              # 0x00100591  out 0x42,al  #= out 0x42, al
+b0 2e              # 0x00100593  mov al,0x2e  #= mov al, 0x2e
+e6 42              # 0x00100595  out 0x42,al  #= out 0x42, al
+0f 31              # 0x00100597  rdtsc  #= rdtsc
+48 c1 e2 20        # 0x00100599  shl rdx,0x20  #= shl rdx, 0x20
+48 09 d0           # 0x0010059d  or rax,rdx  #= or rax, rdx
+49 89 c0           # 0x001005a0  mov r8,rax  #= mov r8, rax
+e4 61              # 0x001005a3  in al,0x61  #= in al, 0x61
+a8 20              # 0x001005a5  test al,0x20  #= test al, 0x20
+74 fa              # 0x001005a7  je 0x1005a3  #= jz 0x1005a3
+0f 31              # 0x001005a9  rdtsc  #= rdtsc
+48 c1 e2 20        # 0x001005ab  shl rdx,0x20  #= shl rdx, 0x20
+48 09 d0           # 0x001005af  or rax,rdx  #= or rax, rdx
+4c 29 c0           # 0x001005b2  sub rax,r8  #= sub rax, r8
+31 d2              # 0x001005b5  xor edx,edx  #= xor edx, edx
+b9 0a 00 00 00     # 0x001005b7  mov ecx,0xa  #= mov ecx, 0xa
+48 f7 f1           # 0x001005bc  div rcx  #= div rcx
+c3                 # 0x001005bf  ret  #= ret
+90                 # 0x001005c0  nop
+90                 # 0x001005c1  nop
+90                 # 0x001005c2  nop
+90                 # 0x001005c3  nop
+90                 # 0x001005c4  nop
+90                 # 0x001005c5  nop
+90                 # 0x001005c6  nop
+90                 # 0x001005c7  nop
+90                 # 0x001005c8  nop
+90                 # 0x001005c9  nop
+90                 # 0x001005ca  nop
+90                 # 0x001005cb  nop
+90                 # 0x001005cc  nop
+90                 # 0x001005cd  nop
+90                 # 0x001005ce  nop
+90                 # 0x001005cf  nop
+90                 # 0x001005d0  nop
+90                 # 0x001005d1  nop
+90                 # 0x001005d2  nop
+90                 # 0x001005d3  nop
+90                 # 0x001005d4  nop
+90                 # 0x001005d5  nop
+90                 # 0x001005d6  nop
+90                 # 0x001005d7  nop
+90                 # 0x001005d8  nop
+90                 # 0x001005d9  nop
+90                 # 0x001005da  nop
+90                 # 0x001005db  nop
+90                 # 0x001005dc  nop
+90                 # 0x001005dd  nop
+90                 # 0x001005de  nop
+90                 # 0x001005df  nop
+90                 # 0x001005e0  nop
+90                 # 0x001005e1  nop
+90                 # 0x001005e2  nop
+90                 # 0x001005e3  nop
+90                 # 0x001005e4  nop
+90                 # 0x001005e5  nop
+90                 # 0x001005e6  nop
+90                 # 0x001005e7  nop
+90                 # 0x001005e8  nop
+90                 # 0x001005e9  nop
+90                 # 0x001005ea  nop
+90                 # 0x001005eb  nop
+90                 # 0x001005ec  nop
+90                 # 0x001005ed  nop
+90                 # 0x001005ee  nop
+90                 # 0x001005ef  nop
+90                 # 0x001005f0  nop
+90                 # 0x001005f1  nop
+90                 # 0x001005f2  nop
+90                 # 0x001005f3  nop
+90                 # 0x001005f4  nop
+90                 # 0x001005f5  nop
+90                 # 0x001005f6  nop
+90                 # 0x001005f7  nop
+90                 # 0x001005f8  nop
+90                 # 0x001005f9  nop
+90                 # 0x001005fa  nop
+90                 # 0x001005fb  nop
+90                 # 0x001005fc  nop
+90                 # 0x001005fd  nop
+90                 # 0x001005fe  nop
+90                 # 0x001005ff  nop
+#
+# poweroff:
+90                 # 0x00100600  nop
+90                 # 0x00100601  nop
+90                 # 0x00100602  nop
+90                 # 0x00100603  nop
+ba f4 00 00 00     # 0x00100604  mov edx,0xf4  #= mov edx, 0xf4
+30 c0              # 0x00100609  xor al,al  #= xor al, al
+ee                 # 0x0010060b  out dx,al  #= out dx, al
+ba 04 06 00 00     # 0x0010060c  mov edx,0x604  #= mov edx, 0x604
+66 b8 00 20        # 0x00100611  mov ax,0x2000  #= mov ax, 0x2000
+66 ef              # 0x00100615  out dx,ax  #= out dx, ax
+ba 04 b0 00 00     # 0x00100617  mov edx,0xb004  #= mov edx, 0xb004
+66 b8 00 20        # 0x0010061c  mov ax,0x2000  #= mov ax, 0x2000
+66 ef              # 0x00100620  out dx,ax  #= out dx, ax
+fa                 # 0x00100622  cli  #= cli
+f4                 # 0x00100623  hlt  #= hlt
+eb fd              # 0x00100624  jmp 0x100623  #= jmp 0x100623

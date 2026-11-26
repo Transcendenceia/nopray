@@ -1,0 +1,631 @@
+{
+  "app": "nopray3d",
+  "version": "1.0.0",
+  "isa": "x86-64",
+  "tier": "L2",
+  "exposure": "local",
+  "size": 8192,
+  "sha256": "3a26bb5088b0de9b84d11012a4368b1937c0e72b37b8e1df284d3a2627cd8728",
+  "reference": "examples/nopray3d-x86_64-cachyos/build/nopray3d",
+  "findings": [
+    {
+      "severity": "warning",
+      "code": "S003",
+      "message": "no PT_GNU_STACK header: declare the stack non-executable explicitly (rw-)"
+    },
+    {
+      "severity": "warning",
+      "code": "C015",
+      "slot": "_start",
+      "addr": "0x40030a",
+      "message": "execution falls through the slot end and slides over its NOP padding into `main_loop`: an implicit coupling; end with an explicit jmp/ret/exit"
+    },
+    {
+      "severity": "info",
+      "code": "R000",
+      "message": "examples/nopray3d-x86_64-cachyos/build/nopray3d is byte-identical to the map (8192 bytes)"
+    }
+  ],
+  "slots": [
+    {
+      "name": "elf_header",
+      "kind": "header",
+      "vaddr": "0x400000",
+      "size": 176,
+      "used": 170,
+      "sha256": "9550136d5fe628f00047676787adf85097ecc1e9ee267435a5c8516540f706c1",
+      "purpose": "ELF64 header + PT_LOAD r-x (0x400000) + PT_LOAD rw- (0x404000, 1 MiB)",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [
+        "render_3d"
+      ],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "read_exact",
+      "kind": "code",
+      "vaddr": "0x4000b0",
+      "size": 32,
+      "used": 31,
+      "sha256": "ba4b3b3bd08aedae6e2bddec385f4201494337725e29b7db83d7756b5390af11",
+      "purpose": "read(fd, buf, len) until complete",
+      "coverage": "full",
+      "instructions": 13,
+      "calls": [],
+      "called_by": [
+        "_start",
+        "main_loop"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [
+        "read"
+      ],
+      "writes": [
+        "r11",
+        "rax",
+        "rcx",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "write_all",
+      "kind": "code",
+      "vaddr": "0x4000d0",
+      "size": 32,
+      "used": 26,
+      "sha256": "5421677889df141fa785382d75a8526ee3ea9f00b20dfcea7a0b695c715b239a",
+      "purpose": "write(fd, buf, len) until complete",
+      "coverage": "full",
+      "instructions": 10,
+      "calls": [],
+      "called_by": [
+        "_start",
+        "blit_x11"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [
+        "write"
+      ],
+      "writes": [
+        "r11",
+        "rax",
+        "rcx",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "exit_clean",
+      "kind": "code",
+      "vaddr": "0x4000f0",
+      "size": 16,
+      "used": 9,
+      "sha256": "0de0e8a3bc54fa92348eef57e187accddf29c9a589f9ba3ebf29c53217bb83de",
+      "purpose": "exit(0)",
+      "coverage": "full",
+      "instructions": 3,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [
+        "exit"
+      ],
+      "writes": [
+        "r11",
+        "rax",
+        "rcx",
+        "rdi"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "_start",
+      "kind": "code",
+      "vaddr": "0x400100",
+      "size": 576,
+      "used": 530,
+      "sha256": "21133679bf57223729d39a7456f879753bc72662310c7d8af0364869ef2e2191",
+      "purpose": "r15 = state; X11 connect + handshake; CreateWindow 640x360; WM_NAME, WM_NORMAL_HINTS, CreateGC, MapWindow; initial pose",
+      "coverage": "full",
+      "instructions": 118,
+      "calls": [
+        "read_exact",
+        "write_all"
+      ],
+      "called_by": [],
+      "jumps_to": [
+        "exit_clean",
+        "main_loop"
+      ],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [
+        "connect",
+        "socket"
+      ],
+      "writes": [
+        "r11",
+        "r15",
+        "rax",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "+0x48",
+        "+0x4c",
+        "+0x50",
+        "+0x54",
+        "+0x58"
+      ],
+      "state_writes": [
+        "+0x0",
+        "+0x10",
+        "+0x3c",
+        "+0x40",
+        "+0x48",
+        "+0x4c",
+        "+0x50",
+        "+0x54",
+        "+0x58",
+        "+0x60",
+        "+0x64",
+        "+0x8"
+      ],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "main_loop",
+      "kind": "code",
+      "vaddr": "0x400340",
+      "size": 384,
+      "used": 235,
+      "sha256": "3ba759c296076deaebdfabab4372fc6e51fdae3b3a136878f37e163232edc8e6",
+      "purpose": "~60 FPS loop: poll(fd,0) drains held keys, poll(fd,16ms) paces frames",
+      "coverage": "full",
+      "instructions": 64,
+      "calls": [
+        "blit_x11",
+        "draw_hud",
+        "read_exact",
+        "render_3d",
+        "update_player"
+      ],
+      "called_by": [],
+      "jumps_to": [
+        "exit_clean"
+      ],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [
+        "poll"
+      ],
+      "writes": [
+        "r11",
+        "rax",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "+0x48",
+        "+0x60"
+      ],
+      "state_writes": [
+        "+0x38",
+        "+0x3c",
+        "+0x40"
+      ],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "update_player",
+      "kind": "code",
+      "vaddr": "0x4004c0",
+      "size": 512,
+      "used": 416,
+      "sha256": "b9e5b2d54543562684d4036d97b4320a503aef86efe229f5e453785888880ff8",
+      "purpose": "x87 fsincos camera, 16:9 plane, autopilot tour or WASD/arrows, sliding collision",
+      "coverage": "full",
+      "instructions": 104,
+      "calls": [],
+      "called_by": [
+        "main_loop"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "rax",
+        "rbx",
+        "rcx",
+        "rsp",
+        "st0",
+        "zmm0",
+        "zmm1",
+        "zmm2",
+        "zmm3",
+        "zmm4"
+      ],
+      "state_reads": [
+        "+0x0",
+        "+0x10",
+        "+0x18",
+        "+0x20",
+        "+0x38",
+        "+0x3c",
+        "+0x8"
+      ],
+      "state_writes": [
+        "+0x0",
+        "+0x10",
+        "+0x18",
+        "+0x20",
+        "+0x28",
+        "+0x30",
+        "+0x44",
+        "+0x8"
+      ],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "render_3d",
+      "kind": "code",
+      "vaddr": "0x4006c0",
+      "size": 1088,
+      "used": 919,
+      "sha256": "421140f9d3f20af311de9f8f77512c3e15d785f6d5d964738770bbf12d279c0a",
+      "purpose": "DDA raycaster over 640 columns in SSE2 double: sky/floor, 5 procedural materials, N/S shading, distance fog",
+      "coverage": "full",
+      "instructions": 261,
+      "calls": [],
+      "called_by": [
+        "main_loop"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "elf_header",
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r8",
+        "r9",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp",
+        "zmm0",
+        "zmm1",
+        "zmm2",
+        "zmm3",
+        "zmm4",
+        "zmm5",
+        "zmm6",
+        "zmm7"
+      ],
+      "state_reads": [
+        "+0x0",
+        "+0x18",
+        "+0x20",
+        "+0x28",
+        "+0x30",
+        "+0x44",
+        "+0x8"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "fill_rect",
+      "kind": "code",
+      "vaddr": "0x400b00",
+      "size": 64,
+      "used": 44,
+      "sha256": "7528a421f68e0a834984faed27958ff45aedccf65bbfda1663358d47d159dbe4",
+      "purpose": "fill_rect with rep stosd on a 640x4 stride",
+      "coverage": "full",
+      "instructions": 15,
+      "calls": [],
+      "called_by": [
+        "draw_glyph",
+        "draw_hud"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "rax",
+        "rcx",
+        "rdi",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "draw_glyph",
+      "kind": "code",
+      "vaddr": "0x400b40",
+      "size": 192,
+      "used": 93,
+      "sha256": "382e44514857b274454bafd0939efb44bf5bfb1d2ba9909c79f86e775e22a3b2",
+      "purpose": "draw_glyph from the 5x7 HUD font",
+      "coverage": "full",
+      "instructions": 34,
+      "calls": [
+        "fill_rect"
+      ],
+      "called_by": [
+        "draw_hud"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r9",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "draw_hud",
+      "kind": "code",
+      "vaddr": "0x400c00",
+      "size": 640,
+      "used": 464,
+      "sha256": "b5189cb9dcff7a28f555aba0ade5cab86e300306dc3a949f7c4bd13d6413c12b",
+      "purpose": "Crosshair, NOPRAY 3D badge, 80x80 color minimap with player and view vector",
+      "coverage": "full",
+      "instructions": 108,
+      "calls": [
+        "draw_glyph",
+        "fill_rect"
+      ],
+      "called_by": [
+        "main_loop"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r12",
+        "r13",
+        "r14",
+        "r8",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp",
+        "zmm0",
+        "zmm1"
+      ],
+      "state_reads": [
+        "+0x0",
+        "+0x18",
+        "+0x20",
+        "+0x40",
+        "+0x8"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "blit_x11",
+      "kind": "code",
+      "vaddr": "0x400e80",
+      "size": 384,
+      "used": 128,
+      "sha256": "2af4a8ae8cf5e9bc5ffd98c7091801251dde58334d6aa8f3d9892a07a2885a42",
+      "purpose": "Flicker-free X11 PutImage in 4 strips of 640x90",
+      "coverage": "full",
+      "instructions": 38,
+      "calls": [
+        "write_all"
+      ],
+      "called_by": [
+        "main_loop"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r12",
+        "r13",
+        "rax",
+        "rbp",
+        "rbx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "+0x48",
+        "+0x4c",
+        "+0x58"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "rodata",
+      "kind": "rodata",
+      "vaddr": "0x401000",
+      "size": 4096,
+      "used": 831,
+      "sha256": "5df6f45664401e4eeab027853a4816f513061bd4d009b7d70cccb21aa7dd846b",
+      "purpose": "sockaddr_un, WM_SIZE_HINTS, 24 IEEE-754 constants (ABS_MASK at 0x401100), palette, key table, 16x16 map, 5x7 font",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [
+        "_start",
+        "draw_hud",
+        "main_loop",
+        "render_3d",
+        "update_player"
+      ],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    }
+  ],
+  "syscall_sites": [
+    {
+      "slot": "read_exact",
+      "addr": "0x4000b7",
+      "number": 0,
+      "name": "read"
+    },
+    {
+      "slot": "write_all",
+      "addr": "0x4000da",
+      "number": 1,
+      "name": "write"
+    },
+    {
+      "slot": "exit_clean",
+      "addr": "0x4000f7",
+      "number": 60,
+      "name": "exit"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x400117",
+      "number": 41,
+      "name": "socket"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x40013e",
+      "number": 42,
+      "name": "connect"
+    },
+    {
+      "slot": "main_loop",
+      "addr": "0x400350",
+      "number": 7,
+      "name": "poll"
+    },
+    {
+      "slot": "main_loop",
+      "addr": "0x400424",
+      "number": 7,
+      "name": "poll"
+    }
+  ],
+  "syscall_set": [
+    "connect",
+    "exit",
+    "poll",
+    "read",
+    "socket",
+    "write"
+  ]
+}

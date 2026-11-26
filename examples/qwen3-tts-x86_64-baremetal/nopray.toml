@@ -1,0 +1,497 @@
+[app]
+name = "nopray-qwen-tts"
+version = "1.0.0"
+standard = "DMCS-1.1"
+tier = "L3"
+exposure = "local"
+description = "Pure NOPRAY bare-metal x86-64 VM (Multiboot 1 ELF32 -> 64-bit Long Mode + AVX2/FMA/F16C) for Qwen3-TTS-12Hz-0.6B-CustomVoice. Zero Linux, zero compiler, zero assembler."
+
+[target]
+isa = "x86-64"
+os = "bare-metal"
+format = "elf32"
+base = 0x00100000
+entry = "boot32"
+output = "nopray-qwen-tts.elf"
+file_size = 0x8000
+state_register = "r15"
+state_base = 0x0010c000
+
+[provenance]
+authored_by = "Angie (Antigravity)"
+method = "Hand-authored hexadecimal opcodes with #= intents; verified via nopray audit --strict"
+date = "2026-11-26"
+notes = "Bare-metal Multiboot 1 x86-64 VM; external DMCS-L3 weights loaded zero-copy via QEMU -initrd."
+
+[[segment]]
+name = "text_rodata"
+vaddr = 0x00100000
+offset = 0x0000
+file_size = 0x7000
+mem_size = 0x7000
+perms = "r-x"
+align = 0x1000
+
+[[segment]]
+name = "data_bss"
+vaddr = 0x0010c000
+offset = 0x7000
+file_size = 0x1000
+mem_size = 0x44000
+perms = "rw-"
+align = 0x1000
+
+[[state]]
+name = "mb_magic"
+vaddr = 0x0010c000
+size = 4
+note = "Multiboot 1 bootloader magic (expected 0x2BADB002)"
+
+[[state]]
+name = "mb_info"
+vaddr = 0x0010c004
+size = 4
+note = "Multiboot 1 info physical pointer"
+
+[[state]]
+name = "boot_tsc"
+vaddr = 0x0010c008
+size = 8
+note = "RDTSC captured at boot32 entry"
+
+[[state]]
+name = "tsc_per_ms"
+vaddr = 0x0010c010
+size = 8
+note = "PIT-calibrated TSC ticks per millisecond"
+
+[[state]]
+name = "weights_base"
+vaddr = 0x0010c018
+size = 8
+note = "Zero-copy physical base address of Multiboot initrd weights.nqts"
+
+[[state]]
+name = "weights_size"
+vaddr = 0x0010c020
+size = 8
+note = "Byte length of Multiboot initrd weights.nqts"
+
+[[state]]
+name = "arena_base"
+vaddr = 0x0010c028
+size = 8
+note = "2 MiB-aligned dynamic RAM arena base above initrd"
+
+[[state]]
+name = "avx_test_buf"
+vaddr = 0x0010c040
+size = 32
+note = "32-byte aligned scratch for AVX2/FMA/F16C self-test"
+
+[[slot]]
+name = "elf32_hdr"
+kind = "header"
+vaddr = 0x00100000
+size = 0x100
+file = "slots/0000_elf32_hdr.hex"
+purpose = "ELF32 header, two W^X PT_LOAD program headers, and 12-byte Multiboot 1 header at +0x80"
+
+[[slot]]
+name = "boot32"
+kind = "code"
+bits = 32
+vaddr = 0x00100100
+size = 0x100
+file = "slots/0100_boot32.hex"
+purpose = "32-bit Multiboot 1 entry: zeroes BSS, builds 0..4 GiB 2 MiB huge-page identity map, enables PAE/LME/PG, loads GDT64 and far-jumps to boot64"
+
+[slot.contract]
+noreturn = true
+
+[[slot]]
+name = "boot64"
+kind = "code"
+vaddr = 0x00100200
+size = 0x200
+file = "slots/0200_boot64.hex"
+purpose = "64-bit Long Mode entry: loads data segments, sets RSP/R15, enables SSE/AVX2/FMA/F16C (XCR0=7, MXCSR), initializes UARTs, calibrates PIT TSC, locates Multiboot initrd, calls tts_main, powers off"
+
+[slot.contract]
+calls = ["uart_init", "pit_calibrate_tsc", "tts_main"]
+noreturn = true
+
+[[slot]]
+name = "io_drivers"
+kind = "code"
+vaddr = 0x00100400
+size = 0x400
+file = "slots/0400_io_drivers.hex"
+purpose = "Bare-metal hardware drivers: COM1 (0x3F8) telemetry serial, COM2 (0x2F8) raw binary WAV stream, PIT Channel 2 TSC calibration, isa-debug-exit / ACPI S5 poweroff"
+
+[[slot.label]]
+name = "uart_init"
+offset = 0x0
+entry = true
+note = "Initialize COM1 (0x3F8) and COM2 (0x2F8) to 115200 8N1 FIFO"
+
+[[slot.label]]
+name = "com1_putc"
+offset = 0x40
+entry = true
+note = "Write byte AL to COM1 (0x3F8)"
+
+[[slot.label]]
+name = "com1_puts"
+offset = 0x60
+entry = true
+note = "Write NUL-terminated string RDI to COM1"
+
+[[slot.label]]
+name = "com1_put_hex64"
+offset = 0x90
+entry = true
+note = "Write 16 hex nibbles of RDI to COM1"
+
+[[slot.label]]
+name = "com1_put_u64"
+offset = 0xe0
+entry = true
+note = "Write unsigned decimal RDI to COM1"
+
+[[slot.label]]
+name = "com2_write"
+offset = 0x140
+entry = true
+note = "Stream RSI raw bytes from RDI to QEMU isa-debugcon (0xE9) via batched rep outsb"
+
+[[slot.label]]
+name = "pit_calibrate_tsc"
+offset = 0x180
+entry = true
+note = "Measure 10 ms on PIT channel 2 and return TSC ticks per ms in RAX"
+
+[[slot.label]]
+name = "poweroff"
+offset = 0x200
+entry = true
+note = "Clean VM shutdown via QEMU isa-debug-exit (0xF4) / ACPI S5 (0x604)"
+
+[slot.contract]
+inputs = ["varies by entry point"]
+outputs = ["rax"]
+clobbers = ["rax", "rcx", "rdx", "rsi", "rdi", "r8", "r9"]
+
+[[slot]]
+name = "tts_main"
+kind = "code"
+vaddr = 0x00100800
+size = 0x400
+file = "slots/0800_tts_main.hex"
+purpose = "Main bare-metal Qwen3-TTS entry: runs Talker 28L + Code Predictor 5L + Speech Tokenizer 12Hz V2 Decoder + BigVGAN Vocoder, logs PIT timings on COM1, streams 24kHz S16LE WAV on COM2"
+
+[slot.contract]
+inputs = ["r15: state_base"]
+outputs = []
+clobbers = ["rax", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7", "ymm8", "ymm9", "ymm10", "ymm11", "ymm12", "ymm13", "ymm14", "ymm15"]
+calls = ["com1_puts", "com1_put_hex64", "com1_put_u64", "com1_putc", "com2_write", "run_talker_cp", "run_decoder_vocoder"]
+
+[[slot]]
+name = "rodata"
+kind = "rodata"
+vaddr = 0x00100c00
+size = 0x400
+file = "slots/0c00_rodata.hex"
+purpose = "64-bit GDT, GDTR pointer, MXCSR constant, telemetry strings, and FP16 test vector"
+
+[[slot.label]]
+name = "gdt64"
+offset = 0x0
+note = "3-entry 64-bit GDT (null, code 0x08, data 0x10)"
+
+[[slot.label]]
+name = "gdt64_ptr"
+offset = 0x18
+note = "10-byte GDTR descriptor pointing to gdt64"
+
+[[slot.label]]
+name = "default_mxcsr"
+offset = 0x24
+note = "MXCSR 0x00001F80"
+
+[[slot.label]]
+name = "str_banner"
+offset = 0x28
+note = "Boot banner string"
+
+[[slot.label]]
+name = "str_initrd"
+offset = 0x68
+note = "initrd base prefix"
+
+[[slot.label]]
+name = "str_size"
+offset = 0x78
+note = "initrd size prefix"
+
+[[slot.label]]
+name = "str_tsc"
+offset = 0x80
+note = "TSC kHz prefix"
+
+[[slot.label]]
+name = "str_avx_ok"
+offset = 0x90
+note = "AVX2/FMA/F16C status suffix"
+
+[[slot.label]]
+name = "test_f16_vals"
+offset = 0xb0
+note = "Eight FP16 test floats (1.0..8.0)"
+
+[[slot.label]]
+name = "str_stage_tk"
+offset = 0xc0
+note = "Talker timing prefix"
+
+[[slot.label]]
+name = "str_stage_dec"
+offset = 0xd0
+note = "Decoder timing prefix"
+
+[[slot.label]]
+name = "str_frames"
+offset = 0xe0
+note = "Frame count prefix"
+
+[[slot.label]]
+name = "str_total"
+offset = 0xf0
+note = "Total ms prefix"
+
+[[slot.label]]
+name = "fconst_base"
+offset = 0x100
+note = "IEEE-754 FP32 math constants table"
+
+[[slot.label]]
+name = "fconst_ext"
+offset = 0x180
+note = "Extra FP32/int32 masks and WAV scale constants"
+
+[[slot.label]]
+name = "wav_hdr_template"
+offset = 0x1a0
+note = "44-byte RIFF/WAVE PCM 24kHz mono 16-bit header template"
+
+[[slot.label]]
+name = "default_prompt_ids"
+offset = 0x1d0
+note = "29 int32 BPE token IDs for default Spanish prompt"
+
+[[slot]]
+name = "math_avx2"
+kind = "code"
+vaddr = 0x00101000
+size = 0x1000
+file = "slots/1000_math_avx2.hex"
+purpose = "Core AVX2+FMA+F16C neural math primitives: gemv_q8_0s, gemv_f16, rmsnorm, layernorm, expf_ymm0, sin2_ymm0, silu_mul, gelu_inplace, softmax_inplace, rope_apply, dequant_q8_row, dequant_f16_row, vec_add_inplace, snakebeta_channel"
+
+[[slot.label]]
+name = "gemv_q8_0s"
+offset = 0x0
+entry = true
+
+[[slot.label]]
+name = "gemv_f16"
+offset = 0x97
+entry = true
+
+[[slot.label]]
+name = "rmsnorm"
+offset = 0xee
+entry = true
+
+[[slot.label]]
+name = "layernorm"
+offset = 0x16f
+entry = true
+
+[[slot.label]]
+name = "expf_ymm0"
+offset = 0x239
+entry = true
+
+[[slot.label]]
+name = "sin2_ymm0"
+offset = 0x2d6
+entry = true
+
+[[slot.label]]
+name = "silu_mul"
+offset = 0x341
+entry = true
+
+[[slot.label]]
+name = "gelu_inplace"
+offset = 0x385
+entry = true
+
+[[slot.label]]
+name = "softmax_inplace"
+offset = 0x45d
+entry = true
+
+[[slot.label]]
+name = "rope_apply"
+offset = 0x538
+entry = true
+
+[[slot.label]]
+name = "dequant_q8_row"
+offset = 0x58e
+entry = true
+
+[[slot.label]]
+name = "dequant_f16_row"
+offset = 0x5fb
+entry = true
+
+[[slot.label]]
+name = "vec_add_inplace"
+offset = 0x61b
+entry = true
+
+[[slot.label]]
+name = "snakebeta_channel"
+offset = 0x63e
+entry = true
+
+[slot.contract]
+inputs = ["SysV AMD64 ABI (varies by entry point)"]
+outputs = ["varies by entry point"]
+clobbers = ["rax", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7", "ymm8", "ymm9", "ymm10"]
+
+[[slot]]
+name = "qwen3_layer"
+kind = "code"
+vaddr = 0x00102000
+size = 0x1000
+file = "slots/2000_qwen3_layer.hex"
+purpose = "Unified Qwen3 Transformer layer (RMSNorm, Q/K/V Q8_0S GEMV, QK-Norm, RoPE, KV-cache, GQA Attention, SwiGLU MLP) serving both Talker 28L and Code Predictor 5L"
+
+[[slot.label]]
+name = "dir_lookup"
+offset = 0x0
+entry = true
+
+[[slot.label]]
+name = "qwen3_gemv_tid"
+offset = 0x20
+entry = true
+
+[[slot.label]]
+name = "qwen3_forward_token"
+offset = 0x501
+entry = true
+
+[slot.contract]
+inputs = ["SysV AMD64 ABI"]
+outputs = ["rax"]
+clobbers = ["rax", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7", "ymm8", "ymm9", "ymm10"]
+calls = ["rmsnorm", "rope_apply", "softmax_inplace", "vec_add_inplace", "silu_mul"]
+
+[[slot]]
+name = "talker_cp"
+kind = "code"
+vaddr = 0x00103000
+size = 0x1000
+file = "slots/3000_talker_cp.hex"
+purpose = "Talker 28L + Code Predictor 5L autoregressive synthesis loop with suppression mask and repetition_penalty=1.05"
+
+[[slot.label]]
+name = "argmax_f32"
+offset = 0x0
+entry = true
+
+[[slot.label]]
+name = "run_talker_cp"
+offset = 0x4f
+entry = true
+
+[slot.contract]
+inputs = ["r15: state_base"]
+outputs = ["rax: frame count T"]
+clobbers = ["rax", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7", "ymm8", "ymm9", "ymm10"]
+calls = ["dir_lookup", "qwen3_forward_token", "qwen3_gemv_tid", "rmsnorm", "vec_add_inplace", "com1_putc"]
+
+[[slot]]
+name = "decoder_xfmr"
+kind = "code"
+vaddr = 0x00104000
+size = 0x1000
+file = "slots/4000_decoder_xfmr.hex"
+purpose = "Speech Tokenizer 12Hz V2 Decoder Part 1: 16-group RVQ lookup, causal pre_conv, input_proj, 8-layer sliding-window=72 causal Pre-Transformer, final norm and output_proj"
+
+[[slot.label]]
+name = "transpose_2d"
+offset = 0x0
+entry = true
+
+[[slot.label]]
+name = "run_decoder_xfmr"
+offset = 0xc2
+entry = true
+
+[slot.contract]
+inputs = ["rdi: frame count T", "r15: state_base"]
+outputs = []
+clobbers = ["rax", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7", "ymm8", "ymm9", "ymm10", "ymm11", "ymm12", "ymm13", "ymm14", "ymm15"]
+calls = ["dir_lookup", "vec_add_inplace", "conv1d_causal_tid", "rmsnorm", "rope_apply", "softmax_inplace", "silu_mul"]
+
+[[slot]]
+name = "decoder_vocoder"
+kind = "code"
+vaddr = 0x00105000
+size = 0x2000
+file = "slots/5000_decoder_vocoder.hex"
+purpose = "Speech Tokenizer 12Hz V2 Decoder Part 2: AVX2+FMA+F16C tiled Conv1d/ConvTranspose1d, DWConv, 2x ConvNeXt Upsample, 4-stage BigVGAN (rates 8,5,4,3) + SnakeBeta + S16LE PCM conversion"
+
+[[slot.label]]
+name = "conv1d_causal_tid"
+offset = 0x0
+entry = true
+
+[[slot.label]]
+name = "transconv1d_causal_tid"
+offset = 0x416
+entry = true
+
+[[slot.label]]
+name = "dwconv_causal_tid"
+offset = 0x873
+entry = true
+
+[[slot.label]]
+name = "snake_all_tid"
+offset = 0x92d
+entry = true
+
+[[slot.label]]
+name = "run_decoder_vocoder"
+offset = 0x9a6
+entry = true
+
+[slot.contract]
+inputs = ["rdi: frame count T", "r15: state_base"]
+outputs = ["rax: PCM sample count (T * 1920)"]
+clobbers = ["rax", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7", "ymm8", "ymm9", "ymm10", "ymm11", "ymm12", "ymm13", "ymm14", "ymm15"]
+calls = ["dir_lookup", "run_decoder_xfmr", "transpose_2d", "layernorm", "gelu_inplace", "vec_add_inplace", "snakebeta_channel", "com1_putc"]
+
+[[slot]]
+name = "data_zero"
+kind = "data"
+vaddr = 0x0010c000
+size = 0x1000
+file = "slots/c000_data.hex"
+purpose = "Initialised writable state page (4 KiB); remainder of data_bss segment is zeroed BSS (page tables + BSP stack)"

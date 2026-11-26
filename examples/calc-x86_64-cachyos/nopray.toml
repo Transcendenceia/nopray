@@ -1,0 +1,174 @@
+[app]
+name = "calc"
+version = "1.0.0"
+standard = "DMCS-1.1"
+tier = "L1"
+exposure = "local"
+description = "4,096-byte X11 desktop calculator (Reference #001). Single RWX PT_LOAD by design of tier L1: local use only."
+
+[target]
+isa = "x86-64"
+os = "linux"
+format = "elf64"
+base = 0x400000
+entry = "_start"
+output = "calc"
+file_size = 0x1000
+state_register = "r15"
+state_base = 0x402000
+
+[[segment]]
+name = "image"
+vaddr = 0x400000
+offset = 0x0
+file_size = 0x1000
+mem_size = 0xa0000
+perms = "rwx"
+align = 0x1000
+
+[syscalls]
+allow = ["read", "write", "socket", "connect", "exit"]
+
+[[state]]
+name = "state"
+vaddr = 0x402000
+size = 0x80
+note = "calculator registers, operator, flags"
+
+[[state]]
+name = "event_buf"
+vaddr = 0x402080
+size = 0x80
+note = "32-byte X11 events"
+
+[[state]]
+name = "request_buf"
+vaddr = 0x402100
+size = 0x100
+note = "outgoing X11 requests"
+
+[[state]]
+name = "setup_reply"
+vaddr = 0x402200
+size = 0x5e00
+note = "X11 connection setup reply"
+
+[[state]]
+name = "framebuffer"
+vaddr = 0x408000
+size = 0x89800
+note = "320x440 BGRA software framebuffer"
+
+[[slot]]
+name = "elf_header"
+kind = "header"
+vaddr = 0x400000
+size = 0x80
+file = "slots/0000_elf_header.hex"
+purpose = "ELF64 header + single PT_LOAD (rwx, memsz 0xA0000)"
+
+[[slot]]
+name = "read_exact"
+kind = "code"
+vaddr = 0x400080
+size = 0x30
+file = "slots/0080_read_exact.hex"
+purpose = "read(fd, buf, len) until len bytes arrive"
+[slot.contract]
+inputs = ["rdi: fd", "rsi: buffer", "rdx: length"]
+outputs = ["rax: last read() result"]
+clobbers = ["rax", "rcx", "r11", "rsi", "rdx"]
+
+[[slot]]
+name = "write_all"
+kind = "code"
+vaddr = 0x4000b0
+size = 0x30
+file = "slots/00b0_write_all.hex"
+purpose = "write(fd, buf, len) until everything is sent"
+[slot.contract]
+inputs = ["rdi: fd", "rsi: buffer", "rdx: length"]
+outputs = ["rax: last write() result"]
+clobbers = ["rax", "rcx", "r11", "rsi", "rdx"]
+
+[[slot]]
+name = "exit_clean"
+kind = "code"
+vaddr = 0x4000e0
+size = 0x20
+file = "slots/00e0_exit_clean.hex"
+purpose = "exit(0)"
+[slot.contract]
+noreturn = true
+
+[[slot]]
+name = "_start"
+kind = "code"
+vaddr = 0x400100
+size = 0x1f0
+file = "slots/0100_start.hex"
+purpose = "r15 = state; connect /tmp/.X11-unix/X0; X11 handshake; CreateWindow 320x440, WM_NAME, WM_NORMAL_HINTS, CreateGC, MapWindow; first render"
+
+[[slot]]
+name = "event_loop"
+kind = "code"
+vaddr = 0x4002f0
+size = 0x130
+file = "slots/02f0_event_loop.hex"
+purpose = "Expose / ButtonPress hit-test 4x5 / ButtonRelease / KeyPress (ES + US + numpad)"
+
+[[slot]]
+name = "handle_action"
+kind = "code"
+vaddr = 0x400420
+size = 0x1b8
+file = "slots/0420_handle_action.hex"
+purpose = "Calculator state machine: C, CE, digits, dot, + - x /, =, sign, %, chaining"
+
+[[slot]]
+name = "apply_op"
+kind = "code"
+vaddr = 0x4005d8
+size = 0xa8
+file = "slots/05d8_apply_op.hex"
+purpose = "Signed 64-bit fixed point (x10000) arithmetic with overflow and divide-by-zero guards"
+
+[[slot]]
+name = "format_display"
+kind = "code"
+vaddr = 0x400680
+size = 0x180
+file = "slots/0680_format_display.hex"
+purpose = "Scaled integer to glyph string (sign, decimal point, trailing-zero trim, ERR)"
+
+[[slot]]
+name = "fill_rect"
+kind = "code"
+vaddr = 0x400800
+size = 0x80
+file = "slots/0800_fill_rect.hex"
+purpose = "fill_rect(x, y, w, h, color) with rep stosd into the framebuffer"
+
+[[slot]]
+name = "draw_glyph"
+kind = "code"
+vaddr = 0x400880
+size = 0xe0
+file = "slots/0880_draw_glyph.hex"
+purpose = "draw_glyph(x, y, idx, scale, color) from the 5x7 bitmap font"
+
+[[slot]]
+name = "render_and_blit"
+kind = "code"
+vaddr = 0x400960
+size = 0x2a0
+file = "slots/0960_render_and_blit.hex"
+purpose = "Paint background, display, 20 buttons; PutImage in 4 strips of 320x110"
+
+[[slot]]
+name = "rodata"
+kind = "rodata"
+vaddr = 0x400c00
+size = 0x400
+file = "slots/0c00_rodata.hex"
+purpose = "sockaddr_un, X11 setup packet, title, WM_SIZE_HINTS, 5x7 font, button tables, 43 key shortcuts"

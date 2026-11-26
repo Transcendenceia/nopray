@@ -1,0 +1,44 @@
+# nopray slot `blit_x11` · code · vaddr 0x403c80 · size 0x100 · used 128 bytes
+# purpose: Flicker-free X11 PutImage over 4 strips of 640x100 (256,000 B each)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# blit_x11:
+53                    # 0x00403c80  push rbx  #= push rbx
+55                    # 0x00403c81  push rbp  #= push rbp
+41 54                 # 0x00403c82  push r12  #= push r12
+41 55                 # 0x00403c84  push r13  #= push r13
+bd 00 82 40 00        # 0x00403c86  mov ebp,0x408200  #= mov ebp, x11_pkt
+c7 45 00 48 02 06 fa  # 0x00403c8b  mov dword ptr [rbp],0xfa060248  #= mov dword ptr [rbp], 0xfa060248
+41 8b 47 4c           # 0x00403c92  mov eax,[r15+0x4c]  #= mov eax, [r15+0x4c]
+ff c0                 # 0x00403c96  inc eax  #= inc eax
+89 45 04              # 0x00403c98  mov [rbp+4],eax  #= mov [rbp+4], eax
+ff c0                 # 0x00403c9b  inc eax  #= inc eax
+89 45 08              # 0x00403c9d  mov [rbp+8],eax  #= mov [rbp+8], eax
+c7 45 0c 80 02 64 00  # 0x00403ca0  mov dword ptr [rbp+0xc],0x640280  #= mov dword ptr [rbp+0xc], 0x640280
+41 8b 47 58           # 0x00403ca7  mov eax,[r15+0x58]  #= mov eax, [r15+0x58]
+c1 e0 08              # 0x00403cab  shl eax,8  #= shl eax, 8
+89 45 14              # 0x00403cae  mov [rbp+0x14],eax  #= mov [rbp+0x14], eax
+45 31 e4              # 0x00403cb1  xor r12d,r12d  #= xor r12d, r12d
+41 bd 00 00 41 00     # 0x00403cb4  mov r13d,0x410000  #= mov r13d, framebuffer
+bb 04 00 00 00        # 0x00403cba  mov ebx,4  #= mov ebx, 4
+44 89 e0              # 0x00403cbf  mov eax,r12d  #= mov eax, r12d
+c1 e0 10              # 0x00403cc2  shl eax,0x10  #= shl eax, 0x10
+89 45 10              # 0x00403cc5  mov [rbp+0x10],eax  #= mov [rbp+0x10], eax
+41 8b 7f 48           # 0x00403cc8  mov edi,[r15+0x48]  #= mov edi, [r15+0x48]
+48 89 ee              # 0x00403ccc  mov rsi,rbp  #= mov rsi, rbp
+ba 18 00 00 00        # 0x00403ccf  mov edx,0x18  #= mov edx, 0x18
+e8 57 c4 ff ff        # 0x00403cd4  call 0x400130  → write_all  #= call write_all
+41 8b 7f 48           # 0x00403cd9  mov edi,[r15+0x48]  #= mov edi, [r15+0x48]
+4c 89 ee              # 0x00403cdd  mov rsi,r13  #= mov rsi, r13
+ba 00 e8 03 00        # 0x00403ce0  mov edx,0x3e800  #= mov edx, 0x3e800
+e8 46 c4 ff ff        # 0x00403ce5  call 0x400130  → write_all  #= call write_all
+41 83 c4 64           # 0x00403cea  add r12d,0x64  #= add r12d, 0x64
+49 81 c5 00 e8 03 00  # 0x00403cee  add r13,0x3e800  #= add r13, 0x3e800
+ff cb                 # 0x00403cf5  dec ebx  #= dec ebx
+75 c6                 # 0x00403cf7  jne 0x403cbf  #= jne 0x403cbf
+41 5d                 # 0x00403cf9  pop r13  #= pop r13
+41 5c                 # 0x00403cfb  pop r12  #= pop r12
+5d                    # 0x00403cfd  pop rbp  #= pop rbp
+5b                    # 0x00403cfe  pop rbx  #= pop rbx
+c3                    # 0x00403cff  ret  #= ret

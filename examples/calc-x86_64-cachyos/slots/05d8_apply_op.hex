@@ -1,0 +1,58 @@
+# nopray slot `apply_op` · code · vaddr 0x4005d8 · size 0xa8 · used 156 bytes
+# purpose: Signed 64-bit fixed point (x10000) arithmetic with overflow and divide-by-zero guards
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# apply_op:
+41 8b 4f 18              # 0x004005d8  mov ecx,[r15+0x18]
+49 8b 07                 # 0x004005dc  mov rax,[r15]
+49 8b 5f 08              # 0x004005df  mov rbx,[r15+8]
+83 f9 01                 # 0x004005e3  cmp ecx,1
+75 07                    # 0x004005e6  jne 0x4005ef
+48 01 d8                 # 0x004005e8  add rax,rbx
+70 78                    # 0x004005eb  jo 0x400665
+eb 60                    # 0x004005ed  jmp 0x40064f
+83 f9 02                 # 0x004005ef  cmp ecx,2
+75 07                    # 0x004005f2  jne 0x4005fb
+48 29 d8                 # 0x004005f4  sub rax,rbx
+70 6c                    # 0x004005f7  jo 0x400665
+eb 54                    # 0x004005f9  jmp 0x40064f
+83 f9 03                 # 0x004005fb  cmp ecx,3
+75 21                    # 0x004005fe  jne 0x400621
+48 f7 eb                 # 0x00400600  imul rbx
+48 89 d1                 # 0x00400603  mov rcx,rdx
+48 85 c9                 # 0x00400606  test rcx,rcx
+79 03                    # 0x00400609  jns 0x40060e
+48 f7 d9                 # 0x0040060b  neg rcx
+48 81 f9 88 13 00 00     # 0x0040060e  cmp rcx,0x1388
+73 4e                    # 0x00400615  jae 0x400665
+b9 10 27 00 00           # 0x00400617  mov ecx,0x2710
+48 f7 f9                 # 0x0040061c  idiv rcx
+eb 2e                    # 0x0040061f  jmp 0x40064f
+48 85 db                 # 0x00400621  test rbx,rbx
+74 3f                    # 0x00400624  je 0x400665
+b9 10 27 00 00           # 0x00400626  mov ecx,0x2710
+48 f7 e9                 # 0x0040062b  imul rcx
+49 89 d8                 # 0x0040062e  mov r8,rbx
+4d 85 c0                 # 0x00400631  test r8,r8
+79 03                    # 0x00400634  jns 0x400639
+49 f7 d8                 # 0x00400636  neg r8
+49 89 d1                 # 0x00400639  mov r9,rdx
+4d 85 c9                 # 0x0040063c  test r9,r9
+79 03                    # 0x0040063f  jns 0x400644
+49 f7 d9                 # 0x00400641  neg r9
+49 d1 e1                 # 0x00400644  shl r9,1
+4d 39 c1                 # 0x00400647  cmp r9,r8
+73 19                    # 0x0040064a  jae 0x400665
+48 f7 fb                 # 0x0040064c  idiv rbx
+49 89 07                 # 0x0040064f  mov [r15],rax
+49 89 47 08              # 0x00400652  mov [r15+8],rax
+31 c0                    # 0x00400656  xor eax,eax
+49 89 47 10              # 0x00400658  mov [r15+0x10],rax
+49 89 47 18              # 0x0040065c  mov [r15+0x18],rax
+41 89 47 3c              # 0x00400660  mov [r15+0x3c],eax
+c3                       # 0x00400664  ret
+41 c7 47 20 01 00 00 00  # 0x00400665  mov dword ptr [r15+0x20],1
+31 c0                    # 0x0040066d  xor eax,eax
+49 89 47 18              # 0x0040066f  mov [r15+0x18],rax
+c3                       # 0x00400673  ret

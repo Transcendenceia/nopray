@@ -1,0 +1,32 @@
+# nopray slot `send_buffer` · code · vaddr 0x400750 · size 0x60 · used 93 bytes
+# purpose: Send status line + headers + Content-Length, then the in-memory body unless the request is HEAD
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# send_buffer:
+56                 # 0x00400750  push rsi
+52                 # 0x00400751  push rdx
+bf 00 a4 40 00     # 0x00400752  mov edi,0x40a400
+be 60 0c 40 00     # 0x00400757  mov esi,0x400c60
+e8 5f ff ff ff     # 0x0040075c  call 0x4006c0  → strcpy_bounded
+4c 89 c6           # 0x00400761  mov rsi,r8
+44 89 c9           # 0x00400764  mov ecx,r9d
+f3 a4              # 0x00400767  rep movsb [rdi],[rsi]
+be 40 0d 40 00     # 0x00400769  mov esi,0x400d40
+e8 4d ff ff ff     # 0x0040076e  call 0x4006c0  → strcpy_bounded
+48 8b 04 24        # 0x00400773  mov rax,[rsp]
+e8 14 ff ff ff     # 0x00400777  call 0x400690  → utoa
+c7 07 0d 0a 0d 0a  # 0x0040077c  mov dword ptr [rdi],0xa0d0a0d
+48 83 c7 04        # 0x00400782  add rdi,4
+48 89 fa           # 0x00400786  mov rdx,rdi
+be 00 a4 40 00     # 0x00400789  mov esi,0x40a400
+48 29 f2           # 0x0040078e  sub rdx,rsi
+41 8b 7f 04        # 0x00400791  mov edi,[r15+4]
+e8 16 f9 ff ff     # 0x00400795  call 0x4000b0  → write_all
+5a                 # 0x0040079a  pop rdx
+5e                 # 0x0040079b  pop rsi
+41 83 7f 0c 00     # 0x0040079c  cmp dword ptr [r15+0xc],0
+75 09              # 0x004007a1  jne 0x4007ac
+41 8b 7f 04        # 0x004007a3  mov edi,[r15+4]
+e8 04 f9 ff ff     # 0x004007a7  call 0x4000b0  → write_all
+c3                 # 0x004007ac  ret

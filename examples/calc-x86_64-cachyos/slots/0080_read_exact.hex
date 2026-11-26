@@ -1,0 +1,19 @@
+# nopray slot `read_exact` · code · vaddr 0x400080 · size 0x30 · used 31 bytes
+# purpose: read(fd, buf, len) until len bytes arrive
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# read_exact:
+48 85 d2        # 0x00400080  test rdx,rdx
+74 11           # 0x00400083  je 0x400096
+31 c0           # 0x00400085  xor eax,eax
+0f 05           # 0x00400087  syscall  ; read
+48 85 c0        # 0x00400089  test rax,rax
+7e 0e           # 0x0040008c  jle 0x40009c
+48 01 c6        # 0x0040008e  add rsi,rax
+48 29 c2        # 0x00400091  sub rdx,rax
+75 ef           # 0x00400094  jne 0x400085
+b8 01 00 00 00  # 0x00400096  mov eax,1
+c3              # 0x0040009b  ret
+31 c0           # 0x0040009c  xor eax,eax
+c3              # 0x0040009e  ret

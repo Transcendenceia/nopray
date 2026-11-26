@@ -1,0 +1,105 @@
+{
+  "tool": "nopray 1.1.0",
+  "app": "nopray-qwen-tts",
+  "version": "1.0.0",
+  "size": 32768,
+  "sha256": "014256c393b5d6d8103bd665cd4a4c82c1d3c103284640070b8e5afc6fecf319",
+  "slots": [
+    {
+      "name": "elf32_hdr",
+      "vaddr": "0x100000",
+      "size": 256,
+      "used": 140,
+      "sha256_used": "32e50729fbf38ae9c5107e904c6e81ed4d1f2a32c9172f517fdcd8d522cf6d84",
+      "sha256_padded": "89e2121a55c2a071403cd0936056965df5c30946cdc2e3575fa731b47ff100c7"
+    },
+    {
+      "name": "boot32",
+      "vaddr": "0x100100",
+      "size": 256,
+      "used": 209,
+      "sha256_used": "cca62e2f94aae50a14a5a47cceebdc6fb6f283cff36d27cce0ed519702d0a1a6",
+      "sha256_padded": "8b1084b909db74d4f61df76fb0d9931df577d0b6c3c234a920fc9cac7ce521f3"
+    },
+    {
+      "name": "boot64",
+      "vaddr": "0x100200",
+      "size": 512,
+      "used": 158,
+      "sha256_used": "acf777de5764e719617dd64489b8fe189c3d226ecf512ae8ccfe119b73b92920",
+      "sha256_padded": "d049ee1e9aa23428c5d5341bdd606bdf9d6cc2781c720b6cb6b1357c678ecd43"
+    },
+    {
+      "name": "io_drivers",
+      "vaddr": "0x100400",
+      "size": 1024,
+      "used": 550,
+      "sha256_used": "c57a4bbe9055f489dd614751cc3211e5ca2a53361c281817cd45f47d8c89be1e",
+      "sha256_padded": "84171ca5d014eaa6035ed8aa11161f86531a9430835dd2c0af09b2959e6b2d5f"
+    },
+    {
+      "name": "tts_main",
+      "vaddr": "0x100800",
+      "size": 1024,
+      "used": 362,
+      "sha256_used": "99c90f952ea4de90cbdadb06448485e325cef5e637e01fef77a5b065c83c63d1",
+      "sha256_padded": "eec53e3a21ee4466daaae86e0ba0fcbd6e895db62c33e249486ce4d064ec9298"
+    },
+    {
+      "name": "rodata",
+      "vaddr": "0x100c00",
+      "size": 1024,
+      "used": 580,
+      "sha256_used": "fdccb87ebdac60bf8c9c2cb8050e532beca340574fe768daf9dfa773aa1839da",
+      "sha256_padded": "6df0d9a72589774c64da568d817a76666eabf4f595a8bae0df7820917bf5cb5f"
+    },
+    {
+      "name": "math_avx2",
+      "vaddr": "0x101000",
+      "size": 4096,
+      "used": 1683,
+      "sha256_used": "8d9215bfd12ddba118d63393fc1a14c0f7990af832c7de51479248ae8322eaf1",
+      "sha256_padded": "bc6a5fc8e10390df0075738566aeb06603efee2e518582f6e9673528037d1b03"
+    },
+    {
+      "name": "qwen3_layer",
+      "vaddr": "0x102000",
+      "size": 4096,
+      "used": 1394,
+      "sha256_used": "75c45f2465f55f2b1afb9251ea61944a08df55524586dd531284e22ba2522959",
+      "sha256_padded": "1353f47f53eb6de03d4559a28dcbdfc4f8f730952a3d96625e91c734fec15037"
+    },
+    {
+      "name": "talker_cp",
+      "vaddr": "0x103000",
+      "size": 4096,
+      "used": 1008,
+      "sha256_used": "6c76a102dc4788491cfb2396a86a6c8f8b57aa3717f9876c72cff50ea98492d9",
+      "sha256_padded": "c10b2f17993999919a7952bc03c33f9a44dbee15ee0b9029811be28513082ed3"
+    },
+    {
+      "name": "decoder_xfmr",
+      "vaddr": "0x104000",
+      "size": 4096,
+      "used": 1790,
+      "sha256_used": "c7de1f405fddf33007d25deed90aaae1313b2836f7fe226c7c760a24629d0d5c",
+      "sha256_padded": "cd465b56bd0157592d9015b3ed42a99324f6b53d55b9f46632a89ee9168041ed"
+    },
+    {
+      "name": "decoder_vocoder",
+      "vaddr": "0x105000",
+      "size": 8192,
+      "used": 3582,
+      "sha256_used": "8e07b1d6895d816499c2a7133e24d567ba4e5b7ced7f3d39b3046b5eb155ffc6",
+      "sha256_padded": "7d96458a599d614a9f9344702867fcdb0a850964a9a89e1b5d8fc9c4c86b6a44"
+    },
+    {
+      "name": "data_zero",
+      "vaddr": "0x10c000",
+      "size": 4096,
+      "used": 1,
+      "sha256_used": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+      "sha256_padded": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240" shape-rendering="crispEdges" role="img" aria-label="NOPRAY — Pixel-art Jesus icon (Native Opcode Protocol: Reach the Almighty Yourself)">
+  <title>NOPRAY — Native Opcode Protocol: Reach the Almighty Yourself</title>
+  <!-- Dark Catppuccin Mocha rounded icon plate -->
+  <rect x="0" y="0" width="240" height="240" rx="36" fill="#11111B"/>
+  <rect x="6" y="6" width="228" height="228" rx="30" fill="none" stroke="#313244" stroke-width="4"/>
+
+  <!-- Subtle corner silicon circuit dots -->
+  <rect x="20" y="20" width="10" height="10" fill="#232336"/>
+  <rect x="30" y="20" width="10" height="10" fill="#1B1B2B"/>
+  <rect x="20" y="30" width="10" height="10" fill="#1B1B2B"/>
+  <rect x="210" y="20" width="10" height="10" fill="#232336"/>
+  <rect x="200" y="20" width="10" height="10" fill="#1B1B2B"/>
+  <rect x="210" y="30" width="10" height="10" fill="#1B1B2B"/>
+  <rect x="20" y="210" width="10" height="10" fill="#232336"/>
+  <rect x="210" y="210" width="10" height="10" fill="#232336"/>
+
+  <!-- Byzantine Golden Pixel Halo (outer ring + radiant core + cruciform rays) -->
+  <!-- Halo outer amber glow -->
+  <rect x="90" y="20" width="60" height="10" fill="#D9931E"/>
+  <rect x="70" y="30" width="100" height="10" fill="#D9931E"/>
+  <rect x="60" y="40" width="120" height="10" fill="#D9931E"/>
+  <rect x="50" y="50" width="140" height="20" fill="#D9931E"/>
+  <rect x="40" y="70" width="160" height="50" fill="#D9931E"/>
+  <rect x="50" y="120" width="140" height="20" fill="#D9931E"/>
+  <rect x="60" y="140" width="120" height="10" fill="#D9931E"/>
+
+  <!-- Halo warm gold body -->
+  <rect x="90" y="30" width="60" height="10" fill="#F5C242"/>
+  <rect x="70" y="40" width="100" height="10" fill="#F5C242"/>
+  <rect x="60" y="50" width="120" height="20" fill="#F5C242"/>
+  <rect x="50" y="70" width="140" height="50" fill="#F5C242"/>
+  <rect x="60" y="120" width="120" height="20" fill="#F5C242"/>
+
+  <!-- Cruciform luminous gold rays (classic iconographic cross inside halo) -->
+  <rect x="110" y="20" width="20" height="30" fill="#FFF2B2"/>
+  <rect x="40" y="90" width="30" height="20" fill="#FFF2B2"/>
+  <rect x="170" y="90" width="30" height="20" fill="#FFF2B2"/>
+
+  <!-- Flowing Chestnut Hair (back & sides) -->
+  <rect x="90" y="50" width="60" height="10" fill="#5C3824"/>
+  <rect x="100" y="50" width="30" height="10" fill="#784B31"/>
+  <rect x="80" y="60" width="80" height="10" fill="#5C3824"/>
+  <rect x="110" y="60" width="20" height="10" fill="#784B31"/>
+  <rect x="70" y="70" width="100" height="10" fill="#5C3824"/>
+  <rect x="70" y="80" width="20" height="70" fill="#5C3824"/>
+  <rect x="150" y="80" width="20" height="70" fill="#5C3824"/>
+  <!-- Hair depth shading -->
+  <rect x="70" y="100" width="10" height="50" fill="#432617"/>
+  <rect x="160" y="100" width="10" height="50" fill="#432617"/>
+  <rect x="80" y="140" width="10" height="20" fill="#432617"/>
+  <rect x="150" y="140" width="10" height="20" fill="#432617"/>
+
+  <!-- Face (warm pixel skin) -->
+  <rect x="100" y="70" width="40" height="10" fill="#F2C6A0"/>
+  <rect x="90" y="80" width="60" height="40" fill="#F2C6A0"/>
+  <!-- Cheek & nose shading -->
+  <rect x="90" y="110" width="10" height="10" fill="#E3B189"/>
+  <rect x="140" y="110" width="10" height="10" fill="#E3B189"/>
+  <rect x="120" y="100" width="10" height="10" fill="#E3B189"/>
+
+  <!-- Eyebrows & Eyes -->
+  <rect x="100" y="80" width="10" height="10" fill="#6E4229"/>
+  <rect x="130" y="80" width="10" height="10" fill="#6E4229"/>
+  <rect x="100" y="90" width="10" height="10" fill="#1E1E2E"/>
+  <rect x="130" y="90" width="10" height="10" fill="#1E1E2E"/>
+
+  <!-- Mustache, Serene Expression & Beard -->
+  <rect x="100" y="110" width="40" height="10" fill="#5C3824"/>
+  <rect x="90" y="120" width="60" height="20" fill="#5C3824"/>
+  <rect x="110" y="120" width="20" height="10" fill="#D9987B"/>
+  <rect x="100" y="140" width="40" height="10" fill="#432617"/>
+  <rect x="110" y="150" width="20" height="10" fill="#432617"/>
+
+  <!-- Neck & Robe Shoulders (White Tunic) -->
+  <rect x="100" y="150" width="10" height="10" fill="#E3B189"/>
+  <rect x="130" y="150" width="10" height="10" fill="#E3B189"/>
+  <rect x="70" y="160" width="100" height="10" fill="#DCE4F5"/>
+  <rect x="50" y="170" width="140" height="10" fill="#DCE4F5"/>
+  <rect x="40" y="180" width="160" height="40" fill="#DCE4F5"/>
+  <!-- Tunic subtle fold shading -->
+  <rect x="40" y="180" width="10" height="40" fill="#B6C3DE"/>
+  <rect x="190" y="180" width="10" height="40" fill="#B6C3DE"/>
+  <rect x="150" y="190" width="10" height="30" fill="#C7D2E8"/>
+
+  <!-- Crimson Mantle Sash (diagonal across tunic) -->
+  <rect x="60" y="160" width="30" height="10" fill="#D63B4D"/>
+  <rect x="50" y="170" width="50" height="10" fill="#E64553"/>
+  <rect x="60" y="180" width="50" height="10" fill="#E64553"/>
+  <rect x="70" y="190" width="50" height="10" fill="#D63B4D"/>
+  <rect x="80" y="200" width="50" height="10" fill="#E64553"/>
+  <rect x="90" y="210" width="50" height="10" fill="#D63B4D"/>
+  <!-- Mantle highlight edge -->
+  <rect x="70" y="170" width="10" height="10" fill="#F38BA8"/>
+  <rect x="80" y="180" width="10" height="10" fill="#F38BA8"/>
+  <rect x="90" y="190" width="10" height="10" fill="#F38BA8"/>
+  <rect x="100" y="200" width="10" height="10" fill="#F38BA8"/>
+
+  <!-- Radiant Sacred Silicon Spark on Chest (Direct-to-CPU Heart) -->
+  <rect x="110" y="180" width="20" height="20" fill="#F5C242"/>
+  <rect x="115" y="185" width="10" height="10" fill="#FFF2B2"/>
+  <rect x="118" y="175" width="4" height="5" fill="#F9E2AF"/>
+  <rect x="118" y="200" width="4" height="5" fill="#F9E2AF"/>
+  <rect x="105" y="188" width="5" height="4" fill="#F9E2AF"/>
+  <rect x="130" y="188" width="5" height="4" fill="#F9E2AF"/>
+</svg>

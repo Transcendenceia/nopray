@@ -1,0 +1,44 @@
+# nopray slot `blit_x11` · code · vaddr 0x400e80 · size 0x180 · used 128 bytes
+# purpose: Flicker-free X11 PutImage in 4 strips of 640x90
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# blit_x11:
+53                    # 0x00400e80  push rbx
+55                    # 0x00400e81  push rbp
+41 54                 # 0x00400e82  push r12
+41 55                 # 0x00400e84  push r13
+bd 00 41 40 00        # 0x00400e86  mov ebp,0x404100
+c7 45 00 48 02 06 e1  # 0x00400e8b  mov dword ptr [rbp],0xe1060248
+41 8b 47 4c           # 0x00400e92  mov eax,[r15+0x4c]
+ff c0                 # 0x00400e96  inc eax
+89 45 04              # 0x00400e98  mov [rbp+4],eax
+ff c0                 # 0x00400e9b  inc eax
+89 45 08              # 0x00400e9d  mov [rbp+8],eax
+c7 45 0c 80 02 5a 00  # 0x00400ea0  mov dword ptr [rbp+0xc],0x5a0280
+41 8b 47 58           # 0x00400ea7  mov eax,[r15+0x58]
+c1 e0 08              # 0x00400eab  shl eax,8
+89 45 14              # 0x00400eae  mov [rbp+0x14],eax
+45 31 e4              # 0x00400eb1  xor r12d,r12d
+41 bd 00 80 40 00     # 0x00400eb4  mov r13d,0x408000
+bb 04 00 00 00        # 0x00400eba  mov ebx,4
+44 89 e0              # 0x00400ebf  mov eax,r12d
+c1 e0 10              # 0x00400ec2  shl eax,0x10
+89 45 10              # 0x00400ec5  mov [rbp+0x10],eax
+41 8b 7f 48           # 0x00400ec8  mov edi,[r15+0x48]
+48 89 ee              # 0x00400ecc  mov rsi,rbp
+ba 18 00 00 00        # 0x00400ecf  mov edx,0x18
+e8 f7 f1 ff ff        # 0x00400ed4  call 0x4000d0  → write_all
+41 8b 7f 48           # 0x00400ed9  mov edi,[r15+0x48]
+4c 89 ee              # 0x00400edd  mov rsi,r13
+ba 00 84 03 00        # 0x00400ee0  mov edx,0x38400
+e8 e6 f1 ff ff        # 0x00400ee5  call 0x4000d0  → write_all
+41 83 c4 5a           # 0x00400eea  add r12d,0x5a
+49 81 c5 00 84 03 00  # 0x00400eee  add r13,0x38400
+ff cb                 # 0x00400ef5  dec ebx
+75 c6                 # 0x00400ef7  jne 0x400ebf
+41 5d                 # 0x00400ef9  pop r13
+41 5c                 # 0x00400efb  pop r12
+5d                    # 0x00400efd  pop rbp
+5b                    # 0x00400efe  pop rbx
+c3                    # 0x00400eff  ret

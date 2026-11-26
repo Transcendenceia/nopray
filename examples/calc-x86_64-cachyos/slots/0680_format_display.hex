@@ -1,0 +1,73 @@
+# nopray slot `format_display` · code · vaddr 0x400680 · size 0x180 · used 207 bytes
+# purpose: Scaled integer to glyph string (sign, decimal point, trailing-zero trim, ERR)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# format_display:
+53                       # 0x00400680  push rbx
+48 83 ec 28              # 0x00400681  sub rsp,0x28
+41 83 7f 20 00           # 0x00400685  cmp dword ptr [r15+0x20],0
+74 16                    # 0x0040068a  je 0x4006a2
+41 c7 47 40 11 12 12 00  # 0x0040068c  mov dword ptr [r15+0x40],0x121211
+41 c7 47 60 03 00 00 00  # 0x00400694  mov dword ptr [r15+0x60],3
+48 83 c4 28              # 0x0040069c  add rsp,0x28
+5b                       # 0x004006a0  pop rbx
+c3                       # 0x004006a1  ret
+49 8b 47 08              # 0x004006a2  mov rax,[r15+8]
+45 31 c9                 # 0x004006a6  xor r9d,r9d
+48 85 c0                 # 0x004006a9  test rax,rax
+79 06                    # 0x004006ac  jns 0x4006b4
+41 b1 01                 # 0x004006ae  mov r9b,1
+48 f7 d8                 # 0x004006b1  neg rax
+31 d2                    # 0x004006b4  xor edx,edx
+b9 10 27 00 00           # 0x004006b6  mov ecx,0x2710
+48 f7 f1                 # 0x004006bb  div rcx
+48 89 c3                 # 0x004006be  mov rbx,rax
+45 31 c0                 # 0x004006c1  xor r8d,r8d
+48 85 d2                 # 0x004006c4  test rdx,rdx
+75 10                    # 0x004006c7  jne 0x4006d9
+49 83 7f 10 00           # 0x004006c9  cmp qword ptr [r15+0x10],0
+74 35                    # 0x004006ce  je 0x400705
+c6 04 24 0a              # 0x004006d0  mov byte ptr [rsp],0xa
+41 ff c0                 # 0x004006d4  inc r8d
+eb 2c                    # 0x004006d7  jmp 0x400705
+48 89 d0                 # 0x004006d9  mov rax,rdx
+31 f6                    # 0x004006dc  xor esi,esi
+bf 04 00 00 00           # 0x004006de  mov edi,4
+b9 0a 00 00 00           # 0x004006e3  mov ecx,0xa
+31 d2                    # 0x004006e8  xor edx,edx
+f7 f1                    # 0x004006ea  div ecx
+09 d6                    # 0x004006ec  or esi,edx
+85 f6                    # 0x004006ee  test esi,esi
+74 07                    # 0x004006f0  je 0x4006f9
+42 88 14 04              # 0x004006f2  mov [rsp+r8],dl
+49 ff c0                 # 0x004006f6  inc r8
+ff cf                    # 0x004006f9  dec edi
+75 eb                    # 0x004006fb  jne 0x4006e8
+42 c6 04 04 0a           # 0x004006fd  mov byte ptr [rsp+r8],0xa
+49 ff c0                 # 0x00400702  inc r8
+48 89 d8                 # 0x00400705  mov rax,rbx
+b9 0a 00 00 00           # 0x00400708  mov ecx,0xa
+31 d2                    # 0x0040070d  xor edx,edx
+48 f7 f1                 # 0x0040070f  div rcx
+42 88 14 04              # 0x00400712  mov [rsp+r8],dl
+49 ff c0                 # 0x00400716  inc r8
+48 85 c0                 # 0x00400719  test rax,rax
+75 ef                    # 0x0040071c  jne 0x40070d
+45 84 c9                 # 0x0040071e  test r9b,r9b
+74 08                    # 0x00400721  je 0x40072b
+42 c6 04 04 0b           # 0x00400723  mov byte ptr [rsp+r8],0xb
+49 ff c0                 # 0x00400728  inc r8
+31 c9                    # 0x0040072b  xor ecx,ecx
+49 ff c8                 # 0x0040072d  dec r8
+42 8a 04 04              # 0x00400730  mov al,[rsp+r8]
+41 88 44 0f 40           # 0x00400734  mov [r15+rcx+0x40],al
+ff c1                    # 0x00400739  inc ecx
+83 f9 0e                 # 0x0040073b  cmp ecx,0xe
+74 05                    # 0x0040073e  je 0x400745
+4d 85 c0                 # 0x00400740  test r8,r8
+75 e8                    # 0x00400743  jne 0x40072d
+41 89 4f 60              # 0x00400745  mov [r15+0x60],ecx
+48 83 c4 28              # 0x00400749  add rsp,0x28
+5b                       # 0x0040074d  pop rbx
+c3                       # 0x0040074e  ret

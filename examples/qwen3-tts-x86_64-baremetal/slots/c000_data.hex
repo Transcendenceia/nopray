@@ -1,0 +1,7 @@
+# nopray slot `data_zero` · data · vaddr 0x10c000 · size 0x1000 · used 1 bytes
+# purpose: Initialised writable state page (4 KiB); remainder of data_bss segment is zeroed BSS (page tables + BSP stack)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# data_zero:
+00           # 0x0010c000  |.|

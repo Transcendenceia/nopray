@@ -1,0 +1,37 @@
+# nopray slot `html_escape` · code · vaddr 0x4006e0 · size 0x70 · used 91 bytes
+# purpose: Copy rcx bytes from rsi to rdi escaping & < > " ; bounded by 0x437000
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# html_escape:
+48 85 c9           # 0x004006e0  test rcx,rcx
+74 55              # 0x004006e3  je 0x40073a
+81 ff 00 70 43 00  # 0x004006e5  cmp edi,0x437000
+73 4d              # 0x004006eb  jae 0x40073a
+ac                 # 0x004006ed  lodsb [rsi]
+3c 26              # 0x004006ee  cmp al,0x26
+75 0f              # 0x004006f0  jne 0x400701
+c7 07 26 61 6d 70  # 0x004006f2  mov dword ptr [rdi],0x706d6126
+c6 47 04 3b        # 0x004006f8  mov byte ptr [rdi+4],0x3b
+83 c7 05           # 0x004006fc  add edi,5
+eb 34              # 0x004006ff  jmp 0x400735
+3c 3c              # 0x00400701  cmp al,0x3c
+75 0b              # 0x00400703  jne 0x400710
+c7 07 26 6c 74 3b  # 0x00400705  mov dword ptr [rdi],0x3b746c26
+83 c7 04           # 0x0040070b  add edi,4
+eb 25              # 0x0040070e  jmp 0x400735
+3c 3e              # 0x00400710  cmp al,0x3e
+75 0b              # 0x00400712  jne 0x40071f
+c7 07 26 67 74 3b  # 0x00400714  mov dword ptr [rdi],0x3b746726
+83 c7 04           # 0x0040071a  add edi,4
+eb 16              # 0x0040071d  jmp 0x400735
+3c 22              # 0x0040071f  cmp al,0x22
+75 11              # 0x00400721  jne 0x400734
+c7 07 26 71 75 6f  # 0x00400723  mov dword ptr [rdi],0x6f757126
+66 c7 47 04 74 3b  # 0x00400729  mov word ptr [rdi+4],0x3b74
+83 c7 06           # 0x0040072f  add edi,6
+eb 01              # 0x00400732  jmp 0x400735
+aa                 # 0x00400734  stosb [rdi]
+48 ff c9           # 0x00400735  dec rcx
+75 ab              # 0x00400738  jne 0x4006e5
+c3                 # 0x0040073a  ret

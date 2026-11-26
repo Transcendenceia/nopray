@@ -1,0 +1,66 @@
+# nopray slot `emit_youtube` · code · vaddr 0x400ac0 · size 0x140 · used 208 bytes
+# purpose: Emit the YouTube embed: sanitise the id to [-_A-Za-z0-9]{1,15}, default ASO_zypdnsQ
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# emit_youtube:
+57              # 0x00400ac0  push rdi
+49 8d 7f 60     # 0x00400ac1  lea rdi,[r15+0x60]
+31 c9           # 0x00400ac5  xor ecx,ecx
+4d 39 ec        # 0x00400ac7  cmp r12,r13
+73 32           # 0x00400aca  jae 0x400afe
+83 f9 0f        # 0x00400acc  cmp ecx,0xf
+73 2d           # 0x00400acf  jae 0x400afe
+41 0f b6 04 24  # 0x00400ad1  movzx eax,byte ptr [r12]
+49 ff c4        # 0x00400ad6  inc r12
+3c 2d           # 0x00400ad9  cmp al,0x2d
+74 1c           # 0x00400adb  je 0x400af9
+3c 5f           # 0x00400add  cmp al,0x5f
+74 18           # 0x00400adf  je 0x400af9
+8d 50 d0        # 0x00400ae1  lea edx,[rax-0x30]
+83 fa 0a        # 0x00400ae4  cmp edx,0xa
+72 10           # 0x00400ae7  jb 0x400af9
+8d 50 bf        # 0x00400ae9  lea edx,[rax-0x41]
+83 fa 1a        # 0x00400aec  cmp edx,0x1a
+72 08           # 0x00400aef  jb 0x400af9
+8d 50 9f        # 0x00400af1  lea edx,[rax-0x61]
+83 fa 1a        # 0x00400af4  cmp edx,0x1a
+73 ce           # 0x00400af7  jae 0x400ac7
+aa              # 0x00400af9  stosb [rdi]
+ff c1           # 0x00400afa  inc ecx
+eb c9           # 0x00400afc  jmp 0x400ac7
+c6 07 00        # 0x00400afe  mov byte ptr [rdi],0
+85 c9           # 0x00400b01  test ecx,ecx
+75 0c           # 0x00400b03  jne 0x400b11
+be f0 0e 40 00  # 0x00400b05  mov esi,0x400ef0
+b9 0c 00 00 00  # 0x00400b0a  mov ecx,0xc
+f3 a4           # 0x00400b0f  rep movsb [rdi],[rsi]
+5f              # 0x00400b11  pop rdi
+be 00 27 40 00  # 0x00400b12  mov esi,0x402700
+e8 a4 fb ff ff  # 0x00400b17  call 0x4006c0  → strcpy_bounded
+49 8d 77 60     # 0x00400b1c  lea rsi,[r15+0x60]
+e8 9b fb ff ff  # 0x00400b20  call 0x4006c0  → strcpy_bounded
+be 30 0f 40 00  # 0x00400b25  mov esi,0x400f30
+e8 91 fb ff ff  # 0x00400b2a  call 0x4006c0  → strcpy_bounded
+49 8d 77 60     # 0x00400b2f  lea rsi,[r15+0x60]
+e8 88 fb ff ff  # 0x00400b33  call 0x4006c0  → strcpy_bounded
+be 00 2b 40 00  # 0x00400b38  mov esi,0x402b00
+e8 7e fb ff ff  # 0x00400b3d  call 0x4006c0  → strcpy_bounded
+41 83 7f 28 01  # 0x00400b42  cmp dword ptr [r15+0x28],1
+75 32           # 0x00400b47  jne 0x400b7b
+be 00 0f 40 00  # 0x00400b49  mov esi,0x400f00
+e8 6d fb ff ff  # 0x00400b4e  call 0x4006c0  → strcpy_bounded
+49 8d 77 60     # 0x00400b53  lea rsi,[r15+0x60]
+e8 64 fb ff ff  # 0x00400b57  call 0x4006c0  → strcpy_bounded
+be 30 0f 40 00  # 0x00400b5c  mov esi,0x400f30
+e8 5a fb ff ff  # 0x00400b61  call 0x4006c0  → strcpy_bounded
+49 8d 77 60     # 0x00400b66  lea rsi,[r15+0x60]
+e8 51 fb ff ff  # 0x00400b6a  call 0x4006c0  → strcpy_bounded
+be 60 0f 40 00  # 0x00400b6f  mov esi,0x400f60
+e8 47 fb ff ff  # 0x00400b74  call 0x4006c0  → strcpy_bounded
+eb 0a           # 0x00400b79  jmp 0x400b85
+be 70 0f 40 00  # 0x00400b7b  mov esi,0x400f70
+e8 3b fb ff ff  # 0x00400b80  call 0x4006c0  → strcpy_bounded
+be 00 2d 40 00  # 0x00400b85  mov esi,0x402d00
+e8 31 fb ff ff  # 0x00400b8a  call 0x4006c0  → strcpy_bounded
+c3              # 0x00400b8f  ret

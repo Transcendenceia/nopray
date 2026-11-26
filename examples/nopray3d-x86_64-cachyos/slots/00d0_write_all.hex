@@ -1,0 +1,16 @@
+# nopray slot `write_all` · code · vaddr 0x4000d0 · size 0x20 · used 26 bytes
+# purpose: write(fd, buf, len) until complete
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# write_all:
+48 85 d2        # 0x004000d0  test rdx,rdx
+74 14           # 0x004000d3  je 0x4000e9
+b8 01 00 00 00  # 0x004000d5  mov eax,1
+0f 05           # 0x004000da  syscall  ; write
+48 85 c0        # 0x004000dc  test rax,rax
+7e 08           # 0x004000df  jle 0x4000e9
+48 01 c6        # 0x004000e1  add rsi,rax
+48 29 c2        # 0x004000e4  sub rdx,rax
+75 ec           # 0x004000e7  jne 0x4000d5
+c3              # 0x004000e9  ret

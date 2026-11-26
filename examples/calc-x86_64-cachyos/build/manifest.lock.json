@@ -1,0 +1,113 @@
+{
+  "tool": "nopray 1.1.0",
+  "app": "calc",
+  "version": "1.0.0",
+  "size": 4096,
+  "sha256": "93227890dd57f148b30d3f77855097b74201504017a062e917cff4d371879db6",
+  "slots": [
+    {
+      "name": "elf_header",
+      "vaddr": "0x400000",
+      "size": 128,
+      "used": 114,
+      "sha256_used": "ae3496cfa18af4d39eb9ee92566e791a176636b6f3250e813e3f7f8cea9fca39",
+      "sha256_padded": "0d08aa6273f874da95df5c360f919ed71a05f443186b015fab4e0b2dc06ff38f"
+    },
+    {
+      "name": "read_exact",
+      "vaddr": "0x400080",
+      "size": 48,
+      "used": 31,
+      "sha256_used": "2392d69243d3c8af472d699e08f472f6fcdb217c0edaba7a2565e23a675ea358",
+      "sha256_padded": "d792ff0315d3f00b39529d5e5e9ec4c7941bd09eb3a1084cc3e19c774a4b3dd0"
+    },
+    {
+      "name": "write_all",
+      "vaddr": "0x4000b0",
+      "size": 48,
+      "used": 26,
+      "sha256_used": "f4e08100500c067b5b22c23d3ecc98b33145da352a3f8f2412710bf4ecac9963",
+      "sha256_padded": "4eb944fe096e5206609285d5b41a41f8f17cb5b599979e379a05ed56fda12f2d"
+    },
+    {
+      "name": "exit_clean",
+      "vaddr": "0x4000e0",
+      "size": 32,
+      "used": 9,
+      "sha256_used": "e5e48bb5cefb9c4ec6dae354d4669463b24727e897bf75b786690c3efbda55f4",
+      "sha256_padded": "84f984258bc6a8db5b4b7fe6002657a9e955869c86cbfb9b9e03ee3859f2c788"
+    },
+    {
+      "name": "_start",
+      "vaddr": "0x400100",
+      "size": 496,
+      "used": 488,
+      "sha256_used": "93bc551765e6cf09e548ca59348d7c40bab2472ad825817109259f45c888c1b1",
+      "sha256_padded": "bddc75062d75f853c9ee269253d5abcafb49f0511ca59d1a4f43815dc2845638"
+    },
+    {
+      "name": "event_loop",
+      "vaddr": "0x4002f0",
+      "size": 304,
+      "used": 255,
+      "sha256_used": "bf5bd461ba8b4b38d34963f86513b6f2e7c81acdec6756d7c03291add80b29ec",
+      "sha256_padded": "94b116c388898c02cf5f1dc705b7323400deaabf83a11361701cc8641227f0f8"
+    },
+    {
+      "name": "handle_action",
+      "vaddr": "0x400420",
+      "size": 440,
+      "used": 433,
+      "sha256_used": "9d0d6583e206e92e64074b62801b80adf061618b7fed0cf96deea28c35206e81",
+      "sha256_padded": "4b0bbff7b91e6f4acae9552d41250f80c114a11cbd70b0393159111a00a74c09"
+    },
+    {
+      "name": "apply_op",
+      "vaddr": "0x4005d8",
+      "size": 168,
+      "used": 156,
+      "sha256_used": "8d18f6b9935cddfcc13b11821b387179079be68ca8ee3eae19453662ef760762",
+      "sha256_padded": "ae605fb7d57a715d7996fc959bf7662f551bf9eb1bb41e33d49c5a2ab53e12a2"
+    },
+    {
+      "name": "format_display",
+      "vaddr": "0x400680",
+      "size": 384,
+      "used": 207,
+      "sha256_used": "95062de0bc38f74806d5a2e710c382b95032cda259b480eae8fbf1736766fc5c",
+      "sha256_padded": "4d7658d267f5e54626ea663b557c2a38018bdde80ee6c207e378731945a5c986"
+    },
+    {
+      "name": "fill_rect",
+      "vaddr": "0x400800",
+      "size": 128,
+      "used": 44,
+      "sha256_used": "52ddc35ea653e7e20c4c6ac22a4915cd18db4a01dafbdd221bec0a15f07893bf",
+      "sha256_padded": "fdedcc464f15b3d510e47fc2c7996dfd857c41892f47fc18e0873ccc87348dcc"
+    },
+    {
+      "name": "draw_glyph",
+      "vaddr": "0x400880",
+      "size": 224,
+      "used": 93,
+      "sha256_used": "df9e8577a0a8fef30f2c20e22ee8d6862ad61696aa91f9742c265397a8e21b20",
+      "sha256_padded": "089c694f7854d7ad73137e46ad2a42ecccbeffef6bf11d06eafb8916082657b8"
+    },
+    {
+      "name": "render_and_blit",
+      "vaddr": "0x400960",
+      "size": 672,
+      "used": 573,
+      "sha256_used": "8a88a325b3cf30cd623f5d9861bc7ed1cd31a5450014a979c205a58a82287851",
+      "sha256_padded": "f1ba4181da0a7a84f0ff2c0a737e80e6959e6cc421a1fd314a891f13e15dc56e"
+    },
+    {
+      "name": "rodata",
+      "vaddr": "0x400c00",
+      "size": 1024,
+      "used": 662,
+      "sha256_used": "00498def53da96ad1b925e80a77828c1b4fababf133c7a7ceea573183f8431f4",
+      "sha256_padded": "1abfa22d7f4fefd5d3dddc4a5b06a36854103647a3c70c4c92f721a5734f53ec"
+    }
+  ]
+}

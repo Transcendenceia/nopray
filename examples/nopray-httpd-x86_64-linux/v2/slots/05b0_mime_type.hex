@@ -1,0 +1,67 @@
+# nopray slot `mime_type` · code · vaddr 0x4005b0 · size 0xe0 · used 216 bytes
+# purpose: Map the file extension to a Content-Type string (rsi) and length (rcx)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# mime_type:
+8b 47 fc           # 0x004005b0  mov eax,[rdi-4]
+3d 68 74 6d 6c     # 0x004005b3  cmp eax,0x6c6d7468
+75 0b              # 0x004005b8  jne 0x4005c5
+be 30 0e 40 00     # 0x004005ba  mov esi,0x400e30
+b9 18 00 00 00     # 0x004005bf  mov ecx,0x18
+c3                 # 0x004005c4  ret
+3d 2e 63 73 73     # 0x004005c5  cmp eax,0x7373632e
+75 0b              # 0x004005ca  jne 0x4005d7
+be 48 0e 40 00     # 0x004005cc  mov esi,0x400e48
+b9 17 00 00 00     # 0x004005d1  mov ecx,0x17
+c3                 # 0x004005d6  ret
+3d 2e 73 76 67     # 0x004005d7  cmp eax,0x6776732e
+75 0b              # 0x004005dc  jne 0x4005e9
+be 60 0e 40 00     # 0x004005de  mov esi,0x400e60
+b9 0d 00 00 00     # 0x004005e3  mov ecx,0xd
+c3                 # 0x004005e8  ret
+3d 2e 70 6e 67     # 0x004005e9  cmp eax,0x676e702e
+75 0b              # 0x004005ee  jne 0x4005fb
+be 70 0e 40 00     # 0x004005f0  mov esi,0x400e70
+b9 09 00 00 00     # 0x004005f5  mov ecx,9
+c3                 # 0x004005fa  ret
+3d 77 65 62 70     # 0x004005fb  cmp eax,0x70626577
+75 0b              # 0x00400600  jne 0x40060d
+be 7c 0e 40 00     # 0x00400602  mov esi,0x400e7c
+b9 0a 00 00 00     # 0x00400607  mov ecx,0xa
+c3                 # 0x0040060c  ret
+3d 2e 74 74 66     # 0x0040060d  cmp eax,0x6674742e
+75 0b              # 0x00400612  jne 0x40061f
+be 88 0e 40 00     # 0x00400614  mov esi,0x400e88
+b9 08 00 00 00     # 0x00400619  mov ecx,8
+c3                 # 0x0040061e  ret
+3d 6a 73 6f 6e     # 0x0040061f  cmp eax,0x6e6f736a
+75 0b              # 0x00400624  jne 0x400631
+be 90 0e 40 00     # 0x00400626  mov esi,0x400e90
+b9 10 00 00 00     # 0x0040062b  mov ecx,0x10
+c3                 # 0x00400630  ret
+3d 2e 74 78 74     # 0x00400631  cmp eax,0x7478742e
+74 16              # 0x00400636  je 0x40064e
+3d 2e 68 65 78     # 0x00400638  cmp eax,0x7865682e
+74 0f              # 0x0040063d  je 0x40064e
+66 81 7f fe 6d 64  # 0x0040063f  cmp word ptr [rdi-2],0x646d
+75 12              # 0x00400645  jne 0x400659
+80 7f fd 2e        # 0x00400647  cmp byte ptr [rdi-3],0x2e
+75 0c              # 0x0040064b  jne 0x400659
+90                 # 0x0040064d  nop
+be a0 0e 40 00     # 0x0040064e  mov esi,0x400ea0
+b9 19 00 00 00     # 0x00400653  mov ecx,0x19
+c3                 # 0x00400658  ret
+3d 2e 77 61 76     # 0x00400659  cmp eax,0x7661772e
+75 0b              # 0x0040065e  jne 0x40066b
+be d8 0e 40 00     # 0x00400660  mov esi,0x400ed8
+b9 09 00 00 00     # 0x00400665  mov ecx,9
+c3                 # 0x0040066a  ret
+3d 2e 6d 70 33     # 0x0040066b  cmp eax,0x33706d2e
+75 0b              # 0x00400670  jne 0x40067d
+be e4 0e 40 00     # 0x00400672  mov esi,0x400ee4
+b9 0a 00 00 00     # 0x00400677  mov ecx,0xa
+c3                 # 0x0040067c  ret
+be c0 0e 40 00     # 0x0040067d  mov esi,0x400ec0
+b9 18 00 00 00     # 0x00400682  mov ecx,0x18
+c3                 # 0x00400687  ret

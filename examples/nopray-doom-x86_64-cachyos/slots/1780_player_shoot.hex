@@ -1,0 +1,76 @@
+# nopray slot `player_shoot` · code · vaddr 0x401780 · size 0x300 · used 371 bytes
+# purpose: Hitscan plasma cannon: consume ammo, set recoil + muzzle flash, test angular alignment & Z-buffer occlusion against alive Sentinels, apply damage/kill/victory
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# player_shoot:
+53                                # 0x00401780  push rbx  #= push rbx
+41 c7 87 94 00 00 00 00 00 00 00  # 0x00401781  mov dword ptr [r15+0x94],0  #= mov dword ptr [r15+0x94], 0
+41 83 7f 44 00                    # 0x0040178c  cmp dword ptr [r15+0x44],0  #= cmp dword ptr [r15+0x44], 0
+0f 85 5a 01 00 00                 # 0x00401791  jne 0x4018f1  #= jne 0x4018f1
+41 83 7f 78 00                    # 0x00401797  cmp dword ptr [r15+0x78],0  #= cmp dword ptr [r15+0x78], 0
+0f 85 4f 01 00 00                 # 0x0040179c  jne 0x4018f1  #= jne 0x4018f1
+41 83 7f 6c 00                    # 0x004017a2  cmp dword ptr [r15+0x6c],0  #= cmp dword ptr [r15+0x6c], 0
+0f 8e 44 01 00 00                 # 0x004017a7  jle 0x4018f1  #= jle 0x4018f1
+41 ff 4f 6c                       # 0x004017ad  dec dword ptr [r15+0x6c]  #= dec dword ptr [r15+0x6c]
+41 c7 47 78 0c 00 00 00           # 0x004017b1  mov dword ptr [r15+0x78],0xc  #= mov dword ptr [r15+0x78], 0xc
+41 c7 47 7c 60 00 00 00           # 0x004017b9  mov dword ptr [r15+0x7c],0x60  #= mov dword ptr [r15+0x7c], 0x60
+41 c7 87 84 00 00 00 18 00 00 00  # 0x004017c1  mov dword ptr [r15+0x84],0x18  #= mov dword ptr [r15+0x84], 0x18
+41 c7 87 d4 00 00 00 c0 12 00 00  # 0x004017cc  mov dword ptr [r15+0xd4],0x12c0  #= mov dword ptr [r15+0xd4], 0x12c0
+bb 90 43 40 00                    # 0x004017d7  mov ebx,0x404390  → f_constants  #= mov ebx, f_constants
+ba 00 aa 40 00                    # 0x004017dc  mov edx,0x40aa00  #= mov edx, 0x40aa00
+f2 0f 10 3a                       # 0x004017e1  movsd xmm7,[rdx]  #= movsd xmm7, [rdx]
+f2 0f 58 bb d8 00 00 00           # 0x004017e5  addsd xmm7,[rbx+0xd8]  #= addsd xmm7, [rbx+0xd8]
+be 00 96 40 00                    # 0x004017ed  mov esi,0x409600  #= mov esi, entities
+45 31 c0                          # 0x004017f2  xor r8d,r8d  #= xor r8d, r8d
+b9 20 00 00 00                    # 0x004017f5  mov ecx,0x20  #= mov ecx, 0x20
+83 7e 20 01                       # 0x004017fa  cmp dword ptr [rsi+0x20],1  #= cmp dword ptr [rsi+0x20], 1
+75 73                             # 0x004017fe  jne 0x401873  #= jne 0x401873
+83 7e 24 00                       # 0x00401800  cmp dword ptr [rsi+0x24],0  #= cmp dword ptr [rsi+0x24], 0
+7e 6d                             # 0x00401804  jle 0x401873  #= jle 0x401873
+f2 0f 10 06                       # 0x00401806  movsd xmm0,[rsi]  #= movsd xmm0, [rsi]
+f2 41 0f 5c 07                    # 0x0040180a  subsd xmm0,[r15]  #= subsd xmm0, [r15]
+f2 0f 10 4e 08                    # 0x0040180f  movsd xmm1,[rsi+8]  #= movsd xmm1, [rsi+8]
+f2 41 0f 5c 4f 08                 # 0x00401814  subsd xmm1,[r15+8]  #= subsd xmm1, [r15+8]
+f2 0f 10 d0                       # 0x0040181a  movsd xmm2,xmm0  #= movsd xmm2, xmm0
+f2 41 0f 59 57 18                 # 0x0040181e  mulsd xmm2,[r15+0x18]  #= mulsd xmm2, [r15+0x18]
+f2 0f 10 d9                       # 0x00401824  movsd xmm3,xmm1  #= movsd xmm3, xmm1
+f2 41 0f 59 5f 20                 # 0x00401828  mulsd xmm3,[r15+0x20]  #= mulsd xmm3, [r15+0x20]
+f2 0f 58 d3                       # 0x0040182e  addsd xmm2,xmm3  #= addsd xmm2, xmm3
+66 0f 2e 93 88 00 00 00           # 0x00401832  ucomisd xmm2,[rbx+0x88]  #= ucomisd xmm2, [rbx+0x88]
+76 37                             # 0x0040183a  jbe 0x401873  #= jbe 0x401873
+66 0f 2e d7                       # 0x0040183c  ucomisd xmm2,xmm7  #= ucomisd xmm2, xmm7
+73 31                             # 0x00401840  jae 0x401873  #= jae 0x401873
+f2 0f 10 e0                       # 0x00401842  movsd xmm4,xmm0  #= movsd xmm4, xmm0
+f2 41 0f 59 67 20                 # 0x00401846  mulsd xmm4,[r15+0x20]  #= mulsd xmm4, [r15+0x20]
+f2 0f 10 e9                       # 0x0040184c  movsd xmm5,xmm1  #= movsd xmm5, xmm1
+f2 41 0f 59 6f 18                 # 0x00401850  mulsd xmm5,[r15+0x18]  #= mulsd xmm5, [r15+0x18]
+f2 0f 5c e5                       # 0x00401856  subsd xmm4,xmm5  #= subsd xmm4, xmm5
+66 0f 54 a3 f0 00 00 00           # 0x0040185a  andpd xmm4,[rbx+0xf0]  #= andpd xmm4, [rbx+0xf0]
+66 0f 2e a3 90 00 00 00           # 0x00401862  ucomisd xmm4,[rbx+0x90]  #= ucomisd xmm4, [rbx+0x90]
+73 07                             # 0x0040186a  jae 0x401873  #= jae 0x401873
+f2 0f 10 fa                       # 0x0040186c  movsd xmm7,xmm2  #= movsd xmm7, xmm2
+49 89 f0                          # 0x00401870  mov r8,rsi  #= mov r8, rsi
+48 83 c6 40                       # 0x00401873  add rsi,0x40  #= add rsi, 0x40
+ff c9                             # 0x00401877  dec ecx  #= dec ecx
+0f 85 7b ff ff ff                 # 0x00401879  jne 0x4017fa  #= jne 0x4017fa
+4d 85 c0                          # 0x0040187f  test r8,r8  #= test r8, r8
+74 6d                             # 0x00401882  je 0x4018f1  #= je 0x4018f1
+41 c7 87 d8 00 00 00 a0 0f 00 00  # 0x00401884  mov dword ptr [r15+0xd8],0xfa0  #= mov dword ptr [r15+0xd8], 0xfa0
+41 c7 40 3c 05 00 00 00           # 0x0040188f  mov dword ptr [r8+0x3c],5  #= mov dword ptr [r8+0x3c], 5
+41 83 68 24 23                    # 0x00401897  sub dword ptr [r8+0x24],0x23  #= sub dword ptr [r8+0x24], 0x23
+41 83 78 24 00                    # 0x0040189c  cmp dword ptr [r8+0x24],0  #= cmp dword ptr [r8+0x24], 0
+7f 4e                             # 0x004018a1  jg 0x4018f1  #= jg 0x4018f1
+41 c7 87 d8 00 00 00 e0 2e 00 00  # 0x004018a3  mov dword ptr [r15+0xd8],0x2ee0  #= mov dword ptr [r15+0xd8], 0x2ee0
+41 c7 40 24 00 00 00 00           # 0x004018ae  mov dword ptr [r8+0x24],0  #= mov dword ptr [r8+0x24], 0
+41 c7 40 28 02 00 00 00           # 0x004018b6  mov dword ptr [r8+0x28],2  #= mov dword ptr [r8+0x28], 2
+41 c7 40 38 02 00 00 00           # 0x004018be  mov dword ptr [r8+0x38],2  #= mov dword ptr [r8+0x38], 2
+41 c7 40 2c 14 00 00 00           # 0x004018c6  mov dword ptr [r8+0x2c],0x14  #= mov dword ptr [r8+0x2c], 0x14
+41 ff 47 70                       # 0x004018ce  inc dword ptr [r15+0x70]  #= inc dword ptr [r15+0x70]
+41 83 47 74 64                    # 0x004018d2  add dword ptr [r15+0x74],0x64  #= add dword ptr [r15+0x74], 0x64
+41 83 7f 70 0a                    # 0x004018d7  cmp dword ptr [r15+0x70],0xa  #= cmp dword ptr [r15+0x70], 0xa
+7c 13                             # 0x004018dc  jl 0x4018f1  #= jl 0x4018f1
+41 c7 47 44 01 00 00 00           # 0x004018de  mov dword ptr [r15+0x44],1  #= mov dword ptr [r15+0x44], 1
+41 c7 87 dc 00 00 00 e0 2e 00 00  # 0x004018e6  mov dword ptr [r15+0xdc],0x2ee0  #= mov dword ptr [r15+0xdc], 0x2ee0
+5b                                # 0x004018f1  pop rbx  #= pop rbx
+c3                                # 0x004018f2  ret  #= ret

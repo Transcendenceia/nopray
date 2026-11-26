@@ -1,0 +1,10 @@
+# nopray slot `rodata` · rodata · vaddr 0x400140 · size 0x40 · used 18 bytes
+# purpose: Message bytes
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# msg:
+#
+# rodata:
+4e 4f 50 52 41 59 20 61 61 72 63 68 36 34 20 4f  # 0x00400140  |NOPRAY aarch64 O|  #= "NOPRAY aarch64 O"
+4b 0a                                            # 0x00400150  |K.|  #= "K\n"

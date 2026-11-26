@@ -1,0 +1,44 @@
+# nopray slot `elf_header` · header · vaddr 0x400000 · size 0x100 · used 232 bytes
+# purpose: ELF64 header + PT_LOAD r-x (32 KiB) + PT_LOAD rw- (1.5 MiB .bss) + PT_GNU_STACK rw-
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# elf_header:
+7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00  # 0x00400000  e_ident  #= e_ident ELF64 LE SysV
+02 00                                            # 0x00400010  e_type = ET_EXEC (0x2)  #= e_type ET_EXEC
+3e 00                                            # 0x00400012  e_machine = 0x3e  #= e_machine 62
+01 00 00 00                                      # 0x00400014  e_version = 0x1  #= e_version 1
+80 01 40 00 00 00 00 00                          # 0x00400018  e_entry = 0x400180  #= e_entry 0x400180
+40 00 00 00 00 00 00 00                          # 0x00400020  e_phoff = 0x40  #= e_phoff 0x40
+00 00 00 00 00 00 00 00                          # 0x00400028  e_shoff = 0x0  #= e_shoff 0
+00 00 00 00                                      # 0x00400030  e_flags = 0x0  #= e_flags 0
+40 00                                            # 0x00400034  e_ehsize = 0x40  #= e_ehsize 64
+38 00                                            # 0x00400036  e_phentsize = 0x38  #= e_phentsize 56
+03 00                                            # 0x00400038  e_phnum = 0x3  #= e_phnum 3
+40 00                                            # 0x0040003a  e_shentsize = 0x40  #= e_shentsize 64
+00 00                                            # 0x0040003c  e_shnum = 0x0  #= e_shnum 0
+00 00                                            # 0x0040003e  e_shstrndx = 0x0  #= e_shstrndx 0
+01 00 00 00                                      # 0x00400040  phdr[0].p_type = PT_LOAD (0x1)  #= p_type PT_LOAD
+05 00 00 00                                      # 0x00400044  phdr[0].p_flags = r-x (0x5)  #= p_flags r-x
+00 00 00 00 00 00 00 00                          # 0x00400048  phdr[0].p_offset = 0x0  #= p_offset 0
+00 00 40 00 00 00 00 00                          # 0x00400050  phdr[0].p_vaddr = 0x400000  #= p_vaddr 0x400000
+00 00 40 00 00 00 00 00                          # 0x00400058  phdr[0].p_paddr = 0x400000  #= p_paddr 0x400000
+00 80 00 00 00 00 00 00                          # 0x00400060  phdr[0].p_filesz = 0x8000  #= p_filesz 0x8000
+00 80 00 00 00 00 00 00                          # 0x00400068  phdr[0].p_memsz = 0x8000  #= p_memsz 0x8000
+00 10 00 00 00 00 00 00                          # 0x00400070  phdr[0].p_align = 0x1000  #= p_align 0x1000
+01 00 00 00                                      # 0x00400078  phdr[1].p_type = PT_LOAD (0x1)  #= p_type PT_LOAD
+06 00 00 00                                      # 0x0040007c  phdr[1].p_flags = rw- (0x6)  #= p_flags rw-
+00 00 00 00 00 00 00 00                          # 0x00400080  phdr[1].p_offset = 0x0  #= p_offset 0
+00 80 40 00 00 00 00 00                          # 0x00400088  phdr[1].p_vaddr = 0x408000  #= p_vaddr 0x408000
+00 80 40 00 00 00 00 00                          # 0x00400090  phdr[1].p_paddr = 0x408000  #= p_paddr 0x408000
+00 00 00 00 00 00 00 00                          # 0x00400098  phdr[1].p_filesz = 0x0  #= p_filesz 0
+00 00 18 00 00 00 00 00                          # 0x004000a0  phdr[1].p_memsz = 0x180000  #= p_memsz 0x180000
+00 10 00 00 00 00 00 00                          # 0x004000a8  phdr[1].p_align = 0x1000  #= p_align 0x1000
+51 e5 74 64                                      # 0x004000b0  phdr[2].p_type = PT_GNU_STACK (0x6474e551)  #= p_type PT_GNU_STACK
+06 00 00 00                                      # 0x004000b4  phdr[2].p_flags = rw- (0x6)  #= p_flags rw-
+00 00 00 00 00 00 00 00                          # 0x004000b8  phdr[2].p_offset = 0x0  #= p_offset 0
+00 00 00 00 00 00 00 00                          # 0x004000c0  phdr[2].p_vaddr = 0x0  #= p_vaddr 0
+00 00 00 00 00 00 00 00                          # 0x004000c8  phdr[2].p_paddr = 0x0  #= p_paddr 0
+00 00 00 00 00 00 00 00                          # 0x004000d0  phdr[2].p_filesz = 0x0  #= p_filesz 0
+00 00 00 00 00 00 00 00                          # 0x004000d8  phdr[2].p_memsz = 0x0  #= p_memsz 0
+10 00 00 00 00 00 00 00                          # 0x004000e0  phdr[2].p_align = 0x10  #= p_align 0x10
