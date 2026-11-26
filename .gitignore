@@ -1,0 +1,7 @@
+# Rust build artifacts & local caches
+/tools/nopray/target/
+/tools/.bin/
+*.swp
+*.tmp
+.DS_Store
+__pycache__/
