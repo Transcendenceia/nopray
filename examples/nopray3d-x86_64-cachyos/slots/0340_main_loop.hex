@@ -1,0 +1,70 @@
+# nopray slot `main_loop` · code · vaddr 0x400340 · size 0x180 · used 235 bytes
+# purpose: ~60 FPS loop: poll(fd,0) drains held keys, poll(fd,16ms) paces frames
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# main_loop:
+b8 07 00 00 00           # 0x00400340  mov eax,7
+49 8d 7f 60              # 0x00400345  lea rdi,[r15+0x60]
+be 01 00 00 00           # 0x00400349  mov esi,1
+31 d2                    # 0x0040034e  xor edx,edx
+0f 05                    # 0x00400350  syscall  ; poll
+85 c0                    # 0x00400352  test eax,eax
+0f 8e a3 00 00 00        # 0x00400354  jle 0x4003fd
+41 8b 7f 48              # 0x0040035a  mov edi,[r15+0x48]
+be 80 40 40 00           # 0x0040035e  mov esi,0x404080
+ba 20 00 00 00           # 0x00400363  mov edx,0x20
+e8 43 fd ff ff           # 0x00400368  call 0x4000b0  → read_exact
+85 c0                    # 0x0040036d  test eax,eax
+0f 84 7b fd ff ff        # 0x0040036f  je 0x4000f0  → exit_clean
+bb 80 40 40 00           # 0x00400375  mov ebx,0x404080
+0f b6 03                 # 0x0040037a  movzx eax,byte ptr [rbx]
+83 e0 7f                 # 0x0040037d  and eax,0x7f
+0f b6 4b 01              # 0x00400380  movzx ecx,byte ptr [rbx+1]
+83 f8 02                 # 0x00400384  cmp eax,2
+74 07                    # 0x00400387  je 0x400390
+83 f8 03                 # 0x00400389  cmp eax,3
+75 b2                    # 0x0040038c  jne 0x400340  → main_loop
+90                       # 0x0040038e  nop
+90                       # 0x0040038f  nop
+83 f8 02                 # 0x00400390  cmp eax,2
+75 2a                    # 0x00400393  jne 0x4003bf
+83 f9 09                 # 0x00400395  cmp ecx,9
+0f 84 52 fd ff ff        # 0x00400398  je 0x4000f0  → exit_clean
+83 f9 18                 # 0x0040039e  cmp ecx,0x18
+0f 84 49 fd ff ff        # 0x004003a1  je 0x4000f0  → exit_clean
+83 f9 41                 # 0x004003a7  cmp ecx,0x41
+75 07                    # 0x004003aa  jne 0x4003b3
+41 83 77 3c 01           # 0x004003ac  xor dword ptr [r15+0x3c],1
+eb 8d                    # 0x004003b1  jmp 0x400340  → main_loop
+83 f9 3a                 # 0x004003b3  cmp ecx,0x3a
+75 07                    # 0x004003b6  jne 0x4003bf
+41 83 77 40 01           # 0x004003b8  xor dword ptr [r15+0x40],1
+eb 81                    # 0x004003bd  jmp 0x400340  → main_loop
+be 80 11 40 00           # 0x004003bf  mov esi,0x401180
+0f b6 16                 # 0x004003c4  movzx edx,byte ptr [rsi]
+85 d2                    # 0x004003c7  test edx,edx
+0f 84 71 ff ff ff        # 0x004003c9  je 0x400340  → main_loop
+39 ca                    # 0x004003cf  cmp edx,ecx
+74 05                    # 0x004003d1  je 0x4003d8
+83 c6 02                 # 0x004003d3  add esi,2
+eb ec                    # 0x004003d6  jmp 0x4003c4
+0f b6 56 01              # 0x004003d8  movzx edx,byte ptr [rsi+1]
+83 f8 02                 # 0x004003dc  cmp eax,2
+75 11                    # 0x004003df  jne 0x4003f2
+41 09 57 38              # 0x004003e1  or [r15+0x38],edx
+41 c7 47 3c 00 00 00 00  # 0x004003e5  mov dword ptr [r15+0x3c],0
+e9 4e ff ff ff           # 0x004003ed  jmp 0x400340  → main_loop
+f7 d2                    # 0x004003f2  not edx
+41 21 57 38              # 0x004003f4  and [r15+0x38],edx
+e9 43 ff ff ff           # 0x004003f8  jmp 0x400340  → main_loop
+e8 be 00 00 00           # 0x004003fd  call 0x4004c0  → update_player
+e8 b9 02 00 00           # 0x00400402  call 0x4006c0  → render_3d
+e8 f4 07 00 00           # 0x00400407  call 0x400c00  → draw_hud
+e8 6f 0a 00 00           # 0x0040040c  call 0x400e80  → blit_x11
+b8 07 00 00 00           # 0x00400411  mov eax,7
+49 8d 7f 60              # 0x00400416  lea rdi,[r15+0x60]
+be 01 00 00 00           # 0x0040041a  mov esi,1
+ba 10 00 00 00           # 0x0040041f  mov edx,0x10
+0f 05                    # 0x00400424  syscall  ; poll
+e9 15 ff ff ff           # 0x00400426  jmp 0x400340  → main_loop

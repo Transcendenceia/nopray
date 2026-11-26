@@ -1,0 +1,118 @@
+{
+  "app": "hello-aarch64",
+  "version": "1.0.0",
+  "isa": "aarch64",
+  "tier": "L2",
+  "exposure": "local",
+  "size": 384,
+  "sha256": "83ad7aad1a700bd2e35b2b8a42eafb11747c5f795bd80b905e224b29a6f8bdf9",
+  "reference": "examples/hello-aarch64-linux/build/hello-aarch64",
+  "findings": [
+    {
+      "severity": "info",
+      "code": "R000",
+      "message": "examples/hello-aarch64-linux/build/hello-aarch64 is byte-identical to the map (384 bytes)"
+    }
+  ],
+  "slots": [
+    {
+      "name": "elf_header",
+      "kind": "header",
+      "vaddr": "0x400000",
+      "size": 256,
+      "used": 176,
+      "sha256": "ec2fb47db02cfcaeab847c67ac64be207544c65fcdcee31c47d55eb343243415",
+      "purpose": "ELF64 header (EM_AARCH64) + PT_LOAD r-x (align 64 KiB) + PT_GNU_STACK rw-",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "_start",
+      "kind": "code",
+      "vaddr": "0x400100",
+      "size": 64,
+      "used": 32,
+      "sha256": "b9f38af6d0798e48e86d16226a32666c0e9ad79c2d0de676bc6f4d3189ec52ad",
+      "purpose": "write(1, msg, 18) then exit(0)",
+      "coverage": "control-flow",
+      "instructions": 8,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [
+        "exit",
+        "write"
+      ],
+      "writes": [
+        "x0",
+        "x1",
+        "x2",
+        "x8"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 8,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "rodata",
+      "kind": "rodata",
+      "vaddr": "0x400140",
+      "size": 64,
+      "used": 18,
+      "sha256": "775f5cede93d2ca6492d494b684f2384112303e09ab2e07f32f40df1dabc78fd",
+      "purpose": "Message bytes",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [
+        "_start"
+      ],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    }
+  ],
+  "syscall_sites": [
+    {
+      "slot": "_start",
+      "addr": "0x400110",
+      "number": 64,
+      "name": "write"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x40011c",
+      "number": 93,
+      "name": "exit"
+    }
+  ],
+  "syscall_set": [
+    "exit",
+    "write"
+  ]
+}

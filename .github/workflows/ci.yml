@@ -1,0 +1,33 @@
+name: NOPRAY Audit & Test CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Clippy (-D warnings)
+        working-directory: tools/nopray
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Unit tests & byte-exact example rebuild/audit suite
+        working-directory: tools/nopray
+        run: cargo test
+
+      - name: Strict audit on flagship examples
+        run: |
+          T=./tools/nopray/target/debug/nopray
+          $T audit --strict examples/hello-aarch64-linux
+          $T audit --strict examples/hello-riscv64-linux
+          $T audit --strict examples/nopray-doom-x86_64-cachyos
+          $T annotate --check examples/nopray-doom-x86_64-cachyos

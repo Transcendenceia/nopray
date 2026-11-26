@@ -1,0 +1,146 @@
+# nopray slot `handle_action` · code · vaddr 0x400420 · size 0x1b8 · used 433 bytes
+# purpose: Calculator state machine: C, CE, digits, dot, + - x /, =, sign, %, chaining
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# handle_action:
+53                       # 0x00400420  push rbx
+89 ff                    # 0x00400421  mov edi,edi
+0f b6 87 60 0d 40 00     # 0x00400423  movzx eax,byte ptr [rdi+0x400d60]
+0f b6 b7 80 0d 40 00     # 0x0040042a  movzx esi,byte ptr [rdi+0x400d80]
+83 f8 03                 # 0x00400431  cmp eax,3
+75 1b                    # 0x00400434  jne 0x400451
+31 c0                    # 0x00400436  xor eax,eax
+49 89 07                 # 0x00400438  mov [r15],rax
+49 89 47 08              # 0x0040043b  mov [r15+8],rax
+49 89 47 10              # 0x0040043f  mov [r15+0x10],rax
+49 89 47 18              # 0x00400443  mov [r15+0x18],rax
+41 89 47 20              # 0x00400447  mov [r15+0x20],eax
+41 89 47 3c              # 0x0040044b  mov [r15+0x3c],eax
+5b                       # 0x0040044f  pop rbx
+c3                       # 0x00400450  ret
+83 f8 04                 # 0x00400451  cmp eax,4
+75 1c                    # 0x00400454  jne 0x400472
+31 c0                    # 0x00400456  xor eax,eax
+49 89 47 08              # 0x00400458  mov [r15+8],rax
+49 89 47 10              # 0x0040045c  mov [r15+0x10],rax
+41 89 47 20              # 0x00400460  mov [r15+0x20],eax
+41 89 47 3c              # 0x00400464  mov [r15+0x3c],eax
+41 c7 47 1c 01 00 00 00  # 0x00400468  mov dword ptr [r15+0x1c],1
+5b                       # 0x00400470  pop rbx
+c3                       # 0x00400471  ret
+41 83 7f 20 00           # 0x00400472  cmp dword ptr [r15+0x20],0
+74 02                    # 0x00400477  je 0x40047b
+5b                       # 0x00400479  pop rbx
+c3                       # 0x0040047a  ret
+85 c0                    # 0x0040047b  test eax,eax
+0f 85 88 00 00 00        # 0x0040047d  jne 0x40050b
+41 83 7f 1c 00           # 0x00400483  cmp dword ptr [r15+0x1c],0
+75 16                    # 0x00400488  jne 0x4004a0
+31 c0                    # 0x0040048a  xor eax,eax
+49 89 47 08              # 0x0040048c  mov [r15+8],rax
+49 89 47 10              # 0x00400490  mov [r15+0x10],rax
+41 89 47 3c              # 0x00400494  mov [r15+0x3c],eax
+41 c7 47 1c 01 00 00 00  # 0x00400498  mov dword ptr [r15+0x1c],1
+49 8b 4f 10              # 0x004004a0  mov rcx,[r15+0x10]
+48 85 c9                 # 0x004004a4  test rcx,rcx
+78 60                    # 0x004004a7  js 0x400509
+75 2c                    # 0x004004a9  jne 0x4004d7
+41 83 7f 3c 0a           # 0x004004ab  cmp dword ptr [r15+0x3c],0xa
+7d 57                    # 0x004004b0  jge 0x400509
+41 ff 47 3c              # 0x004004b2  inc dword ptr [r15+0x3c]
+49 8b 47 08              # 0x004004b6  mov rax,[r15+8]
+48 6b c0 0a              # 0x004004ba  imul rax,0xa
+69 d6 10 27 00 00        # 0x004004be  imul edx,esi,0x2710
+48 85 c0                 # 0x004004c4  test rax,rax
+79 05                    # 0x004004c7  jns 0x4004ce
+48 29 d0                 # 0x004004c9  sub rax,rdx
+eb 03                    # 0x004004cc  jmp 0x4004d1
+48 01 d0                 # 0x004004ce  add rax,rdx
+49 89 47 08              # 0x004004d1  mov [r15+8],rax
+5b                       # 0x004004d5  pop rbx
+c3                       # 0x004004d6  ret
+48 0f af f1              # 0x004004d7  imul rsi,rcx
+49 8b 47 08              # 0x004004db  mov rax,[r15+8]
+48 85 c0                 # 0x004004df  test rax,rax
+79 05                    # 0x004004e2  jns 0x4004e9
+48 29 f0                 # 0x004004e4  sub rax,rsi
+eb 03                    # 0x004004e7  jmp 0x4004ec
+48 01 f0                 # 0x004004e9  add rax,rsi
+49 89 47 08              # 0x004004ec  mov [r15+8],rax
+48 89 c8                 # 0x004004f0  mov rax,rcx
+31 d2                    # 0x004004f3  xor edx,edx
+b9 0a 00 00 00           # 0x004004f5  mov ecx,0xa
+48 f7 f1                 # 0x004004fa  div rcx
+48 85 c0                 # 0x004004fd  test rax,rax
+75 03                    # 0x00400500  jne 0x400505
+48 ff c8                 # 0x00400502  dec rax
+49 89 47 10              # 0x00400505  mov [r15+0x10],rax
+5b                       # 0x00400509  pop rbx
+c3                       # 0x0040050a  ret
+83 f8 05                 # 0x0040050b  cmp eax,5
+75 34                    # 0x0040050e  jne 0x400544
+41 83 7f 1c 00           # 0x00400510  cmp dword ptr [r15+0x1c],0
+75 1c                    # 0x00400515  jne 0x400533
+31 c0                    # 0x00400517  xor eax,eax
+49 89 47 08              # 0x00400519  mov [r15+8],rax
+41 89 47 3c              # 0x0040051d  mov [r15+0x3c],eax
+41 c7 47 1c 01 00 00 00  # 0x00400521  mov dword ptr [r15+0x1c],1
+49 c7 47 10 e8 03 00 00  # 0x00400529  mov qword ptr [r15+0x10],0x3e8
+5b                       # 0x00400531  pop rbx
+c3                       # 0x00400532  ret
+49 83 7f 10 00           # 0x00400533  cmp qword ptr [r15+0x10],0
+75 08                    # 0x00400538  jne 0x400542
+49 c7 47 10 e8 03 00 00  # 0x0040053a  mov qword ptr [r15+0x10],0x3e8
+5b                       # 0x00400542  pop rbx
+c3                       # 0x00400543  ret
+83 f8 01                 # 0x00400544  cmp eax,1
+75 39                    # 0x00400547  jne 0x400582
+41 83 7f 18 00           # 0x00400549  cmp dword ptr [r15+0x18],0
+74 17                    # 0x0040054e  je 0x400567
+41 83 7f 1c 00           # 0x00400550  cmp dword ptr [r15+0x1c],0
+74 10                    # 0x00400555  je 0x400567
+56                       # 0x00400557  push rsi
+e8 7b 00 00 00           # 0x00400558  call 0x4005d8  → apply_op
+5e                       # 0x0040055d  pop rsi
+41 83 7f 20 00           # 0x0040055e  cmp dword ptr [r15+0x20],0
+74 09                    # 0x00400563  je 0x40056e
+5b                       # 0x00400565  pop rbx
+c3                       # 0x00400566  ret
+49 8b 47 08              # 0x00400567  mov rax,[r15+8]
+49 89 07                 # 0x0040056b  mov [r15],rax
+41 89 77 18              # 0x0040056e  mov [r15+0x18],esi
+31 c0                    # 0x00400572  xor eax,eax
+41 89 47 1c              # 0x00400574  mov [r15+0x1c],eax
+49 89 47 10              # 0x00400578  mov [r15+0x10],rax
+41 89 47 3c              # 0x0040057c  mov [r15+0x3c],eax
+5b                       # 0x00400580  pop rbx
+c3                       # 0x00400581  ret
+83 f8 02                 # 0x00400582  cmp eax,2
+75 0e                    # 0x00400585  jne 0x400595
+41 83 7f 18 00           # 0x00400587  cmp dword ptr [r15+0x18],0
+74 05                    # 0x0040058c  je 0x400593
+e8 45 00 00 00           # 0x0040058e  call 0x4005d8  → apply_op
+5b                       # 0x00400593  pop rbx
+c3                       # 0x00400594  ret
+83 f8 06                 # 0x00400595  cmp eax,6
+75 14                    # 0x00400598  jne 0x4005ae
+49 f7 5f 08              # 0x0040059a  neg qword ptr [r15+8]
+41 83 7f 1c 00           # 0x0040059e  cmp dword ptr [r15+0x1c],0
+75 07                    # 0x004005a3  jne 0x4005ac
+49 8b 47 08              # 0x004005a5  mov rax,[r15+8]
+49 89 07                 # 0x004005a9  mov [r15],rax
+5b                       # 0x004005ac  pop rbx
+c3                       # 0x004005ad  ret
+83 f8 07                 # 0x004005ae  cmp eax,7
+75 1c                    # 0x004005b1  jne 0x4005cf
+49 8b 47 08              # 0x004005b3  mov rax,[r15+8]
+48 99                    # 0x004005b7  cqo
+b9 64 00 00 00           # 0x004005b9  mov ecx,0x64
+48 f7 f9                 # 0x004005be  idiv rcx
+49 89 47 08              # 0x004005c1  mov [r15+8],rax
+41 83 7f 1c 00           # 0x004005c5  cmp dword ptr [r15+0x1c],0
+75 03                    # 0x004005ca  jne 0x4005cf
+49 89 07                 # 0x004005cc  mov [r15],rax
+5b                       # 0x004005cf  pop rbx
+c3                       # 0x004005d0  ret

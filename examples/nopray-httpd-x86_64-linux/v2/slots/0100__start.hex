@@ -1,0 +1,175 @@
+# nopray slot `_start` · code · vaddr 0x400100 · size 0x1b0 · used 389 bytes
+# purpose: r15 = state; ignore SIGPIPE (rt_sigaction); socket, SO_REUSEADDR, bind 127.0.0.1:18950, listen; accept loop: read request, handle_request, close
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# _start:
+41 bf 00 a0 40 00        # 0x00400100  mov r15d,0x40a000
+41 c7 47 40 01 00 00 00  # 0x00400106  mov dword ptr [r15+0x40],1
+b8 0d 00 00 00           # 0x0040010e  mov eax,0xd
+bf 0d 00 00 00           # 0x00400113  mov edi,0xd
+49 8d 77 40              # 0x00400118  lea rsi,[r15+0x40]
+31 d2                    # 0x0040011c  xor edx,edx
+41 ba 08 00 00 00        # 0x0040011e  mov r10d,8
+0f 05                    # 0x00400124  syscall  ; rt_sigaction
+41 c7 47 24 01 00 00 00  # 0x00400126  mov dword ptr [r15+0x24],1
+41 c7 47 30 05 00 00 00  # 0x0040012e  mov dword ptr [r15+0x30],5
+b8 29 00 00 00           # 0x00400136  mov eax,0x29
+bf 02 00 00 00           # 0x0040013b  mov edi,2
+be 01 00 00 00           # 0x00400140  mov esi,1
+31 d2                    # 0x00400145  xor edx,edx
+0f 05                    # 0x00400147  syscall  ; socket
+85 c0                    # 0x00400149  test eax,eax
+78 93                    # 0x0040014b  js 0x4000e0  → exit_failure
+41 89 07                 # 0x0040014d  mov [r15],eax
+89 c7                    # 0x00400150  mov edi,eax
+b8 36 00 00 00           # 0x00400152  mov eax,0x36
+be 01 00 00 00           # 0x00400157  mov esi,1
+ba 02 00 00 00           # 0x0040015c  mov edx,2
+4d 8d 57 24              # 0x00400161  lea r10,[r15+0x24]
+41 b8 04 00 00 00        # 0x00400165  mov r8d,4
+0f 05                    # 0x0040016b  syscall  ; setsockopt
+41 8b 3f                 # 0x0040016d  mov edi,[r15]
+b8 31 00 00 00           # 0x00400170  mov eax,0x31
+be 00 0c 40 00           # 0x00400175  mov esi,0x400c00  → rodata
+ba 10 00 00 00           # 0x0040017a  mov edx,0x10
+0f 05                    # 0x0040017f  syscall  ; bind
+85 c0                    # 0x00400181  test eax,eax
+0f 88 57 ff ff ff        # 0x00400183  js 0x4000e0  → exit_failure
+41 8b 3f                 # 0x00400189  mov edi,[r15]
+b8 32 00 00 00           # 0x0040018c  mov eax,0x32
+be 40 00 00 00           # 0x00400191  mov esi,0x40
+0f 05                    # 0x00400196  syscall  ; listen
+85 c0                    # 0x00400198  test eax,eax
+0f 88 40 ff ff ff        # 0x0040019a  js 0x4000e0  → exit_failure
+90                       # 0x004001a0  nop
+90                       # 0x004001a1  nop
+90                       # 0x004001a2  nop
+90                       # 0x004001a3  nop
+90                       # 0x004001a4  nop
+90                       # 0x004001a5  nop
+90                       # 0x004001a6  nop
+90                       # 0x004001a7  nop
+90                       # 0x004001a8  nop
+90                       # 0x004001a9  nop
+90                       # 0x004001aa  nop
+90                       # 0x004001ab  nop
+90                       # 0x004001ac  nop
+90                       # 0x004001ad  nop
+90                       # 0x004001ae  nop
+90                       # 0x004001af  nop
+90                       # 0x004001b0  nop
+90                       # 0x004001b1  nop
+90                       # 0x004001b2  nop
+90                       # 0x004001b3  nop
+90                       # 0x004001b4  nop
+90                       # 0x004001b5  nop
+90                       # 0x004001b6  nop
+90                       # 0x004001b7  nop
+90                       # 0x004001b8  nop
+90                       # 0x004001b9  nop
+90                       # 0x004001ba  nop
+90                       # 0x004001bb  nop
+90                       # 0x004001bc  nop
+90                       # 0x004001bd  nop
+90                       # 0x004001be  nop
+90                       # 0x004001bf  nop
+90                       # 0x004001c0  nop
+90                       # 0x004001c1  nop
+90                       # 0x004001c2  nop
+90                       # 0x004001c3  nop
+90                       # 0x004001c4  nop
+90                       # 0x004001c5  nop
+90                       # 0x004001c6  nop
+90                       # 0x004001c7  nop
+90                       # 0x004001c8  nop
+90                       # 0x004001c9  nop
+90                       # 0x004001ca  nop
+90                       # 0x004001cb  nop
+90                       # 0x004001cc  nop
+90                       # 0x004001cd  nop
+90                       # 0x004001ce  nop
+90                       # 0x004001cf  nop
+90                       # 0x004001d0  nop
+90                       # 0x004001d1  nop
+90                       # 0x004001d2  nop
+90                       # 0x004001d3  nop
+90                       # 0x004001d4  nop
+90                       # 0x004001d5  nop
+90                       # 0x004001d6  nop
+90                       # 0x004001d7  nop
+90                       # 0x004001d8  nop
+90                       # 0x004001d9  nop
+90                       # 0x004001da  nop
+90                       # 0x004001db  nop
+90                       # 0x004001dc  nop
+90                       # 0x004001dd  nop
+90                       # 0x004001de  nop
+90                       # 0x004001df  nop
+90                       # 0x004001e0  nop
+90                       # 0x004001e1  nop
+90                       # 0x004001e2  nop
+90                       # 0x004001e3  nop
+90                       # 0x004001e4  nop
+90                       # 0x004001e5  nop
+90                       # 0x004001e6  nop
+90                       # 0x004001e7  nop
+90                       # 0x004001e8  nop
+90                       # 0x004001e9  nop
+90                       # 0x004001ea  nop
+90                       # 0x004001eb  nop
+90                       # 0x004001ec  nop
+90                       # 0x004001ed  nop
+90                       # 0x004001ee  nop
+90                       # 0x004001ef  nop
+90                       # 0x004001f0  nop
+90                       # 0x004001f1  nop
+90                       # 0x004001f2  nop
+90                       # 0x004001f3  nop
+90                       # 0x004001f4  nop
+90                       # 0x004001f5  nop
+90                       # 0x004001f6  nop
+90                       # 0x004001f7  nop
+90                       # 0x004001f8  nop
+90                       # 0x004001f9  nop
+90                       # 0x004001fa  nop
+90                       # 0x004001fb  nop
+90                       # 0x004001fc  nop
+90                       # 0x004001fd  nop
+90                       # 0x004001fe  nop
+90                       # 0x004001ff  nop
+41 8b 3f                 # 0x00400200  mov edi,[r15]
+31 f6                    # 0x00400203  xor esi,esi
+31 d2                    # 0x00400205  xor edx,edx
+b8 2b 00 00 00           # 0x00400207  mov eax,0x2b
+0f 05                    # 0x0040020c  syscall  ; accept
+85 c0                    # 0x0040020e  test eax,eax
+78 ee                    # 0x00400210  js 0x400200
+41 89 47 04              # 0x00400212  mov [r15+4],eax
+89 c7                    # 0x00400216  mov edi,eax
+b8 36 00 00 00           # 0x00400218  mov eax,0x36
+be 01 00 00 00           # 0x0040021d  mov esi,1
+ba 14 00 00 00           # 0x00400222  mov edx,0x14
+4d 8d 57 30              # 0x00400227  lea r10,[r15+0x30]
+41 b8 10 00 00 00        # 0x0040022b  mov r8d,0x10
+0f 05                    # 0x00400231  syscall  ; setsockopt
+41 8b 7f 04              # 0x00400233  mov edi,[r15+4]
+b8 36 00 00 00           # 0x00400237  mov eax,0x36
+be 01 00 00 00           # 0x0040023c  mov esi,1
+ba 15 00 00 00           # 0x00400241  mov edx,0x15
+4d 8d 57 30              # 0x00400246  lea r10,[r15+0x30]
+41 b8 10 00 00 00        # 0x0040024a  mov r8d,0x10
+0f 05                    # 0x00400250  syscall  ; setsockopt
+41 8b 7f 04              # 0x00400252  mov edi,[r15+4]
+be 00 a8 40 00           # 0x00400256  mov esi,0x40a800
+ba 00 08 00 00           # 0x0040025b  mov edx,0x800
+31 c0                    # 0x00400260  xor eax,eax
+0f 05                    # 0x00400262  syscall  ; read
+48 85 c0                 # 0x00400264  test rax,rax
+7e 0c                    # 0x00400267  jle 0x400275
+c6 80 00 a8 40 00 00     # 0x00400269  mov byte ptr [rax+0x40a800],0
+e8 3b 00 00 00           # 0x00400270  call 0x4002b0  → handle_request
+41 8b 7f 04              # 0x00400275  mov edi,[r15+4]
+b8 03 00 00 00           # 0x00400279  mov eax,3
+0f 05                    # 0x0040027e  syscall  ; close
+e9 7b ff ff ff           # 0x00400280  jmp 0x400200

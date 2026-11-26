@@ -1,0 +1,65 @@
+# nopray slot `reset_level` · code · vaddr 0x400e80 · size 0x200 · used 353 bytes
+# purpose: Copy 24x24 level map into .bss, initialize 10 Sentinels + 6 pickups from rodata spawn table, reset player pose/HP/ammo/kills/score
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# reset_level:
+be 00 45 40 00                    # 0x00400e80  mov esi,0x404500  → level_map_init  #= mov esi, level_map_init
+bf 00 92 40 00                    # 0x00400e85  mov edi,0x409200  #= mov edi, level_map
+b9 40 02 00 00                    # 0x00400e8a  mov ecx,0x240  #= mov ecx, 0x240
+f3 a4                             # 0x00400e8f  rep movsb [rdi],[rsi]  #= rep movsb
+bf 00 96 40 00                    # 0x00400e91  mov edi,0x409600  #= mov edi, entities
+31 c0                             # 0x00400e96  xor eax,eax  #= xor eax, eax
+b9 00 01 00 00                    # 0x00400e98  mov ecx,0x100  #= mov ecx, 0x100
+f3 48 ab                          # 0x00400e9d  rep stosq [rdi]  #= rep stosq
+be 80 47 40 00                    # 0x00400ea0  mov esi,0x404780  → entity_spawns  #= mov esi, entity_spawns
+bf 00 96 40 00                    # 0x00400ea5  mov edi,0x409600  #= mov edi, entities
+b9 10 00 00 00                    # 0x00400eaa  mov ecx,0x10  #= mov ecx, 0x10
+f3 0f 5a 06                       # 0x00400eaf  cvtss2sd xmm0,[rsi]  #= cvtss2sd xmm0, [rsi]
+f2 0f 11 07                       # 0x00400eb3  movsd [rdi],xmm0  #= movsd [rdi], xmm0
+f3 0f 5a 46 04                    # 0x00400eb7  cvtss2sd xmm0,[rsi+4]  #= cvtss2sd xmm0, [rsi+4]
+f2 0f 11 47 08                    # 0x00400ebc  movsd [rdi+8],xmm0  #= movsd [rdi+8], xmm0
+8b 46 08                          # 0x00400ec1  mov eax,[rsi+8]  #= mov eax, [rsi+8]
+89 47 20                          # 0x00400ec4  mov [rdi+0x20],eax  #= mov [rdi+0x20], eax
+8b 56 0c                          # 0x00400ec7  mov edx,[rsi+0xc]  #= mov edx, [rsi+0xc]
+89 57 2c                          # 0x00400eca  mov [rdi+0x2c],edx  #= mov [rdi+0x2c], edx
+83 f8 01                          # 0x00400ecd  cmp eax,1  #= cmp eax, 1
+75 10                             # 0x00400ed0  jne 0x400ee2  #= jne 0x400ee2
+c7 47 24 64 00 00 00              # 0x00400ed2  mov dword ptr [rdi+0x24],0x64  #= mov dword ptr [rdi+0x24], 0x64
+c7 47 38 00 00 00 00              # 0x00400ed9  mov dword ptr [rdi+0x38],0  #= mov dword ptr [rdi+0x38], 0
+eb 0d                             # 0x00400ee0  jmp 0x400eef  #= jmp 0x400eef
+c7 47 24 01 00 00 00              # 0x00400ee2  mov dword ptr [rdi+0x24],1  #= mov dword ptr [rdi+0x24], 1
+8d 50 01                          # 0x00400ee9  lea edx,[rax+1]  #= lea edx, [rax+1]
+89 57 38                          # 0x00400eec  mov [rdi+0x38],edx  #= mov [rdi+0x38], edx
+48 83 c6 10                       # 0x00400eef  add rsi,0x10  #= add rsi, 0x10
+48 83 c7 40                       # 0x00400ef3  add rdi,0x40  #= add rdi, 0x40
+ff c9                             # 0x00400ef7  dec ecx  #= dec ecx
+75 b4                             # 0x00400ef9  jne 0x400eaf  #= jne 0x400eaf
+be 90 43 40 00                    # 0x00400efb  mov esi,0x404390  → f_constants  #= mov esi, f_constants
+f2 0f 10 06                       # 0x00400f00  movsd xmm0,[rsi]  #= movsd xmm0, [rsi]
+f2 41 0f 11 07                    # 0x00400f04  movsd [r15],xmm0  #= movsd [r15], xmm0
+f2 0f 10 46 08                    # 0x00400f09  movsd xmm0,[rsi+8]  #= movsd xmm0, [rsi+8]
+f2 41 0f 11 47 08                 # 0x00400f0e  movsd [r15+8],xmm0  #= movsd [r15+8], xmm0
+f2 0f 10 46 10                    # 0x00400f14  movsd xmm0,[rsi+0x10]  #= movsd xmm0, [rsi+0x10]
+f2 41 0f 11 47 10                 # 0x00400f19  movsd [r15+0x10],xmm0  #= movsd [r15+0x10], xmm0
+41 c7 47 38 00 00 00 00           # 0x00400f1f  mov dword ptr [r15+0x38],0  #= mov dword ptr [r15+0x38], 0
+41 c7 47 3c 01 00 00 00           # 0x00400f27  mov dword ptr [r15+0x3c],1  #= mov dword ptr [r15+0x3c], 1
+41 c7 47 44 00 00 00 00           # 0x00400f2f  mov dword ptr [r15+0x44],0  #= mov dword ptr [r15+0x44], 0
+41 c7 47 68 64 00 00 00           # 0x00400f37  mov dword ptr [r15+0x68],0x64  #= mov dword ptr [r15+0x68], 0x64
+41 c7 47 6c 28 00 00 00           # 0x00400f3f  mov dword ptr [r15+0x6c],0x28  #= mov dword ptr [r15+0x6c], 0x28
+41 c7 47 70 00 00 00 00           # 0x00400f47  mov dword ptr [r15+0x70],0  #= mov dword ptr [r15+0x70], 0
+41 c7 47 74 00 00 00 00           # 0x00400f4f  mov dword ptr [r15+0x74],0  #= mov dword ptr [r15+0x74], 0
+41 c7 47 78 00 00 00 00           # 0x00400f57  mov dword ptr [r15+0x78],0  #= mov dword ptr [r15+0x78], 0
+41 c7 47 7c 00 00 00 00           # 0x00400f5f  mov dword ptr [r15+0x7c],0  #= mov dword ptr [r15+0x7c], 0
+41 c7 87 80 00 00 00 00 00 00 00  # 0x00400f67  mov dword ptr [r15+0x80],0  #= mov dword ptr [r15+0x80], 0
+41 c7 87 84 00 00 00 00 00 00 00  # 0x00400f72  mov dword ptr [r15+0x84],0  #= mov dword ptr [r15+0x84], 0
+41 c7 87 88 00 00 00 00 00 00 00  # 0x00400f7d  mov dword ptr [r15+0x88],0  #= mov dword ptr [r15+0x88], 0
+41 c7 87 8c 00 00 00 00 00 00 00  # 0x00400f88  mov dword ptr [r15+0x8c],0  #= mov dword ptr [r15+0x8c], 0
+41 c7 87 90 00 00 00 00 00 00 00  # 0x00400f93  mov dword ptr [r15+0x90],0  #= mov dword ptr [r15+0x90], 0
+41 c7 87 94 00 00 00 00 00 00 00  # 0x00400f9e  mov dword ptr [r15+0x94],0  #= mov dword ptr [r15+0x94], 0
+41 c7 87 98 00 00 00 00 00 00 00  # 0x00400fa9  mov dword ptr [r15+0x98],0  #= mov dword ptr [r15+0x98], 0
+41 c7 87 d4 00 00 00 00 00 00 00  # 0x00400fb4  mov dword ptr [r15+0xd4],0  #= mov dword ptr [r15+0xd4], 0
+41 c7 87 d8 00 00 00 00 00 00 00  # 0x00400fbf  mov dword ptr [r15+0xd8],0  #= mov dword ptr [r15+0xd8], 0
+41 c7 87 dc 00 00 00 00 00 00 00  # 0x00400fca  mov dword ptr [r15+0xdc],0  #= mov dword ptr [r15+0xdc], 0
+41 c7 87 e0 00 00 00 00 00 00 00  # 0x00400fd5  mov dword ptr [r15+0xe0],0  #= mov dword ptr [r15+0xe0], 0
+c3                                # 0x00400fe0  ret  #= ret

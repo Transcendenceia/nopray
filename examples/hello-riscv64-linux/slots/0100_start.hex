@@ -1,0 +1,15 @@
+# nopray slot `_start` · code · vaddr 0x400100 · size 0x40 · used 36 bytes
+# purpose: write(1, msg, 18) then exit(0)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# _start:
+13 05 10 00  # 0x00400100  addi a0,zero,1  #= addi a0,zero,1
+97 05 00 00  # 0x00400104  auipc a1,0x0  #= auipc a1,0x0
+93 85 c5 03  # 0x00400108  addi a1,a1,60  #= addi a1,a1,60
+13 06 20 01  # 0x0040010c  addi a2,zero,18  #= addi a2,zero,18
+93 08 00 04  # 0x00400110  addi a7,zero,64  #= addi a7,zero,64
+73 00 00 00  # 0x00400114  ecall  ; write  #= ecall
+13 05 00 00  # 0x00400118  addi a0,zero,0  #= addi a0,zero,0
+93 08 d0 05  # 0x0040011c  addi a7,zero,93  #= addi a7,zero,93
+73 00 00 00  # 0x00400120  ecall  ; exit  #= ecall

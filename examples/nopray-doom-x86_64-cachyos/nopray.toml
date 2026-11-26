@@ -1,0 +1,592 @@
+[app]
+name = "nopray-doom"
+version = "1.0.0"
+standard = "DMCS-1.1"
+tier = "L2"
+exposure = "local"
+description = "Transcendence DOOM: 32 KiB pure hand-authored x86-64 FPS engine (X11 640x400, procedural 64x64 wall/floor/ceiling textures, Z-buffered 3D sprites, Sentinel AI + fireballs, sliding doors, animated plasma cannon, HUD & minimap, W^X, 6 syscalls)."
+
+[target]
+isa = "x86-64"
+os = "linux"
+format = "elf64"
+base = 0x400000
+entry = "start"
+output = "nopray-doom"
+file_size = 0x8000
+state_register = "r15"
+state_base = 0x408000
+
+[syscalls]
+allow = ["socket", "connect", "read", "write", "poll", "exit"]
+
+[provenance]
+authored_by = "Angie (AI agent) & Marlon Basayo — TranscendenceIA"
+method = "Every x86-64 instruction opcode and ELF header byte authored by hand in hexadecimal; helper arithmetic resolves only @label branch displacements and declared rodata addresses. Attestation backed by DMCS-1.1 strict audit."
+date = "2026-11-26"
+
+[[segment]]
+name = "text"
+vaddr = 0x400000
+offset = 0x0
+file_size = 0x8000
+mem_size = 0x8000
+perms = "r-x"
+align = 0x1000
+
+[[segment]]
+name = "bss"
+vaddr = 0x408000
+offset = 0x0
+file_size = 0x0
+mem_size = 0x180000
+perms = "rw-"
+align = 0x1000
+
+# ── State fields accessed via r15 = 0x408000 ──────────────────────────────────
+[[state]]
+name = "pos_x"
+vaddr = 0x408000
+size = 8
+[[state]]
+name = "pos_y"
+vaddr = 0x408008
+size = 8
+[[state]]
+name = "angle"
+vaddr = 0x408010
+size = 8
+[[state]]
+name = "dir_x"
+vaddr = 0x408018
+size = 8
+[[state]]
+name = "dir_y"
+vaddr = 0x408020
+size = 8
+[[state]]
+name = "plane_x"
+vaddr = 0x408028
+size = 8
+[[state]]
+name = "plane_y"
+vaddr = 0x408030
+size = 8
+[[state]]
+name = "keys_mask"
+vaddr = 0x408038
+size = 4
+[[state]]
+name = "minimap_on"
+vaddr = 0x40803c
+size = 4
+[[state]]
+name = "frame_cnt"
+vaddr = 0x408040
+size = 4
+[[state]]
+name = "game_state"
+vaddr = 0x408044
+size = 4
+[[state]]
+name = "x11_fd"
+vaddr = 0x408048
+size = 4
+[[state]]
+name = "res_base"
+vaddr = 0x40804c
+size = 4
+[[state]]
+name = "root_win"
+vaddr = 0x408050
+size = 4
+[[state]]
+name = "root_visual"
+vaddr = 0x408054
+size = 4
+[[state]]
+name = "root_depth"
+vaddr = 0x408058
+size = 4
+[[state]]
+name = "mouse_prev_x"
+vaddr = 0x40805c
+size = 4
+[[state]]
+name = "pollfd"
+vaddr = 0x408060
+size = 8
+[[state]]
+name = "hp"
+vaddr = 0x408068
+size = 4
+[[state]]
+name = "ammo"
+vaddr = 0x40806c
+size = 4
+[[state]]
+name = "kills"
+vaddr = 0x408070
+size = 4
+[[state]]
+name = "score"
+vaddr = 0x408074
+size = 4
+[[state]]
+name = "fire_cd"
+vaddr = 0x408078
+size = 4
+[[state]]
+name = "muzzle_flash"
+vaddr = 0x40807c
+size = 4
+[[state]]
+name = "hurt_flash"
+vaddr = 0x408080
+size = 4
+[[state]]
+name = "gun_recoil"
+vaddr = 0x408084
+size = 4
+[[state]]
+name = "walk_bob"
+vaddr = 0x408088
+size = 4
+[[state]]
+name = "pickup_flash"
+vaddr = 0x40808c
+size = 4
+[[state]]
+name = "mouse_dx"
+vaddr = 0x408090
+size = 4
+[[state]]
+name = "want_shoot"
+vaddr = 0x408094
+size = 4
+[[state]]
+name = "want_use"
+vaddr = 0x408098
+size = 4
+[[state]]
+name = "rng_state"
+vaddr = 0x40809c
+size = 4
+[[state]]
+name = "x11_ev"
+vaddr = 0x4080a0
+size = 32
+[[state]]
+name = "audio_fd"
+vaddr = 0x4080c0
+size = 4
+[[state]]
+name = "audio_muted"
+vaddr = 0x4080c4
+size = 4
+[[state]]
+name = "audio_pollfd"
+vaddr = 0x4080c8
+size = 8
+[[state]]
+name = "audio_ch"
+vaddr = 0x4080d0
+size = 4
+[[state]]
+name = "sfx_shot_t"
+vaddr = 0x4080d4
+size = 4
+[[state]]
+name = "sfx_boom_t"
+vaddr = 0x4080d8
+size = 4
+[[state]]
+name = "sfx_chime_t"
+vaddr = 0x4080dc
+size = 4
+[[state]]
+name = "sfx_hurt_t"
+vaddr = 0x4080e0
+size = 4
+[[state]]
+name = "aud_ph_shot"
+vaddr = 0x4080e4
+size = 4
+[[state]]
+name = "aud_ph_boom"
+vaddr = 0x4080e8
+size = 4
+[[state]]
+name = "aud_ph_chime"
+vaddr = 0x4080ec
+size = 4
+[[state]]
+name = "aud_ph_hurt"
+vaddr = 0x4080f0
+size = 4
+[[state]]
+name = "aud_ph_bass"
+vaddr = 0x4080f4
+size = 4
+[[state]]
+name = "aud_step_cnt"
+vaddr = 0x4080f8
+size = 4
+[[state]]
+name = "aud_noise"
+vaddr = 0x4080fc
+size = 4
+[[state]]
+name = "x11_pkt"
+vaddr = 0x408200
+size = 4096
+[[state]]
+name = "level_map"
+vaddr = 0x409200
+size = 576
+[[state]]
+name = "entities"
+vaddr = 0x409600
+size = 2048
+[[state]]
+name = "zbuffer"
+vaddr = 0x40a000
+size = 5120
+[[state]]
+name = "sprite_order"
+vaddr = 0x40b400
+size = 128
+[[state]]
+name = "audio_pkt"
+vaddr = 0x40b500
+size = 4096
+[[state]]
+name = "framebuffer"
+vaddr = 0x410000
+size = 1024000
+[[state]]
+name = "textures"
+vaddr = 0x510000
+size = 131072
+[[state]]
+name = "sprites"
+vaddr = 0x530000
+size = 24576
+
+# ── Fixed slots (0x400000 .. 0x407FFF) ────────────────────────────────────────
+[[slot]]
+name = "elf_header"
+kind = "header"
+vaddr = 0x400000
+size = 0x100
+file = "slots/0000_elf_header.hex"
+purpose = "ELF64 header + PT_LOAD r-x (32 KiB) + PT_LOAD rw- (1.5 MiB .bss) + PT_GNU_STACK rw-"
+
+[[slot]]
+name = "io_helpers"
+kind = "code"
+vaddr = 0x400100
+size = 0x80
+file = "slots/0100_io_helpers.hex"
+purpose = "Syscall wrappers: read_exact (+0x00), write_all (+0x30), exit_clean (+0x60)"
+[[slot.label]]
+name = "read_exact"
+offset = 0x0
+entry = false
+note = "Read exact byte count from fd (slot start alias)"
+[[slot.label]]
+name = "write_all"
+offset = 0x30
+entry = true
+note = "Write exact byte count to fd"
+[[slot.label]]
+name = "exit_clean"
+offset = 0x60
+entry = true
+note = "Clean exit(0)"
+
+[[slot]]
+name = "start"
+kind = "code"
+vaddr = 0x400180
+size = 0x300
+file = "slots/0180_start.hex"
+purpose = "Pin r15=0x408000; X11 connect + handshake; CreateWindow 640x400; WM_NAME, WM_NORMAL_HINTS, CreateGC, MapWindow; init textures/sprites/level; jmp main_loop"
+[slot.contract]
+calls = ["io_helpers", "write_all", "init_textures", "init_sprites", "reset_level", "audio_engine"]
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r11", "r15"]
+noreturn = true
+
+[[slot]]
+name = "init_textures"
+kind = "code"
+vaddr = 0x400480
+size = 0x580
+file = "slots/0480_init_textures.hex"
+purpose = "Generate 7 procedural 64x64 BGRA TranscendenceIA textures at 0x510000 (obsidian panel, spectral conduit, ember reactor, violet monolith, cyber blast door, floor grid, ceiling panels)"
+[slot.contract]
+calls = []
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "rbp"]
+
+[[slot]]
+name = "init_sprites"
+kind = "code"
+vaddr = 0x400a00
+size = 0x480
+file = "slots/0a00_init_sprites.hex"
+purpose = "Generate 6 procedural 32x32 RGBA sprites at 0x530000 (Sentinel idle, attack flare, explosion burst, cyan medkit, violet ammo cell, ember fireball)"
+[slot.contract]
+calls = []
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "rbp"]
+
+[[slot]]
+name = "reset_level"
+kind = "code"
+vaddr = 0x400e80
+size = 0x200
+file = "slots/0e80_reset_level.hex"
+purpose = "Copy 24x24 level map into .bss, initialize 10 Sentinels + 6 pickups from rodata spawn table, reset player pose/HP/ammo/kills/score"
+[slot.contract]
+calls = []
+clobbers = ["rax", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "xmm0"]
+
+[[slot]]
+name = "main_loop"
+kind = "code"
+vaddr = 0x401080
+size = 0x380
+file = "slots/1080_main_loop.hex"
+purpose = "60 FPS event + frame loop: drain X11 keyboard/mouse events, dispatch update + 3D render + sprites + weapon + HUD + blit, pace 16ms via poll"
+[slot.contract]
+calls = ["io_helpers", "reset_level", "update_player", "player_shoot", "update_entities", "render_world", "render_sprites", "render_weapon", "render_hud", "blit_x11", "audio_tick"]
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r11"]
+noreturn = true
+
+[[slot]]
+name = "update_player"
+kind = "code"
+vaddr = 0x401400
+size = 0x380
+file = "slots/1400_update_player.hex"
+purpose = "x87 fsincos camera + FOV plane, WASD move/strafe + arrow/mouse turning + sprint, sliding collision against 24x24 map, E key door toggle, timer decay"
+[slot.contract]
+calls = []
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "st0", "st1", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6"]
+
+[[slot]]
+name = "player_shoot"
+kind = "code"
+vaddr = 0x401780
+size = 0x300
+file = "slots/1780_player_shoot.hex"
+purpose = "Hitscan plasma cannon: consume ammo, set recoil + muzzle flash, test angular alignment & Z-buffer occlusion against alive Sentinels, apply damage/kill/victory"
+[slot.contract]
+calls = []
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7"]
+
+[[slot]]
+name = "update_entities"
+kind = "code"
+vaddr = 0x401a80
+size = 0x580
+file = "slots/1a80_update_entities.hex"
+purpose = "Update pickups, Sentinel AI (sight/chase/windup/fireball launch with wall collision), enemy fireball flight/hit/damage, death explosion timers"
+[slot.contract]
+calls = []
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "rbp", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7"]
+
+[[slot]]
+name = "render_world"
+kind = "code"
+vaddr = 0x402000
+size = 0x900
+file = "slots/2000_render_world.hex"
+purpose = "Perspective textured floor & ceiling casting (640x336) + 640-column SSE2 DDA wall raycaster with 64x64 textures, Z-buffer store, N/S shading, distance fog, and muzzle-flash lighting"
+[slot.contract]
+calls = []
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "rbp", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14", "xmm15"]
+
+[[slot]]
+name = "render_sprites"
+kind = "code"
+vaddr = 0x402900
+size = 0x600
+file = "slots/2900_render_sprites.hex"
+purpose = "Back-to-front Z-sorted 3D billboard sprite projection and rendering clipped against per-column Z-buffer with fog and hit/flash tint"
+[slot.contract]
+calls = []
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "rbp", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11"]
+
+[[slot]]
+name = "render_weapon"
+kind = "code"
+vaddr = 0x402f00
+size = 0x480
+file = "slots/2f00_render_weapon.hex"
+purpose = "First-person animated Transcendence Plasma Cannon with walk bob, recoil, spectral rails, muzzle flash starburst, plus hurt/pickup screen edge flash"
+[slot.contract]
+calls = ["draw_primitives"]
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "rbp"]
+
+[[slot]]
+name = "draw_primitives"
+kind = "code"
+vaddr = 0x403380
+size = 0x300
+file = "slots/3380_draw_primitives.hex"
+purpose = "2D UI primitives on 640x400 BGRA framebuffer: fill_rect (+0x00), draw_glyph (+0xa0), draw_number (+0x160), draw_string (+0x210)"
+[slot.contract]
+calls = []
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "rbp"]
+[[slot.label]]
+name = "fill_rect"
+offset = 0x0
+entry = false
+note = "Clipped filled rectangle on 640x400 framebuffer (slot start alias)"
+[[slot.label]]
+name = "draw_glyph"
+offset = 0xa0
+entry = true
+note = "Draw 5x7 glyph (edi=x, esi=y, edx=char, ecx=scale, r8d=color)"
+[[slot.label]]
+name = "draw_number"
+offset = 0x160
+entry = true
+note = "Draw unsigned integer (edi=x, esi=y, edx=value, ecx=scale, r8d=color)"
+[[slot.label]]
+name = "draw_string"
+offset = 0x210
+entry = true
+note = "Draw NUL-terminated ASCII string (edi=x, esi=y, rdx=ptr, ecx=scale, r8d=color)"
+
+[[slot]]
+name = "render_hud"
+kind = "code"
+vaddr = 0x403680
+size = 0x600
+file = "slots/3680_render_hud.hex"
+purpose = "TranscendenceIA HUD bar (y=336..399), spectral divider, HP/AMMO/KILLS/SCORE readouts & bars, crosshair, toggleable 24x24 radar minimap, victory/gameover banners"
+[slot.contract]
+calls = ["draw_primitives", "draw_number", "draw_string"]
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "rbp", "xmm0", "xmm1"]
+
+[[slot]]
+name = "blit_x11"
+kind = "code"
+vaddr = 0x403c80
+size = 0x100
+file = "slots/3c80_blit_x11.hex"
+purpose = "Flicker-free X11 PutImage over 4 strips of 640x100 (256,000 B each)"
+[slot.contract]
+calls = ["write_all"]
+clobbers = ["rax", "rcx", "rdx", "rsi", "rdi", "r11"]
+
+[[slot]]
+name = "audio_engine"
+kind = "code"
+vaddr = 0x403d80
+size = 0x580
+file = "slots/3d80_audio_engine.hex"
+purpose = "Direct PipeWire/PulseAudio native Unix socket PCM synthesizer (24kHz S16LE mono, 400 samples/frame): audio_init (+0x00) and audio_tick (+0x180) with plasma shot, explosion, chime, hurt SFX, cyber-bass pulse, and instant mute"
+[slot.contract]
+calls = ["io_helpers", "write_all"]
+clobbers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "rbp"]
+[[slot.label]]
+name = "audio_init"
+offset = 0x0
+entry = false
+note = "Connect to /run/user/1000/pulse/native and open 24kHz S16LE mono stream (slot start alias)"
+[[slot.label]]
+name = "audio_tick"
+offset = 0x180
+entry = true
+note = "Mix 400 S16LE PCM samples (or silence when muted), drain server requests, and stream packet"
+
+[[slot]]
+name = "rodata"
+kind = "rodata"
+vaddr = 0x404300
+size = 0x3d00
+file = "slots/4300_rodata.hex"
+purpose = "Explicitly labelled read-only constants, X11 & PulseAudio headers, IEEE-754 floats, key table, 24x24 Transcendence Lab map, entity spawns, 5x7 font, HUD strings, and synth bass riff"
+[[slot.label]]
+name = "sockaddr_x11"
+offset = 0x0
+[[slot.label]]
+name = "x11_setup"
+offset = 0x14
+[[slot.label]]
+name = "win_title"
+offset = 0x20
+[[slot.label]]
+name = "wm_hints"
+offset = 0x40
+[[slot.label]]
+name = "f_constants"
+offset = 0x90
+[[slot.label]]
+name = "abs_mask"
+offset = 0x180
+[[slot.label]]
+name = "key_table"
+offset = 0x1a0
+[[slot.label]]
+name = "spectral_bar"
+offset = 0x1d0
+[[slot.label]]
+name = "level_map_init"
+offset = 0x200
+[[slot.label]]
+name = "entity_spawns"
+offset = 0x480
+[[slot.label]]
+name = "font_5x7"
+offset = 0x600
+[[slot.label]]
+name = "str_hp"
+offset = 0x800
+[[slot.label]]
+name = "str_ammo"
+offset = 0x808
+[[slot.label]]
+name = "str_kills"
+offset = 0x810
+[[slot.label]]
+name = "str_brand"
+offset = 0x818
+[[slot.label]]
+name = "str_victory"
+offset = 0x830
+[[slot.label]]
+name = "str_gameover"
+offset = 0x850
+[[slot.label]]
+name = "str_restart"
+offset = 0x870
+[[slot.label]]
+name = "str_controls"
+offset = 0x890
+[[slot.label]]
+name = "str_controls2"
+offset = 0x8b0
+[[slot.label]]
+name = "str_sfx_on"
+offset = 0x8d0
+[[slot.label]]
+name = "str_sfx_mute"
+offset = 0x8e0
+[[slot.label]]
+name = "sockaddr_pa"
+offset = 0x900
+[[slot.label]]
+name = "pa_pkt_auth"
+offset = 0x920
+[[slot.label]]
+name = "pa_pkt_name"
+offset = 0xa50
+[[slot.label]]
+name = "pa_pkt_stream"
+offset = 0xaa0
+[[slot.label]]
+name = "bass_riff"
+offset = 0xb20

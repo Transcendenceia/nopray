@@ -1,0 +1,110 @@
+# nopray slot `update_player` · code · vaddr 0x4004c0 · size 0x200 · used 416 bytes
+# purpose: x87 fsincos camera, 16:9 plane, autopilot tour or WASD/arrows, sliding collision
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# update_player:
+53                    # 0x004004c0  push rbx
+41 ff 47 44           # 0x004004c1  inc dword ptr [r15+0x44]
+bb 80 10 40 00        # 0x004004c5  mov ebx,0x401080
+41 dd 47 10           # 0x004004ca  fld st,qword ptr [r15+0x10]
+d9 fb                 # 0x004004ce  fsincos
+41 dd 5f 18           # 0x004004d0  fstp qword ptr [r15+0x18],st
+41 dd 5f 20           # 0x004004d4  fstp qword ptr [r15+0x20],st
+41 83 7f 3c 00        # 0x004004d8  cmp dword ptr [r15+0x3c],0
+74 65                 # 0x004004dd  je 0x400544
+f2 41 0f 10 47 18     # 0x004004df  movsd xmm0,[r15+0x18]
+f2 0f 59 43 40        # 0x004004e5  mulsd xmm0,[rbx+0x40]
+f2 41 0f 58 07        # 0x004004ea  addsd xmm0,[r15]
+f2 0f 2c c0           # 0x004004ef  cvttsd2si eax,xmm0
+f2 41 0f 10 4f 20     # 0x004004f3  movsd xmm1,[r15+0x20]
+f2 0f 59 4b 40        # 0x004004f9  mulsd xmm1,[rbx+0x40]
+f2 41 0f 58 4f 08     # 0x004004fe  addsd xmm1,[r15+8]
+f2 0f 2c c9           # 0x00400504  cvttsd2si ecx,xmm1
+c1 e1 04              # 0x00400508  shl ecx,4
+01 c8                 # 0x0040050b  add eax,ecx
+25 ff 00 00 00        # 0x0040050d  and eax,0xff
+80 b8 00 12 40 00 00  # 0x00400512  cmp byte ptr [rax+0x401200],0
+f2 41 0f 10 47 10     # 0x00400519  movsd xmm0,[r15+0x10]
+74 11                 # 0x0040051f  je 0x400532
+f2 0f 58 43 20        # 0x00400521  addsd xmm0,[rbx+0x20]
+f2 41 0f 11 47 10     # 0x00400526  movsd [r15+0x10],xmm0
+66 0f 57 d2           # 0x0040052c  xorpd xmm2,xmm2
+eb 58                 # 0x00400530  jmp 0x40058a
+f2 0f 58 43 38        # 0x00400532  addsd xmm0,[rbx+0x38]
+f2 41 0f 11 47 10     # 0x00400537  movsd [r15+0x10],xmm0
+f2 0f 10 53 30        # 0x0040053d  movsd xmm2,[rbx+0x30]
+eb 46                 # 0x00400542  jmp 0x40058a
+41 8b 47 38           # 0x00400544  mov eax,[r15+0x38]
+f2 0f 10 5b 20        # 0x00400548  movsd xmm3,[rbx+0x20]
+a8 10                 # 0x0040054d  test al,0x10
+74 04                 # 0x0040054f  je 0x400555
+f2 0f 58 db           # 0x00400551  addsd xmm3,xmm3
+66 0f 57 d2           # 0x00400555  xorpd xmm2,xmm2
+a8 01                 # 0x00400559  test al,1
+74 04                 # 0x0040055b  je 0x400561
+f2 0f 58 d3           # 0x0040055d  addsd xmm2,xmm3
+a8 02                 # 0x00400561  test al,2
+74 04                 # 0x00400563  je 0x400569
+f2 0f 5c d3           # 0x00400565  subsd xmm2,xmm3
+f2 41 0f 10 47 10     # 0x00400569  movsd xmm0,[r15+0x10]
+f2 0f 10 63 28        # 0x0040056f  movsd xmm4,[rbx+0x28]
+a8 04                 # 0x00400574  test al,4
+74 04                 # 0x00400576  je 0x40057c
+f2 0f 5c c4           # 0x00400578  subsd xmm0,xmm4
+a8 08                 # 0x0040057c  test al,8
+74 04                 # 0x0040057e  je 0x400584
+f2 0f 58 c4           # 0x00400580  addsd xmm0,xmm4
+f2 41 0f 11 47 10     # 0x00400584  movsd [r15+0x10],xmm0
+f2 41 0f 10 47 18     # 0x0040058a  movsd xmm0,[r15+0x18]
+f2 0f 59 c2           # 0x00400590  mulsd xmm0,xmm2
+f2 41 0f 10 0f        # 0x00400594  movsd xmm1,[r15]
+f2 0f 58 c8           # 0x00400599  addsd xmm1,xmm0
+f2 0f 10 5b 48        # 0x0040059d  movsd xmm3,[rbx+0x48]
+66 0f 57 e4           # 0x004005a2  xorpd xmm4,xmm4
+66 0f 2f c4           # 0x004005a6  comisd xmm0,xmm4
+73 06                 # 0x004005aa  jae 0x4005b2
+f2 0f 5c e3           # 0x004005ac  subsd xmm4,xmm3
+eb 04                 # 0x004005b0  jmp 0x4005b6
+f2 0f 58 e3           # 0x004005b2  addsd xmm4,xmm3
+f2 0f 58 e1           # 0x004005b6  addsd xmm4,xmm1
+f2 0f 2c c4           # 0x004005ba  cvttsd2si eax,xmm4
+f2 41 0f 2c 4f 08     # 0x004005be  cvttsd2si ecx,[r15+8]
+c1 e1 04              # 0x004005c4  shl ecx,4
+01 c8                 # 0x004005c7  add eax,ecx
+25 ff 00 00 00        # 0x004005c9  and eax,0xff
+80 b8 00 12 40 00 00  # 0x004005ce  cmp byte ptr [rax+0x401200],0
+75 05                 # 0x004005d5  jne 0x4005dc
+f2 41 0f 11 0f        # 0x004005d7  movsd [r15],xmm1
+f2 41 0f 10 47 20     # 0x004005dc  movsd xmm0,[r15+0x20]
+f2 0f 59 c2           # 0x004005e2  mulsd xmm0,xmm2
+f2 41 0f 10 4f 08     # 0x004005e6  movsd xmm1,[r15+8]
+f2 0f 58 c8           # 0x004005ec  addsd xmm1,xmm0
+66 0f 57 e4           # 0x004005f0  xorpd xmm4,xmm4
+66 0f 2f c4           # 0x004005f4  comisd xmm0,xmm4
+73 06                 # 0x004005f8  jae 0x400600
+f2 0f 5c e3           # 0x004005fa  subsd xmm4,xmm3
+eb 04                 # 0x004005fe  jmp 0x400604
+f2 0f 58 e3           # 0x00400600  addsd xmm4,xmm3
+f2 0f 58 e1           # 0x00400604  addsd xmm4,xmm1
+f2 0f 2c cc           # 0x00400608  cvttsd2si ecx,xmm4
+f2 41 0f 2c 07        # 0x0040060c  cvttsd2si eax,[r15]
+c1 e1 04              # 0x00400611  shl ecx,4
+01 c8                 # 0x00400614  add eax,ecx
+25 ff 00 00 00        # 0x00400616  and eax,0xff
+80 b8 00 12 40 00 00  # 0x0040061b  cmp byte ptr [rax+0x401200],0
+75 06                 # 0x00400622  jne 0x40062a
+f2 41 0f 11 4f 08     # 0x00400624  movsd [r15+8],xmm1
+41 dd 47 10           # 0x0040062a  fld st,qword ptr [r15+0x10]
+d9 fb                 # 0x0040062e  fsincos
+41 dd 5f 18           # 0x00400630  fstp qword ptr [r15+0x18],st
+41 dd 5f 20           # 0x00400634  fstp qword ptr [r15+0x20],st
+f2 41 0f 10 47 18     # 0x00400638  movsd xmm0,[r15+0x18]
+f2 0f 59 43 18        # 0x0040063e  mulsd xmm0,[rbx+0x18]
+f2 41 0f 11 47 30     # 0x00400643  movsd [r15+0x30],xmm0
+66 0f 57 c0           # 0x00400649  xorpd xmm0,xmm0
+f2 41 0f 5c 47 20     # 0x0040064d  subsd xmm0,[r15+0x20]
+f2 0f 59 43 18        # 0x00400653  mulsd xmm0,[rbx+0x18]
+f2 41 0f 11 47 28     # 0x00400658  movsd [r15+0x28],xmm0
+5b                    # 0x0040065e  pop rbx
+c3                    # 0x0040065f  ret

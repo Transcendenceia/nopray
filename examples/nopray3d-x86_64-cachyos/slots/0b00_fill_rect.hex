@@ -1,0 +1,21 @@
+# nopray slot `fill_rect` · code · vaddr 0x400b00 · size 0x40 · used 44 bytes
+# purpose: fill_rect with rep stosd on a 640x4 stride
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# fill_rect:
+69 f6 80 02 00 00        # 0x00400b00  imul esi,0x280
+01 fe                    # 0x00400b06  add esi,edi
+48 8d 3c b5 00 80 40 00  # 0x00400b08  lea rdi,[rsi*4+0x408000]
+85 c9                    # 0x00400b10  test ecx,ecx
+7e 17                    # 0x00400b12  jle 0x400b2b
+44 89 c0                 # 0x00400b14  mov eax,r8d
+48 89 fe                 # 0x00400b17  mov rsi,rdi
+51                       # 0x00400b1a  push rcx
+89 d1                    # 0x00400b1b  mov ecx,edx
+f3 ab                    # 0x00400b1d  rep stosd [rdi]
+59                       # 0x00400b1f  pop rcx
+48 8d be 00 0a 00 00     # 0x00400b20  lea rdi,[rsi+0xa00]
+ff c9                    # 0x00400b27  dec ecx
+75 e9                    # 0x00400b29  jne 0x400b14
+c3                       # 0x00400b2b  ret

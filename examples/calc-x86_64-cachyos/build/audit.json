@@ -1,0 +1,551 @@
+{
+  "app": "calc",
+  "version": "1.0.0",
+  "isa": "x86-64",
+  "tier": "L1",
+  "exposure": "local",
+  "size": 4096,
+  "sha256": "93227890dd57f148b30d3f77855097b74201504017a062e917cff4d371879db6",
+  "reference": "examples/calc-x86_64-cachyos/build/calc",
+  "findings": [
+    {
+      "severity": "warning",
+      "code": "S003",
+      "message": "no PT_GNU_STACK header: declare the stack non-executable explicitly (rw-)"
+    },
+    {
+      "severity": "warning",
+      "code": "S001",
+      "addr": "0x400000",
+      "message": "segment `image` is writable and executable (rwx); tier L2+ and exposed programs require W^X"
+    },
+    {
+      "severity": "warning",
+      "code": "C015",
+      "slot": "_start",
+      "addr": "0x4002e3",
+      "message": "execution falls through the slot end and slides over its NOP padding into `event_loop`: an implicit coupling; end with an explicit jmp/ret/exit"
+    },
+    {
+      "severity": "info",
+      "code": "R000",
+      "message": "examples/calc-x86_64-cachyos/build/calc is byte-identical to the map (4096 bytes)"
+    }
+  ],
+  "slots": [
+    {
+      "name": "elf_header",
+      "kind": "header",
+      "vaddr": "0x400000",
+      "size": 128,
+      "used": 114,
+      "sha256": "0d08aa6273f874da95df5c360f919ed71a05f443186b015fab4e0b2dc06ff38f",
+      "purpose": "ELF64 header + single PT_LOAD (rwx, memsz 0xA0000)",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "read_exact",
+      "kind": "code",
+      "vaddr": "0x400080",
+      "size": 48,
+      "used": 31,
+      "sha256": "d792ff0315d3f00b39529d5e5e9ec4c7941bd09eb3a1084cc3e19c774a4b3dd0",
+      "purpose": "read(fd, buf, len) until len bytes arrive",
+      "coverage": "full",
+      "instructions": 13,
+      "calls": [],
+      "called_by": [
+        "_start",
+        "event_loop"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [
+        "read"
+      ],
+      "writes": [
+        "r11",
+        "rax",
+        "rcx",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "write_all",
+      "kind": "code",
+      "vaddr": "0x4000b0",
+      "size": 48,
+      "used": 26,
+      "sha256": "4eb944fe096e5206609285d5b41a41f8f17cb5b599979e379a05ed56fda12f2d",
+      "purpose": "write(fd, buf, len) until everything is sent",
+      "coverage": "full",
+      "instructions": 10,
+      "calls": [],
+      "called_by": [
+        "_start",
+        "render_and_blit"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [
+        "write"
+      ],
+      "writes": [
+        "r11",
+        "rax",
+        "rcx",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "exit_clean",
+      "kind": "code",
+      "vaddr": "0x4000e0",
+      "size": 32,
+      "used": 9,
+      "sha256": "84f984258bc6a8db5b4b7fe6002657a9e955869c86cbfb9b9e03ee3859f2c788",
+      "purpose": "exit(0)",
+      "coverage": "full",
+      "instructions": 3,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [
+        "exit"
+      ],
+      "writes": [
+        "r11",
+        "rax",
+        "rcx",
+        "rdi"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "_start",
+      "kind": "code",
+      "vaddr": "0x400100",
+      "size": 496,
+      "used": 488,
+      "sha256": "bddc75062d75f853c9ee269253d5abcafb49f0511ca59d1a4f43815dc2845638",
+      "purpose": "r15 = state; connect /tmp/.X11-unix/X0; X11 handshake; CreateWindow 320x440, WM_NAME, WM_NORMAL_HINTS, CreateGC, MapWindow; first render",
+      "coverage": "full",
+      "instructions": 109,
+      "calls": [
+        "read_exact",
+        "render_and_blit",
+        "write_all"
+      ],
+      "called_by": [],
+      "jumps_to": [
+        "event_loop",
+        "exit_clean"
+      ],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [
+        "connect",
+        "socket"
+      ],
+      "writes": [
+        "r11",
+        "r15",
+        "rax",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "state"
+      ],
+      "state_writes": [
+        "state"
+      ],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "event_loop",
+      "kind": "code",
+      "vaddr": "0x4002f0",
+      "size": 304,
+      "used": 255,
+      "sha256": "94b116c388898c02cf5f1dc705b7323400deaabf83a11361701cc8641227f0f8",
+      "purpose": "Expose / ButtonPress hit-test 4x5 / ButtonRelease / KeyPress (ES + US + numpad)",
+      "coverage": "full",
+      "instructions": 73,
+      "calls": [
+        "handle_action",
+        "read_exact",
+        "render_and_blit"
+      ],
+      "called_by": [],
+      "jumps_to": [
+        "exit_clean"
+      ],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "rax",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "state"
+      ],
+      "state_writes": [
+        "state"
+      ],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "handle_action",
+      "kind": "code",
+      "vaddr": "0x400420",
+      "size": 440,
+      "used": 433,
+      "sha256": "4b0bbff7b91e6f4acae9552d41250f80c114a11cbd70b0393159111a00a74c09",
+      "purpose": "Calculator state machine: C, CE, digits, dot, + - x /, =, sign, %, chaining",
+      "coverage": "full",
+      "instructions": 140,
+      "calls": [
+        "apply_op"
+      ],
+      "called_by": [
+        "event_loop"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "rax",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "state"
+      ],
+      "state_writes": [
+        "state"
+      ],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "apply_op",
+      "kind": "code",
+      "vaddr": "0x4005d8",
+      "size": 168,
+      "used": 156,
+      "sha256": "ae605fb7d57a715d7996fc959bf7662f551bf9eb1bb41e33d49c5a2ab53e12a2",
+      "purpose": "Signed 64-bit fixed point (x10000) arithmetic with overflow and divide-by-zero guards",
+      "coverage": "full",
+      "instructions": 52,
+      "calls": [],
+      "called_by": [
+        "handle_action"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r8",
+        "r9",
+        "rax",
+        "rbx",
+        "rcx",
+        "rdx",
+        "rsp"
+      ],
+      "state_reads": [
+        "state"
+      ],
+      "state_writes": [
+        "state"
+      ],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "format_display",
+      "kind": "code",
+      "vaddr": "0x400680",
+      "size": 384,
+      "used": 207,
+      "sha256": "4d7658d267f5e54626ea663b557c2a38018bdde80ee6c207e378731945a5c986",
+      "purpose": "Scaled integer to glyph string (sign, decimal point, trailing-zero trim, ERR)",
+      "coverage": "full",
+      "instructions": 67,
+      "calls": [],
+      "called_by": [
+        "render_and_blit"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r8",
+        "r9",
+        "rax",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "state"
+      ],
+      "state_writes": [
+        "state"
+      ],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "fill_rect",
+      "kind": "code",
+      "vaddr": "0x400800",
+      "size": 128,
+      "used": 44,
+      "sha256": "fdedcc464f15b3d510e47fc2c7996dfd857c41892f47fc18e0873ccc87348dcc",
+      "purpose": "fill_rect(x, y, w, h, color) with rep stosd into the framebuffer",
+      "coverage": "full",
+      "instructions": 15,
+      "calls": [],
+      "called_by": [
+        "draw_glyph",
+        "render_and_blit"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "rax",
+        "rcx",
+        "rdi",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "draw_glyph",
+      "kind": "code",
+      "vaddr": "0x400880",
+      "size": 224,
+      "used": 93,
+      "sha256": "089c694f7854d7ad73137e46ad2a42ecccbeffef6bf11d06eafb8916082657b8",
+      "purpose": "draw_glyph(x, y, idx, scale, color) from the 5x7 bitmap font",
+      "coverage": "full",
+      "instructions": 34,
+      "calls": [
+        "fill_rect"
+      ],
+      "called_by": [
+        "render_and_blit"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r9",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "render_and_blit",
+      "kind": "code",
+      "vaddr": "0x400960",
+      "size": 672,
+      "used": 573,
+      "sha256": "f1ba4181da0a7a84f0ff2c0a737e80e6959e6cc421a1fd314a891f13e15dc56e",
+      "purpose": "Paint background, display, 20 buttons; PutImage in 4 strips of 320x110",
+      "coverage": "full",
+      "instructions": 144,
+      "calls": [
+        "draw_glyph",
+        "fill_rect",
+        "format_display",
+        "write_all"
+      ],
+      "called_by": [
+        "_start",
+        "event_loop"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r12",
+        "r13",
+        "r14",
+        "r8",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "state"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "rodata",
+      "kind": "rodata",
+      "vaddr": "0x400c00",
+      "size": 1024,
+      "used": 662,
+      "sha256": "1abfa22d7f4fefd5d3dddc4a5b06a36854103647a3c70c4c92f721a5734f53ec",
+      "purpose": "sockaddr_un, X11 setup packet, title, WM_SIZE_HINTS, 5x7 font, button tables, 43 key shortcuts",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [
+        "_start",
+        "event_loop"
+      ],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    }
+  ],
+  "syscall_sites": [
+    {
+      "slot": "read_exact",
+      "addr": "0x400087",
+      "number": 0,
+      "name": "read"
+    },
+    {
+      "slot": "write_all",
+      "addr": "0x4000ba",
+      "number": 1,
+      "name": "write"
+    },
+    {
+      "slot": "exit_clean",
+      "addr": "0x4000e7",
+      "number": 60,
+      "name": "exit"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x400117",
+      "number": 41,
+      "name": "socket"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x400132",
+      "number": 42,
+      "name": "connect"
+    }
+  ],
+  "syscall_set": [
+    "connect",
+    "exit",
+    "read",
+    "socket",
+    "write"
+  ]
+}

@@ -1,0 +1,77 @@
+# nopray slot `io_helpers` · code · vaddr 0x400100 · size 0x80 · used 105 bytes
+# purpose: Syscall wrappers: read_exact (+0x00), write_all (+0x30), exit_clean (+0x60)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# read_exact:
+#
+# io_helpers:
+48 85 d2        # 0x00400100  test rdx,rdx  #= test rdx, rdx
+74 11           # 0x00400103  je 0x400116  #= je 0x400116
+31 c0           # 0x00400105  xor eax,eax  #= xor eax, eax
+0f 05           # 0x00400107  syscall  ; read  #= syscall
+48 85 c0        # 0x00400109  test rax,rax  #= test rax, rax
+7e 0e           # 0x0040010c  jle 0x40011c  #= jle 0x40011c
+48 01 c6        # 0x0040010e  add rsi,rax  #= add rsi, rax
+48 29 c2        # 0x00400111  sub rdx,rax  #= sub rdx, rax
+eb ea           # 0x00400114  jmp 0x400100  → read_exact  #= jmp 0x400100
+b8 01 00 00 00  # 0x00400116  mov eax,1  #= mov eax, 1
+c3              # 0x0040011b  ret  #= ret
+31 c0           # 0x0040011c  xor eax,eax  #= xor eax, eax
+c3              # 0x0040011e  ret  #= ret
+90              # 0x0040011f  nop  #= nop
+90              # 0x00400120  nop  #= nop
+90              # 0x00400121  nop  #= nop
+90              # 0x00400122  nop  #= nop
+90              # 0x00400123  nop  #= nop
+90              # 0x00400124  nop  #= nop
+90              # 0x00400125  nop  #= nop
+90              # 0x00400126  nop  #= nop
+90              # 0x00400127  nop  #= nop
+90              # 0x00400128  nop  #= nop
+90              # 0x00400129  nop  #= nop
+90              # 0x0040012a  nop  #= nop
+90              # 0x0040012b  nop  #= nop
+90              # 0x0040012c  nop  #= nop
+90              # 0x0040012d  nop  #= nop
+90              # 0x0040012e  nop  #= nop
+90              # 0x0040012f  nop  #= nop
+#
+# write_all:
+48 85 d2        # 0x00400130  test rdx,rdx  #= test rdx, rdx
+74 14           # 0x00400133  je 0x400149  #= je 0x400149
+b8 01 00 00 00  # 0x00400135  mov eax,1  #= mov eax, 1
+0f 05           # 0x0040013a  syscall  ; write  #= syscall
+48 85 c0        # 0x0040013c  test rax,rax  #= test rax, rax
+7e 08           # 0x0040013f  jle 0x400149  #= jle 0x400149
+48 01 c6        # 0x00400141  add rsi,rax  #= add rsi, rax
+48 29 c2        # 0x00400144  sub rdx,rax  #= sub rdx, rax
+eb e7           # 0x00400147  jmp 0x400130  → write_all  #= jmp 0x400130
+c3              # 0x00400149  ret  #= ret
+90              # 0x0040014a  nop  #= nop
+90              # 0x0040014b  nop  #= nop
+90              # 0x0040014c  nop  #= nop
+90              # 0x0040014d  nop  #= nop
+90              # 0x0040014e  nop  #= nop
+90              # 0x0040014f  nop  #= nop
+90              # 0x00400150  nop  #= nop
+90              # 0x00400151  nop  #= nop
+90              # 0x00400152  nop  #= nop
+90              # 0x00400153  nop  #= nop
+90              # 0x00400154  nop  #= nop
+90              # 0x00400155  nop  #= nop
+90              # 0x00400156  nop  #= nop
+90              # 0x00400157  nop  #= nop
+90              # 0x00400158  nop  #= nop
+90              # 0x00400159  nop  #= nop
+90              # 0x0040015a  nop  #= nop
+90              # 0x0040015b  nop  #= nop
+90              # 0x0040015c  nop  #= nop
+90              # 0x0040015d  nop  #= nop
+90              # 0x0040015e  nop  #= nop
+90              # 0x0040015f  nop  #= nop
+#
+# exit_clean:
+b8 3c 00 00 00  # 0x00400160  mov eax,0x3c  #= mov eax, 0x3c
+31 ff           # 0x00400165  xor edi,edi  #= xor edi, edi
+0f 05           # 0x00400167  syscall  ; exit  #= syscall

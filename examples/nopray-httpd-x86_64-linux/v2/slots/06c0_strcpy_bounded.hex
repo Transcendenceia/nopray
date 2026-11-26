@@ -1,0 +1,16 @@
+# nopray slot `strcpy_bounded` · code · vaddr 0x4006c0 · size 0x20 · used 22 bytes
+# purpose: Append the NUL-terminated string at rsi to rdi, never writing past 0x437000
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# strcpy_bounded:
+48 85 f6           # 0x004006c0  test rsi,rsi
+74 10              # 0x004006c3  je 0x4006d5
+81 ff 00 70 43 00  # 0x004006c5  cmp edi,0x437000
+73 08              # 0x004006cb  jae 0x4006d5
+ac                 # 0x004006cd  lodsb [rsi]
+84 c0              # 0x004006ce  test al,al
+74 03              # 0x004006d0  je 0x4006d5
+aa                 # 0x004006d2  stosb [rdi]
+eb f0              # 0x004006d3  jmp 0x4006c5
+c3                 # 0x004006d5  ret

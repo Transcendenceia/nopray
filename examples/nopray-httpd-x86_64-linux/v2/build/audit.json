@@ -1,0 +1,790 @@
+{
+  "app": "nopray-httpd",
+  "version": "2.0.0",
+  "isa": "x86-64",
+  "tier": "L2",
+  "exposure": "internet",
+  "size": 40960,
+  "sha256": "5abe5a32236cdb0ec5317ae20f501e34a728c391f80df0a1fb25c051fd474c7d",
+  "reference": "examples/nopray-httpd-x86_64-linux/v2/build/nopray-httpd",
+  "findings": [
+    {
+      "severity": "warning",
+      "code": "S003",
+      "message": "no PT_GNU_STACK header: declare the stack non-executable explicitly (rw-)"
+    },
+    {
+      "severity": "info",
+      "code": "R000",
+      "message": "examples/nopray-httpd-x86_64-linux/v2/build/nopray-httpd is byte-identical to the map (40960 bytes)"
+    }
+  ],
+  "slots": [
+    {
+      "name": "elf_header",
+      "kind": "header",
+      "vaddr": "0x400000",
+      "size": 176,
+      "used": 170,
+      "sha256": "599fa158e8c87b9ce944614cada6ba4459304317230840cfd0411a59e7be6a3a",
+      "purpose": "ELF header and program headers",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "write_all",
+      "kind": "code",
+      "vaddr": "0x4000b0",
+      "size": 32,
+      "used": 26,
+      "sha256": "5421677889df141fa785382d75a8526ee3ea9f00b20dfcea7a0b695c715b239a",
+      "purpose": "write(fd, buf, len) until everything is sent",
+      "coverage": "full",
+      "instructions": 10,
+      "calls": [],
+      "called_by": [
+        "handle_request",
+        "send_buffer",
+        "serve_file"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [
+        "write"
+      ],
+      "writes": [
+        "r11",
+        "rax",
+        "rcx",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "strlen",
+      "kind": "code",
+      "vaddr": "0x4000d0",
+      "size": 16,
+      "used": 14,
+      "sha256": "93dac237dcf3828995263246785d09b750724e18264948258b62363281164438",
+      "purpose": "Length of the NUL-terminated string at rdi (result in rax)",
+      "coverage": "full",
+      "instructions": 6,
+      "calls": [],
+      "called_by": [
+        "handle_request"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "rax",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "exit_failure",
+      "kind": "code",
+      "vaddr": "0x4000e0",
+      "size": 32,
+      "used": 12,
+      "sha256": "6bab3ec95e7eaab4276148b4d41857b131f5d432ae210b5a382882a49e57b2af",
+      "purpose": "exit(1): startup failure path (socket/bind/listen errors)",
+      "coverage": "full",
+      "instructions": 3,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [
+        "exit"
+      ],
+      "writes": [
+        "r11",
+        "rax",
+        "rcx",
+        "rdi"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "_start",
+      "kind": "code",
+      "vaddr": "0x400100",
+      "size": 432,
+      "used": 389,
+      "sha256": "14b5d0cc4e3eb137b1f7bc96cb375bc75aaa3f7863b6ded5434f96f1ed8cfeb4",
+      "purpose": "r15 = state; ignore SIGPIPE (rt_sigaction); socket, SO_REUSEADDR, bind 127.0.0.1:18950, listen; accept loop: read request, handle_request, close",
+      "coverage": "full",
+      "instructions": 169,
+      "calls": [
+        "handle_request"
+      ],
+      "called_by": [],
+      "jumps_to": [
+        "exit_failure"
+      ],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [
+        "accept",
+        "bind",
+        "close",
+        "listen",
+        "read",
+        "rt_sigaction",
+        "setsockopt",
+        "socket"
+      ],
+      "writes": [
+        "r10",
+        "r11",
+        "r15",
+        "r8",
+        "rax",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "+0x0",
+        "+0x24",
+        "+0x30",
+        "+0x4",
+        "+0x40"
+      ],
+      "state_writes": [
+        "+0x0",
+        "+0x24",
+        "+0x30",
+        "+0x4",
+        "+0x40"
+      ],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "handle_request",
+      "kind": "code",
+      "vaddr": "0x4002b0",
+      "size": 768,
+      "used": 759,
+      "sha256": "3f9929e8113dc05ba7ad5aebdf3119cb83741adc328cb51c8bc9ef5594eee83c",
+      "purpose": "Parse method (GET/HEAD, else 405) and route: / /live /silent -> render_page; /healthz /deck-idle /styles.css -> embedded bodies; /assets /docs /downloads /content/site.txt -> path checks, openat, fstat, serve_file; else 400/404",
+      "coverage": "full",
+      "instructions": 238,
+      "calls": [
+        "mime_type",
+        "render_page",
+        "send_buffer",
+        "serve_file",
+        "strlen",
+        "write_all"
+      ],
+      "called_by": [
+        "_start"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [
+        "close",
+        "fstat",
+        "openat"
+      ],
+      "writes": [
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r8",
+        "r9",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "+0x4",
+        "+0x8"
+      ],
+      "state_writes": [
+        "+0x10",
+        "+0x28",
+        "+0x8",
+        "+0xc"
+      ],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "mime_type",
+      "kind": "code",
+      "vaddr": "0x4005b0",
+      "size": 224,
+      "used": 216,
+      "sha256": "d0844eaa17ba839be14a3f876d9fc79a592123d8e64e92d696684dd171c5da73",
+      "purpose": "Map the file extension to a Content-Type string (rsi) and length (rcx)",
+      "coverage": "full",
+      "instructions": 61,
+      "calls": [],
+      "called_by": [
+        "handle_request"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "rax",
+        "rcx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "utoa",
+      "kind": "code",
+      "vaddr": "0x400690",
+      "size": 48,
+      "used": 45,
+      "sha256": "e2524d65bf6cf457e823599911dd5e1425a75212b55d21dde66917441ada52c1",
+      "purpose": "Unsigned rax -> decimal ASCII at rdi (advances rdi)",
+      "coverage": "full",
+      "instructions": 17,
+      "calls": [],
+      "called_by": [
+        "send_buffer",
+        "serve_file"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r8",
+        "rax",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "strcpy_bounded",
+      "kind": "code",
+      "vaddr": "0x4006c0",
+      "size": 32,
+      "used": 22,
+      "sha256": "56a6125752d52939b3c2a9bbb8bd52620fb56d7c4274fbec2ddb5b4a47f68a7e",
+      "purpose": "Append the NUL-terminated string at rsi to rdi, never writing past 0x437000",
+      "coverage": "full",
+      "instructions": 10,
+      "calls": [],
+      "called_by": [
+        "compile_site",
+        "emit_youtube",
+        "render_page",
+        "send_buffer",
+        "serve_file"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "rax",
+        "rdi",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "html_escape",
+      "kind": "code",
+      "vaddr": "0x4006e0",
+      "size": 112,
+      "used": 91,
+      "sha256": "6ae7c14440dfb98e0a7e45ba60e8e172a1289b21cb90624638cbbedd05026eb4",
+      "purpose": "Copy rcx bytes from rsi to rdi escaping & < > \" ; bounded by 0x437000",
+      "coverage": "full",
+      "instructions": 31,
+      "calls": [],
+      "called_by": [
+        "compile_site"
+      ],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "rax",
+        "rcx",
+        "rdi",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "send_buffer",
+      "kind": "code",
+      "vaddr": "0x400750",
+      "size": 96,
+      "used": 93,
+      "sha256": "2feec90310b1eed183f343fc61178d0719445a67d13e95bdcd2b0abe1ed34300",
+      "purpose": "Send status line + headers + Content-Length, then the in-memory body unless the request is HEAD",
+      "coverage": "full",
+      "instructions": 26,
+      "calls": [
+        "strcpy_bounded",
+        "utoa",
+        "write_all"
+      ],
+      "called_by": [
+        "handle_request",
+        "render_page"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "rax",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "+0x4",
+        "+0xc"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "serve_file",
+      "kind": "code",
+      "vaddr": "0x4007b0",
+      "size": 144,
+      "used": 136,
+      "sha256": "6773d16d62e7413f39a5748c273dbca68bcd4282d352f1103f6a63079a5dc53a",
+      "purpose": "Send headers, then sendfile() loop for the opened file unless HEAD; close the file",
+      "coverage": "full",
+      "instructions": 38,
+      "calls": [
+        "strcpy_bounded",
+        "utoa",
+        "write_all"
+      ],
+      "called_by": [
+        "handle_request"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [
+        "close",
+        "sendfile"
+      ],
+      "writes": [
+        "r10",
+        "r11",
+        "r12",
+        "r8",
+        "r9",
+        "rax",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "+0x10",
+        "+0x4",
+        "+0x8",
+        "+0xc"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "render_page",
+      "kind": "code",
+      "vaddr": "0x400840",
+      "size": 256,
+      "used": 206,
+      "sha256": "4dd7de2bd681085358ae0d58b6e2b90b967a1a68e86184ad32716b08772e8fc5",
+      "purpose": "Build the page in RAM: shell + mode (gate/live/silent), read content/site.txt (<= 32 KiB), compile_site, footer, send_buffer",
+      "coverage": "full",
+      "instructions": 64,
+      "calls": [
+        "compile_site",
+        "send_buffer",
+        "strcpy_bounded"
+      ],
+      "called_by": [
+        "handle_request"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [
+        "close",
+        "openat",
+        "read"
+      ],
+      "writes": [
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r8",
+        "r9",
+        "rax",
+        "rbp",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "+0x28"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "compile_site",
+      "kind": "code",
+      "vaddr": "0x400940",
+      "size": 384,
+      "used": 371,
+      "sha256": "604fea3b6ca0e90ebb59ead7559114f20e369eb221dc9f60a41a8ca1f665745f",
+      "purpose": "Compile the site.txt tag lines (H1, LD, S1, TR, DO, YT, ...) into HTML5, escaping all text",
+      "coverage": "full",
+      "instructions": 146,
+      "calls": [
+        "emit_youtube",
+        "html_escape",
+        "strcpy_bounded"
+      ],
+      "called_by": [
+        "render_page"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r12",
+        "r13",
+        "r14",
+        "rax",
+        "rbx",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "emit_youtube",
+      "kind": "code",
+      "vaddr": "0x400ac0",
+      "size": 320,
+      "used": 208,
+      "sha256": "783f7759cc6ad422416af9d4ec245e71d655d3089a92b22ee70b8d883e9fb130",
+      "purpose": "Emit the YouTube embed: sanitise the id to [-_A-Za-z0-9]{1,15}, default ASO_zypdnsQ",
+      "coverage": "full",
+      "instructions": 60,
+      "calls": [
+        "strcpy_bounded"
+      ],
+      "called_by": [
+        "compile_site"
+      ],
+      "jumps_to": [],
+      "data_refs": [
+        "rodata"
+      ],
+      "referenced_by": [],
+      "syscalls": [],
+      "writes": [
+        "r12",
+        "rax",
+        "rcx",
+        "rdi",
+        "rdx",
+        "rsi",
+        "rsp"
+      ],
+      "state_reads": [
+        "+0x28",
+        "+0x60"
+      ],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    },
+    {
+      "name": "rodata",
+      "kind": "rodata",
+      "vaddr": "0x400c00",
+      "size": 37888,
+      "used": 35763,
+      "sha256": "a57a5ef6fed1fc1b67d847d0a588f71c9ede769ec2eacfa58b373947a09b031b",
+      "purpose": "HTTP response templates, site.txt path, MIME table, healthz JSON, embedded HTML shell and CSS",
+      "coverage": null,
+      "instructions": 0,
+      "calls": [],
+      "called_by": [],
+      "jumps_to": [],
+      "data_refs": [],
+      "referenced_by": [
+        "_start",
+        "compile_site",
+        "emit_youtube",
+        "handle_request",
+        "mime_type",
+        "render_page",
+        "send_buffer",
+        "serve_file"
+      ],
+      "syscalls": [],
+      "writes": [],
+      "state_reads": [],
+      "state_writes": [],
+      "indirect_branches": 0,
+      "intents": 0,
+      "intent_mismatches": 0
+    }
+  ],
+  "syscall_sites": [
+    {
+      "slot": "write_all",
+      "addr": "0x4000ba",
+      "number": 1,
+      "name": "write"
+    },
+    {
+      "slot": "exit_failure",
+      "addr": "0x4000ea",
+      "number": 60,
+      "name": "exit"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x400124",
+      "number": 13,
+      "name": "rt_sigaction"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x400147",
+      "number": 41,
+      "name": "socket"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x40016b",
+      "number": 54,
+      "name": "setsockopt"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x40017f",
+      "number": 49,
+      "name": "bind"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x400196",
+      "number": 50,
+      "name": "listen"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x40020c",
+      "number": 43,
+      "name": "accept"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x400231",
+      "number": 54,
+      "name": "setsockopt"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x400250",
+      "number": 54,
+      "name": "setsockopt"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x400262",
+      "number": 0,
+      "name": "read"
+    },
+    {
+      "slot": "_start",
+      "addr": "0x40027e",
+      "number": 3,
+      "name": "close"
+    },
+    {
+      "slot": "handle_request",
+      "addr": "0x4004fd",
+      "number": 257,
+      "name": "openat"
+    },
+    {
+      "slot": "handle_request",
+      "addr": "0x400513",
+      "number": 5,
+      "name": "fstat"
+    },
+    {
+      "slot": "handle_request",
+      "addr": "0x400559",
+      "number": 3,
+      "name": "close"
+    },
+    {
+      "slot": "serve_file",
+      "addr": "0x400820",
+      "number": 40,
+      "name": "sendfile"
+    },
+    {
+      "slot": "serve_file",
+      "addr": "0x400835",
+      "number": 3,
+      "name": "close"
+    },
+    {
+      "slot": "render_page",
+      "addr": "0x40088b",
+      "number": 257,
+      "name": "openat"
+    },
+    {
+      "slot": "render_page",
+      "addr": "0x4008ab",
+      "number": 0,
+      "name": "read"
+    },
+    {
+      "slot": "render_page",
+      "addr": "0x4008c7",
+      "number": 3,
+      "name": "close"
+    }
+  ],
+  "syscall_set": [
+    "accept",
+    "bind",
+    "close",
+    "exit",
+    "fstat",
+    "listen",
+    "openat",
+    "read",
+    "rt_sigaction",
+    "sendfile",
+    "setsockopt",
+    "socket",
+    "write"
+  ]
+}

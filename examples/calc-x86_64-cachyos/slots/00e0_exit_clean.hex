@@ -1,0 +1,9 @@
+# nopray slot `exit_clean` · code · vaddr 0x4000e0 · size 0x20 · used 9 bytes
+# purpose: exit(0)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# exit_clean:
+b8 3c 00 00 00  # 0x004000e0  mov eax,0x3c
+31 ff           # 0x004000e5  xor edi,edi
+0f 05           # 0x004000e7  syscall  ; exit

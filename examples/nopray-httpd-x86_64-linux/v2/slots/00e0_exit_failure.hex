@@ -1,0 +1,9 @@
+# nopray slot `exit_failure` · code · vaddr 0x4000e0 · size 0x20 · used 12 bytes
+# purpose: exit(1): startup failure path (socket/bind/listen errors)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# exit_failure:
+b8 3c 00 00 00  # 0x004000e0  mov eax,0x3c
+bf 01 00 00 00  # 0x004000e5  mov edi,1
+0f 05           # 0x004000ea  syscall  ; exit

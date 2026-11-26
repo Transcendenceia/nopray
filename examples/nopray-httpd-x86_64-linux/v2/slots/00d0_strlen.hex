@@ -1,0 +1,12 @@
+# nopray slot `strlen` · code · vaddr 0x4000d0 · size 0x10 · used 14 bytes
+# purpose: Length of the NUL-terminated string at rdi (result in rax)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# strlen:
+31 c0        # 0x004000d0  xor eax,eax
+80 3c 07 00  # 0x004000d2  cmp byte ptr [rdi+rax],0
+74 05        # 0x004000d6  je 0x4000dd
+48 ff c0     # 0x004000d8  inc rax
+eb f5        # 0x004000db  jmp 0x4000d2
+c3           # 0x004000dd  ret

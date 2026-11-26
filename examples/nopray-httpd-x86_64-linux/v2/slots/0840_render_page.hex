@@ -1,0 +1,70 @@
+# nopray slot `render_page` · code · vaddr 0x400840 · size 0x100 · used 206 bytes
+# purpose: Build the page in RAM: shell + mode (gate/live/silent), read content/site.txt (<= 32 KiB), compile_site, footer, send_buffer
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# render_page:
+53                    # 0x00400840  push rbx
+55                    # 0x00400841  push rbp
+41 54                 # 0x00400842  push r12
+41 55                 # 0x00400844  push r13
+41 56                 # 0x00400846  push r14
+bf 00 40 41 00        # 0x00400848  mov edi,0x414000
+be 00 18 40 00        # 0x0040084d  mov esi,0x401800
+e8 69 fe ff ff        # 0x00400852  call 0x4006c0  → strcpy_bounded
+41 83 7f 28 00        # 0x00400857  cmp dword ptr [r15+0x28],0
+75 0a                 # 0x0040085c  jne 0x400868
+be 00 1c 40 00        # 0x0040085e  mov esi,0x401c00
+e8 58 fe ff ff        # 0x00400863  call 0x4006c0  → strcpy_bounded
+be 00 20 40 00        # 0x00400868  mov esi,0x402000
+e8 4e fe ff ff        # 0x0040086d  call 0x4006c0  → strcpy_bounded
+49 89 fe              # 0x00400872  mov r14,rdi
+b8 01 01 00 00        # 0x00400875  mov eax,0x101
+48 c7 c7 9c ff ff ff  # 0x0040087a  mov rdi,0xffffffffffffff9c
+be 30 0c 40 00        # 0x00400881  mov esi,0x400c30
+31 d2                 # 0x00400886  xor edx,edx
+45 31 d2              # 0x00400888  xor r10d,r10d
+0f 05                 # 0x0040088b  syscall  ; openat
+85 c0                 # 0x0040088d  test eax,eax
+78 4b                 # 0x0040088f  js 0x4008dc
+89 c3                 # 0x00400891  mov ebx,eax
+41 bc 00 b0 40 00     # 0x00400893  mov r12d,0x40b000
+bd 00 80 00 00        # 0x00400899  mov ebp,0x8000
+85 ed                 # 0x0040089e  test ebp,ebp
+7e 19                 # 0x004008a0  jle 0x4008bb
+89 df                 # 0x004008a2  mov edi,ebx
+4c 89 e6              # 0x004008a4  mov rsi,r12
+89 ea                 # 0x004008a7  mov edx,ebp
+31 c0                 # 0x004008a9  xor eax,eax
+0f 05                 # 0x004008ab  syscall  ; read
+48 85 c0              # 0x004008ad  test rax,rax
+7e 09                 # 0x004008b0  jle 0x4008bb
+49 01 c4              # 0x004008b2  add r12,rax
+29 c5                 # 0x004008b5  sub ebp,eax
+eb e5                 # 0x004008b7  jmp 0x40089e
+90                    # 0x004008b9  nop
+90                    # 0x004008ba  nop
+41 c6 04 24 00        # 0x004008bb  mov byte ptr [r12],0
+89 df                 # 0x004008c0  mov edi,ebx
+b8 03 00 00 00        # 0x004008c2  mov eax,3
+0f 05                 # 0x004008c7  syscall  ; close
+4c 89 f7              # 0x004008c9  mov rdi,r14
+4c 89 e5              # 0x004008cc  mov rbp,r12
+41 bc 00 b0 40 00     # 0x004008cf  mov r12d,0x40b000
+e8 66 00 00 00        # 0x004008d5  call 0x400940  → compile_site
+eb 03                 # 0x004008da  jmp 0x4008df
+4c 89 f7              # 0x004008dc  mov rdi,r14
+be 00 24 40 00        # 0x004008df  mov esi,0x402400
+e8 d7 fd ff ff        # 0x004008e4  call 0x4006c0  → strcpy_bounded
+be 00 40 41 00        # 0x004008e9  mov esi,0x414000
+48 89 fa              # 0x004008ee  mov rdx,rdi
+48 29 f2              # 0x004008f1  sub rdx,rsi
+41 b8 30 0e 40 00     # 0x004008f4  mov r8d,0x400e30
+41 b9 18 00 00 00     # 0x004008fa  mov r9d,0x18
+e8 4b fe ff ff        # 0x00400900  call 0x400750  → send_buffer
+41 5e                 # 0x00400905  pop r14
+41 5d                 # 0x00400907  pop r13
+41 5c                 # 0x00400909  pop r12
+5d                    # 0x0040090b  pop rbp
+5b                    # 0x0040090c  pop rbx
+c3                    # 0x0040090d  ret

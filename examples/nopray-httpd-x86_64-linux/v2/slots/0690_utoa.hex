@@ -1,0 +1,23 @@
+# nopray slot `utoa` · code · vaddr 0x400690 · size 0x30 · used 45 bytes
+# purpose: Unsigned rax -> decimal ASCII at rdi (advances rdi)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# utoa:
+48 83 ec 20        # 0x00400690  sub rsp,0x20
+31 c9              # 0x00400694  xor ecx,ecx
+41 b8 0a 00 00 00  # 0x00400696  mov r8d,0xa
+31 d2              # 0x0040069c  xor edx,edx
+49 f7 f0           # 0x0040069e  div r8
+80 c2 30           # 0x004006a1  add dl,0x30
+88 14 0c           # 0x004006a4  mov [rsp+rcx],dl
+ff c1              # 0x004006a7  inc ecx
+48 85 c0           # 0x004006a9  test rax,rax
+75 ee              # 0x004006ac  jne 0x40069c
+ff c9              # 0x004006ae  dec ecx
+8a 04 0c           # 0x004006b0  mov al,[rsp+rcx]
+aa                 # 0x004006b3  stosb [rdi]
+85 c9              # 0x004006b4  test ecx,ecx
+75 f6              # 0x004006b6  jne 0x4006ae
+48 83 c4 20        # 0x004006b8  add rsp,0x20
+c3                 # 0x004006bc  ret

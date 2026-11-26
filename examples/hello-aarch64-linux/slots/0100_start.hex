@@ -1,0 +1,14 @@
+# nopray slot `_start` · code · vaddr 0x400100 · size 0x40 · used 32 bytes
+# purpose: write(1, msg, 18) then exit(0)
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# _start:
+20 00 80 d2  # 0x00400100  mov x0, #0x1  #= movz x0, #0x1
+e1 01 00 10  # 0x00400104  adr x1, 0x400140  → msg  #= adr x1, msg
+42 02 80 d2  # 0x00400108  mov x2, #0x12  #= movz x2, #0x12
+08 08 80 d2  # 0x0040010c  mov x8, #0x40  #= movz x8, #0x40
+01 00 00 d4  # 0x00400110  svc #0x0  ; write  #= svc #0x0
+00 00 80 d2  # 0x00400114  mov x0, #0x0  #= movz x0, #0x0
+a8 0b 80 d2  # 0x00400118  mov x8, #0x5d  #= movz x8, #0x5d
+01 00 00 d4  # 0x0040011c  svc #0x0  ; exit  #= svc #0x0

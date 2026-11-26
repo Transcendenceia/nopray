@@ -1,0 +1,152 @@
+# nopray slot `compile_site` · code · vaddr 0x400940 · size 0x180 · used 371 bytes
+# purpose: Compile the site.txt tag lines (H1, LD, S1, TR, DO, YT, ...) into HTML5, escaping all text
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# compile_site:
+49 39 ec           # 0x00400940  cmp r12,rbp
+0f 83 69 01 00 00  # 0x00400943  jae 0x400ab2
+4d 89 e5           # 0x00400949  mov r13,r12
+49 39 ed           # 0x0040094c  cmp r13,rbp
+73 0c              # 0x0040094f  jae 0x40095d
+41 80 7d 00 0a     # 0x00400951  cmp byte ptr [r13],0xa
+74 05              # 0x00400956  je 0x40095d
+49 ff c5           # 0x00400958  inc r13
+eb ef              # 0x0040095b  jmp 0x40094c
+4d 89 ee           # 0x0040095d  mov r14,r13
+4c 39 f5           # 0x00400960  cmp rbp,r14
+76 03              # 0x00400963  jbe 0x400968
+49 ff c6           # 0x00400965  inc r14
+4d 39 e5           # 0x00400968  cmp r13,r12
+76 0a              # 0x0040096b  jbe 0x400977
+41 80 7d ff 0d     # 0x0040096d  cmp byte ptr [r13-1],0xd
+75 03              # 0x00400972  jne 0x400977
+49 ff cd           # 0x00400974  dec r13
+4c 89 e8           # 0x00400977  mov rax,r13
+4c 29 e0           # 0x0040097a  sub rax,r12
+48 83 f8 02        # 0x0040097d  cmp rax,2
+0f 82 22 01 00 00  # 0x00400981  jb 0x400aa9
+41 80 3c 24 23     # 0x00400987  cmp byte ptr [r12],0x23
+0f 84 17 01 00 00  # 0x0040098c  je 0x400aa9
+41 0f b7 14 24     # 0x00400992  movzx edx,word ptr [r12]
+49 83 c4 02        # 0x00400997  add r12,2
+4d 39 ec           # 0x0040099b  cmp r12,r13
+73 0a              # 0x0040099e  jae 0x4009aa
+41 80 3c 24 20     # 0x004009a0  cmp byte ptr [r12],0x20
+75 03              # 0x004009a5  jne 0x4009aa
+49 ff c4           # 0x004009a7  inc r12
+bb 00 15 40 00     # 0x004009aa  mov ebx,0x401500
+0f b7 03           # 0x004009af  movzx eax,word ptr [rbx]
+85 c0              # 0x004009b2  test eax,eax
+0f 84 ef 00 00 00  # 0x004009b4  je 0x400aa9
+39 d0              # 0x004009ba  cmp eax,edx
+74 05              # 0x004009bc  je 0x4009c3
+83 c3 10           # 0x004009be  add ebx,0x10
+eb ec              # 0x004009c1  jmp 0x4009af
+0f b7 43 02        # 0x004009c3  movzx eax,word ptr [rbx+2]
+83 f8 03           # 0x004009c7  cmp eax,3
+75 0d              # 0x004009ca  jne 0x4009d9
+8b 73 04           # 0x004009cc  mov esi,[rbx+4]
+e8 ec fc ff ff     # 0x004009cf  call 0x4006c0  → strcpy_bounded
+e9 d0 00 00 00     # 0x004009d4  jmp 0x400aa9
+83 f8 04           # 0x004009d9  cmp eax,4
+75 0a              # 0x004009dc  jne 0x4009e8
+e8 dd 00 00 00     # 0x004009de  call 0x400ac0  → emit_youtube
+e9 c1 00 00 00     # 0x004009e3  jmp 0x400aa9
+83 f8 05           # 0x004009e8  cmp eax,5
+75 18              # 0x004009eb  jne 0x400a05
+4c 89 e6           # 0x004009ed  mov rsi,r12
+4c 89 e9           # 0x004009f0  mov rcx,r13
+4c 29 e1           # 0x004009f3  sub rcx,r12
+e8 e5 fc ff ff     # 0x004009f6  call 0x4006e0  → html_escape
+b0 0a              # 0x004009fb  mov al,0xa
+aa                 # 0x004009fd  stosb [rdi]
+e9 a6 00 00 00     # 0x004009fe  jmp 0x400aa9
+90                 # 0x00400a03  nop
+90                 # 0x00400a04  nop
+85 c0              # 0x00400a05  test eax,eax
+75 23              # 0x00400a07  jne 0x400a2c
+8b 73 04           # 0x00400a09  mov esi,[rbx+4]
+e8 af fc ff ff     # 0x00400a0c  call 0x4006c0  → strcpy_bounded
+4c 89 e6           # 0x00400a11  mov rsi,r12
+4c 89 e9           # 0x00400a14  mov rcx,r13
+4c 29 e1           # 0x00400a17  sub rcx,r12
+e8 c1 fc ff ff     # 0x00400a1a  call 0x4006e0  → html_escape
+8b 73 0c           # 0x00400a1f  mov esi,[rbx+0xc]
+e8 99 fc ff ff     # 0x00400a22  call 0x4006c0  → strcpy_bounded
+e9 7d 00 00 00     # 0x00400a27  jmp 0x400aa9
+4c 89 e2           # 0x00400a2c  mov rdx,r12
+4c 39 ea           # 0x00400a2f  cmp rdx,r13
+73 0b              # 0x00400a32  jae 0x400a3f
+80 3a 7c           # 0x00400a34  cmp byte ptr [rdx],0x7c
+74 06              # 0x00400a37  je 0x400a3f
+48 ff c2           # 0x00400a39  inc rdx
+eb f1              # 0x00400a3c  jmp 0x400a2f
+90                 # 0x00400a3e  nop
+52                 # 0x00400a3f  push rdx
+8b 73 04           # 0x00400a40  mov esi,[rbx+4]
+e8 78 fc ff ff     # 0x00400a43  call 0x4006c0  → strcpy_bounded
+48 8b 0c 24        # 0x00400a48  mov rcx,[rsp]
+4c 89 e6           # 0x00400a4c  mov rsi,r12
+4c 29 e1           # 0x00400a4f  sub rcx,r12
+e8 89 fc ff ff     # 0x00400a52  call 0x4006e0  → html_escape
+8b 73 08           # 0x00400a57  mov esi,[rbx+8]
+e8 61 fc ff ff     # 0x00400a5a  call 0x4006c0  → strcpy_bounded
+5e                 # 0x00400a5f  pop rsi
+4c 39 ee           # 0x00400a60  cmp rsi,r13
+73 0e              # 0x00400a63  jae 0x400a73
+48 ff c6           # 0x00400a65  inc rsi
+4c 89 e9           # 0x00400a68  mov rcx,r13
+48 29 f1           # 0x00400a6b  sub rcx,rsi
+e8 6d fc ff ff     # 0x00400a6e  call 0x4006e0  → html_escape
+8b 73 0c           # 0x00400a73  mov esi,[rbx+0xc]
+e8 45 fc ff ff     # 0x00400a76  call 0x4006c0  → strcpy_bounded
+eb 2c              # 0x00400a7b  jmp 0x400aa9
+90                 # 0x00400a7d  nop
+90                 # 0x00400a7e  nop
+90                 # 0x00400a7f  nop
+90                 # 0x00400a80  nop
+90                 # 0x00400a81  nop
+90                 # 0x00400a82  nop
+90                 # 0x00400a83  nop
+90                 # 0x00400a84  nop
+90                 # 0x00400a85  nop
+90                 # 0x00400a86  nop
+90                 # 0x00400a87  nop
+90                 # 0x00400a88  nop
+90                 # 0x00400a89  nop
+90                 # 0x00400a8a  nop
+90                 # 0x00400a8b  nop
+90                 # 0x00400a8c  nop
+90                 # 0x00400a8d  nop
+90                 # 0x00400a8e  nop
+90                 # 0x00400a8f  nop
+90                 # 0x00400a90  nop
+90                 # 0x00400a91  nop
+90                 # 0x00400a92  nop
+90                 # 0x00400a93  nop
+90                 # 0x00400a94  nop
+90                 # 0x00400a95  nop
+90                 # 0x00400a96  nop
+90                 # 0x00400a97  nop
+90                 # 0x00400a98  nop
+90                 # 0x00400a99  nop
+90                 # 0x00400a9a  nop
+90                 # 0x00400a9b  nop
+90                 # 0x00400a9c  nop
+90                 # 0x00400a9d  nop
+90                 # 0x00400a9e  nop
+90                 # 0x00400a9f  nop
+90                 # 0x00400aa0  nop
+90                 # 0x00400aa1  nop
+90                 # 0x00400aa2  nop
+90                 # 0x00400aa3  nop
+90                 # 0x00400aa4  nop
+90                 # 0x00400aa5  nop
+90                 # 0x00400aa6  nop
+90                 # 0x00400aa7  nop
+90                 # 0x00400aa8  nop
+4d 89 f4           # 0x00400aa9  mov r12,r14
+e9 8f fe ff ff     # 0x00400aac  jmp 0x400940  → compile_site
+90                 # 0x00400ab1  nop
+c3                 # 0x00400ab2  ret

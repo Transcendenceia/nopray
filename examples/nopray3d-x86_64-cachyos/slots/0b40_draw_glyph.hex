@@ -1,0 +1,40 @@
+# nopray slot `draw_glyph` · code · vaddr 0x400b40 · size 0xc0 · used 93 bytes
+# purpose: draw_glyph from the 5x7 HUD font
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# draw_glyph:
+53                 # 0x00400b40  push rbx
+55                 # 0x00400b41  push rbp
+41 54              # 0x00400b42  push r12
+41 55              # 0x00400b44  push r13
+41 56              # 0x00400b46  push r14
+41 89 f9           # 0x00400b48  mov r9d,edi
+41 89 f2           # 0x00400b4b  mov r10d,esi
+41 89 cb           # 0x00400b4e  mov r11d,ecx
+6b d2 07           # 0x00400b51  imul edx,7
+8d 9a 00 13 40 00  # 0x00400b54  lea ebx,[rdx+0x401300]
+bd 07 00 00 00     # 0x00400b5a  mov ebp,7
+44 0f b6 23        # 0x00400b5f  movzx r12d,byte ptr [rbx]
+45 89 cd           # 0x00400b63  mov r13d,r9d
+41 be 10 00 00 00  # 0x00400b66  mov r14d,0x10
+45 85 f4           # 0x00400b6c  test r12d,r14d
+74 11              # 0x00400b6f  je 0x400b82
+44 89 ef           # 0x00400b71  mov edi,r13d
+44 89 d6           # 0x00400b74  mov esi,r10d
+44 89 da           # 0x00400b77  mov edx,r11d
+44 89 d9           # 0x00400b7a  mov ecx,r11d
+e8 7e ff ff ff     # 0x00400b7d  call 0x400b00  → fill_rect
+45 01 dd           # 0x00400b82  add r13d,r11d
+41 d1 ee           # 0x00400b85  shr r14d,1
+75 e2              # 0x00400b88  jne 0x400b6c
+45 01 da           # 0x00400b8a  add r10d,r11d
+48 ff c3           # 0x00400b8d  inc rbx
+ff cd              # 0x00400b90  dec ebp
+75 cb              # 0x00400b92  jne 0x400b5f
+41 5e              # 0x00400b94  pop r14
+41 5d              # 0x00400b96  pop r13
+41 5c              # 0x00400b98  pop r12
+5d                 # 0x00400b9a  pop rbp
+5b                 # 0x00400b9b  pop rbx
+c3                 # 0x00400b9c  ret

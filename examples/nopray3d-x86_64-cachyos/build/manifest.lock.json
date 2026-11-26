@@ -1,0 +1,113 @@
+{
+  "tool": "nopray 1.1.0",
+  "app": "nopray3d",
+  "version": "1.0.0",
+  "size": 8192,
+  "sha256": "3a26bb5088b0de9b84d11012a4368b1937c0e72b37b8e1df284d3a2627cd8728",
+  "slots": [
+    {
+      "name": "elf_header",
+      "vaddr": "0x400000",
+      "size": 176,
+      "used": 170,
+      "sha256_used": "fdc996063d0f61a55ac0476becfa777356047efa4510e01ed9106d54ebb1ee91",
+      "sha256_padded": "9550136d5fe628f00047676787adf85097ecc1e9ee267435a5c8516540f706c1"
+    },
+    {
+      "name": "read_exact",
+      "vaddr": "0x4000b0",
+      "size": 32,
+      "used": 31,
+      "sha256_used": "2392d69243d3c8af472d699e08f472f6fcdb217c0edaba7a2565e23a675ea358",
+      "sha256_padded": "ba4b3b3bd08aedae6e2bddec385f4201494337725e29b7db83d7756b5390af11"
+    },
+    {
+      "name": "write_all",
+      "vaddr": "0x4000d0",
+      "size": 32,
+      "used": 26,
+      "sha256_used": "f4e08100500c067b5b22c23d3ecc98b33145da352a3f8f2412710bf4ecac9963",
+      "sha256_padded": "5421677889df141fa785382d75a8526ee3ea9f00b20dfcea7a0b695c715b239a"
+    },
+    {
+      "name": "exit_clean",
+      "vaddr": "0x4000f0",
+      "size": 16,
+      "used": 9,
+      "sha256_used": "e5e48bb5cefb9c4ec6dae354d4669463b24727e897bf75b786690c3efbda55f4",
+      "sha256_padded": "0de0e8a3bc54fa92348eef57e187accddf29c9a589f9ba3ebf29c53217bb83de"
+    },
+    {
+      "name": "_start",
+      "vaddr": "0x400100",
+      "size": 576,
+      "used": 530,
+      "sha256_used": "51da9ea9d123fdf9b93f02f5c4edb0c9a482712d5cd2283c1bc7083e81d909b1",
+      "sha256_padded": "21133679bf57223729d39a7456f879753bc72662310c7d8af0364869ef2e2191"
+    },
+    {
+      "name": "main_loop",
+      "vaddr": "0x400340",
+      "size": 384,
+      "used": 235,
+      "sha256_used": "2fc0e09a36b88f6c6436341819d12570f8773f7b4aac35fb89fd2576e2f88569",
+      "sha256_padded": "3ba759c296076deaebdfabab4372fc6e51fdae3b3a136878f37e163232edc8e6"
+    },
+    {
+      "name": "update_player",
+      "vaddr": "0x4004c0",
+      "size": 512,
+      "used": 416,
+      "sha256_used": "b2e92251f191319dfab4390ad3caae27a8486899b29065b826adb7edbf15c2d5",
+      "sha256_padded": "b9e5b2d54543562684d4036d97b4320a503aef86efe229f5e453785888880ff8"
+    },
+    {
+      "name": "render_3d",
+      "vaddr": "0x4006c0",
+      "size": 1088,
+      "used": 919,
+      "sha256_used": "d0ce6ed1b7956a07b4e71b43d30fdf059d0e7783310be4e08b4443cedab975cd",
+      "sha256_padded": "421140f9d3f20af311de9f8f77512c3e15d785f6d5d964738770bbf12d279c0a"
+    },
+    {
+      "name": "fill_rect",
+      "vaddr": "0x400b00",
+      "size": 64,
+      "used": 44,
+      "sha256_used": "ffcf2e2f79bab8288955ac143ac5ac93f8dc6207f0e7491ab91b58fc087b789d",
+      "sha256_padded": "7528a421f68e0a834984faed27958ff45aedccf65bbfda1663358d47d159dbe4"
+    },
+    {
+      "name": "draw_glyph",
+      "vaddr": "0x400b40",
+      "size": 192,
+      "used": 93,
+      "sha256_used": "5ef14742193f010df36d9defaa14b17c4542bbc15a34432694d4fd6d9b6a839e",
+      "sha256_padded": "382e44514857b274454bafd0939efb44bf5bfb1d2ba9909c79f86e775e22a3b2"
+    },
+    {
+      "name": "draw_hud",
+      "vaddr": "0x400c00",
+      "size": 640,
+      "used": 464,
+      "sha256_used": "ade9376fc8c5e11ce24b809d2903099606e3c91741e63793e3463d0f24f43ee0",
+      "sha256_padded": "b5189cb9dcff7a28f555aba0ade5cab86e300306dc3a949f7c4bd13d6413c12b"
+    },
+    {
+      "name": "blit_x11",
+      "vaddr": "0x400e80",
+      "size": 384,
+      "used": 128,
+      "sha256_used": "fc78fb19891f9184c6620465ff5cf5d592317cbd3512c953d6bbf9e36d390d56",
+      "sha256_padded": "2af4a8ae8cf5e9bc5ffd98c7091801251dde58334d6aa8f3d9892a07a2885a42"
+    },
+    {
+      "name": "rodata",
+      "vaddr": "0x401000",
+      "size": 4096,
+      "used": 831,
+      "sha256_used": "035ea4991151057d6f740324b098e336bd5e349d4022303fd9a4d896034a5845",
+      "sha256_padded": "5df6f45664401e4eeab027853a4816f513061bd4d009b7d70cccb21aa7dd846b"
+    }
+  ]
+}

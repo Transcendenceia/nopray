@@ -1,0 +1,33 @@
+{
+  "tool": "nopray 1.1.0",
+  "app": "hello-riscv64",
+  "version": "1.0.0",
+  "size": 384,
+  "sha256": "c4eb6cd145c51b6b55226b6c21107d59111b36d28cf9a7ccef5b64b6ec9444bd",
+  "slots": [
+    {
+      "name": "elf_header",
+      "vaddr": "0x400000",
+      "size": 256,
+      "used": 176,
+      "sha256_used": "89917831c97cf5b7a7fa1a173995ebd10e5455f47f658d72567f37c824c8a31c",
+      "sha256_padded": "83320e2ea087783b4f2d485fb7b811f99b828e5e8e4197cf8a1ea805f7b205cf"
+    },
+    {
+      "name": "_start",
+      "vaddr": "0x400100",
+      "size": 64,
+      "used": 36,
+      "sha256_used": "59e67cfcb220f7c1c873885807b75b19e543477207887a72f33205e66c860a67",
+      "sha256_padded": "6380969d26bd2d20fec4e482ce47c2d66c2fcd88e1f6a0e421faa0d9e32622e9"
+    },
+    {
+      "name": "rodata",
+      "vaddr": "0x400140",
+      "size": 64,
+      "used": 18,
+      "sha256_used": "864bc6257bda5dcea86621d38944245b836bf328cb2b1a5d630d9a5cacac8930",
+      "sha256_padded": "39e79f5a341fd01e31ca2843e45cc0e6d51a1721c402fe04e56e43f2d2c505f5"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "tool": "nopray 1.1.0",
+  "app": "hello-aarch64",
+  "version": "1.0.0",
+  "size": 384,
+  "sha256": "83ad7aad1a700bd2e35b2b8a42eafb11747c5f795bd80b905e224b29a6f8bdf9",
+  "slots": [
+    {
+      "name": "elf_header",
+      "vaddr": "0x400000",
+      "size": 256,
+      "used": 176,
+      "sha256_used": "27074ae713bf73f150eea2174deac0f47089abd7a628926b2e352be2025a6201",
+      "sha256_padded": "ec2fb47db02cfcaeab847c67ac64be207544c65fcdcee31c47d55eb343243415"
+    },
+    {
+      "name": "_start",
+      "vaddr": "0x400100",
+      "size": 64,
+      "used": 32,
+      "sha256_used": "c38f128898deab70286148b9d005dccbdfea0b42c74d0891c2ec4472f4281e4e",
+      "sha256_padded": "b9f38af6d0798e48e86d16226a32666c0e9ad79c2d0de676bc6f4d3189ec52ad"
+    },
+    {
+      "name": "rodata",
+      "vaddr": "0x400140",
+      "size": 64,
+      "used": 18,
+      "sha256_used": "57a91d20487f44e50e15c2dd73db9cb89cefe8a298b42e28a5dd7762f7f5cf8a",
+      "sha256_padded": "775f5cede93d2ca6492d494b684f2384112303e09ab2e07f32f40df1dabc78fd"
+    }
+  ]
+}

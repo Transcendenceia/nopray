@@ -1,0 +1,267 @@
+# nopray slot `render_3d` · code · vaddr 0x4006c0 · size 0x440 · used 919 bytes
+# purpose: DDA raycaster over 640 columns in SSE2 double: sky/floor, 5 procedural materials, N/S shading, distance fog
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# render_3d:
+53                       # 0x004006c0  push rbx
+55                       # 0x004006c1  push rbp
+41 54                    # 0x004006c2  push r12
+41 55                    # 0x004006c4  push r13
+41 56                    # 0x004006c6  push r14
+bb 80 10 40 00           # 0x004006c8  mov ebx,0x401080
+45 31 e4                 # 0x004006cd  xor r12d,r12d
+f2 41 0f 2a c4           # 0x004006d0  cvtsi2sd xmm0,r12d
+f2 0f 59 43 58           # 0x004006d5  mulsd xmm0,[rbx+0x58]
+f2 0f 5c 43 50           # 0x004006da  subsd xmm0,[rbx+0x50]
+f2 41 0f 10 4f 28        # 0x004006df  movsd xmm1,[r15+0x28]
+f2 0f 59 c8              # 0x004006e5  mulsd xmm1,xmm0
+f2 41 0f 58 4f 18        # 0x004006e9  addsd xmm1,[r15+0x18]
+f2 41 0f 10 57 30        # 0x004006ef  movsd xmm2,[r15+0x30]
+f2 0f 59 d0              # 0x004006f5  mulsd xmm2,xmm0
+f2 41 0f 58 57 20        # 0x004006f9  addsd xmm2,[r15+0x20]
+f2 45 0f 2c 07           # 0x004006ff  cvttsd2si r8d,[r15]
+f2 45 0f 2c 4f 08        # 0x00400704  cvttsd2si r9d,[r15+8]
+66 0f 28 f9              # 0x0040070a  movapd xmm7,xmm1
+66 0f 54 bb 80 00 00 00  # 0x0040070e  andpd xmm7,[rbx+0x80]
+f2 0f 5f 7b 60           # 0x00400716  maxsd xmm7,[rbx+0x60]
+f2 0f 10 5b 50           # 0x0040071b  movsd xmm3,[rbx+0x50]
+f2 0f 5e df              # 0x00400720  divsd xmm3,xmm7
+66 0f 28 fa              # 0x00400724  movapd xmm7,xmm2
+66 0f 54 bb 80 00 00 00  # 0x00400728  andpd xmm7,[rbx+0x80]
+f2 0f 5f 7b 60           # 0x00400730  maxsd xmm7,[rbx+0x60]
+f2 0f 10 63 50           # 0x00400735  movsd xmm4,[rbx+0x50]
+f2 0f 5e e7              # 0x0040073a  divsd xmm4,xmm7
+66 0f 57 c0              # 0x0040073e  xorpd xmm0,xmm0
+f2 41 0f 2a f8           # 0x00400742  cvtsi2sd xmm7,r8d
+66 0f 2f c8              # 0x00400747  comisd xmm1,xmm0
+73 15                    # 0x0040074b  jae 0x400762
+41 ba ff ff ff ff        # 0x0040074d  mov r10d,0xffffffff
+f2 41 0f 10 2f           # 0x00400753  movsd xmm5,[r15]
+f2 0f 5c ef              # 0x00400758  subsd xmm5,xmm7
+f2 0f 59 eb              # 0x0040075c  mulsd xmm5,xmm3
+eb 18                    # 0x00400760  jmp 0x40077a
+41 ba 01 00 00 00        # 0x00400762  mov r10d,1
+66 0f 28 ef              # 0x00400768  movapd xmm5,xmm7
+f2 0f 58 6b 50           # 0x0040076c  addsd xmm5,[rbx+0x50]
+f2 41 0f 5c 2f           # 0x00400771  subsd xmm5,[r15]
+f2 0f 59 eb              # 0x00400776  mulsd xmm5,xmm3
+f2 41 0f 2a f9           # 0x0040077a  cvtsi2sd xmm7,r9d
+66 0f 2f d0              # 0x0040077f  comisd xmm2,xmm0
+73 16                    # 0x00400783  jae 0x40079b
+41 bb ff ff ff ff        # 0x00400785  mov r11d,0xffffffff
+f2 41 0f 10 77 08        # 0x0040078b  movsd xmm6,[r15+8]
+f2 0f 5c f7              # 0x00400791  subsd xmm6,xmm7
+f2 0f 59 f4              # 0x00400795  mulsd xmm6,xmm4
+eb 19                    # 0x00400799  jmp 0x4007b4
+41 bb 01 00 00 00        # 0x0040079b  mov r11d,1
+66 0f 28 f7              # 0x004007a1  movapd xmm6,xmm7
+f2 0f 58 73 50           # 0x004007a5  addsd xmm6,[rbx+0x50]
+f2 41 0f 5c 77 08        # 0x004007aa  subsd xmm6,[r15+8]
+f2 0f 59 f4              # 0x004007b0  mulsd xmm6,xmm4
+b9 20 00 00 00           # 0x004007b4  mov ecx,0x20
+66 0f 2f ee              # 0x004007b9  comisd xmm5,xmm6
+73 0c                    # 0x004007bd  jae 0x4007cb
+f2 0f 58 eb              # 0x004007bf  addsd xmm5,xmm3
+45 01 d0                 # 0x004007c3  add r8d,r10d
+45 31 ed                 # 0x004007c6  xor r13d,r13d
+eb 0d                    # 0x004007c9  jmp 0x4007d8
+f2 0f 58 f4              # 0x004007cb  addsd xmm6,xmm4
+45 01 d9                 # 0x004007cf  add r9d,r11d
+41 bd 01 00 00 00        # 0x004007d2  mov r13d,1
+44 89 c8                 # 0x004007d8  mov eax,r9d
+83 e0 0f                 # 0x004007db  and eax,0xf
+c1 e0 04                 # 0x004007de  shl eax,4
+44 89 c2                 # 0x004007e1  mov edx,r8d
+83 e2 0f                 # 0x004007e4  and edx,0xf
+01 d0                    # 0x004007e7  add eax,edx
+44 0f b6 b0 00 12 40 00  # 0x004007e9  movzx r14d,byte ptr [rax+0x401200]
+45 85 f6                 # 0x004007f1  test r14d,r14d
+75 0a                    # 0x004007f4  jne 0x400800
+ff c9                    # 0x004007f6  dec ecx
+75 bf                    # 0x004007f8  jne 0x4007b9
+41 be 01 00 00 00        # 0x004007fa  mov r14d,1
+45 85 ed                 # 0x00400800  test r13d,r13d
+75 18                    # 0x00400803  jne 0x40081d
+66 0f 28 fd              # 0x00400805  movapd xmm7,xmm5
+f2 0f 5c fb              # 0x00400809  subsd xmm7,xmm3
+66 0f 28 c7              # 0x0040080d  movapd xmm0,xmm7
+f2 0f 59 c2              # 0x00400811  mulsd xmm0,xmm2
+f2 41 0f 58 47 08        # 0x00400815  addsd xmm0,[r15+8]
+eb 15                    # 0x0040081b  jmp 0x400832
+66 0f 28 fe              # 0x0040081d  movapd xmm7,xmm6
+f2 0f 5c fc              # 0x00400821  subsd xmm7,xmm4
+66 0f 28 c7              # 0x00400825  movapd xmm0,xmm7
+f2 0f 59 c1              # 0x00400829  mulsd xmm0,xmm1
+f2 41 0f 58 07           # 0x0040082d  addsd xmm0,[r15]
+f2 0f 5f 7b 68           # 0x00400832  maxsd xmm7,[rbx+0x68]
+f2 0f 59 43 78           # 0x00400837  mulsd xmm0,[rbx+0x78]
+f2 44 0f 2c d0           # 0x0040083c  cvttsd2si r10d,xmm0
+41 83 e2 3f              # 0x00400841  and r10d,0x3f
+f2 0f 10 43 70           # 0x00400845  movsd xmm0,[rbx+0x70]
+f2 0f 5e c7              # 0x0040084a  divsd xmm0,xmm7
+f2 0f 2c c8              # 0x0040084e  cvttsd2si ecx,xmm0
+83 f9 01                 # 0x00400852  cmp ecx,1
+7d 05                    # 0x00400855  jge 0x40085c
+b9 01 00 00 00           # 0x00400857  mov ecx,1
+81 f9 00 10 00 00        # 0x0040085c  cmp ecx,0x1000
+7e 05                    # 0x00400862  jle 0x400869
+b9 00 10 00 00           # 0x00400864  mov ecx,0x1000
+b8 00 00 40 00           # 0x00400869  mov eax,0x400000  → elf_header
+31 d2                    # 0x0040086e  xor edx,edx
+f7 f1                    # 0x00400870  div ecx
+41 89 c3                 # 0x00400872  mov r11d,eax
+89 ca                    # 0x00400875  mov edx,ecx
+d1 ea                    # 0x00400877  shr edx,1
+b8 b4 00 00 00           # 0x00400879  mov eax,0xb4
+29 d0                    # 0x0040087e  sub eax,edx
+41 89 c0                 # 0x00400880  mov r8d,eax
+45 85 c0                 # 0x00400883  test r8d,r8d
+79 03                    # 0x00400886  jns 0x40088b
+45 31 c0                 # 0x00400888  xor r8d,r8d
+44 89 c5                 # 0x0040088b  mov ebp,r8d
+29 c5                    # 0x0040088e  sub ebp,eax
+41 0f af eb              # 0x00400890  imul ebp,r11d
+44 8d 8a b4 00 00 00     # 0x00400894  lea r9d,[rdx+0xb4]
+41 81 f9 68 01 00 00     # 0x0040089b  cmp r9d,0x168
+7e 06                    # 0x004008a2  jle 0x4008aa
+41 b9 68 01 00 00        # 0x004008a4  mov r9d,0x168
+f2 0f 59 bb 90 00 00 00  # 0x004008aa  mulsd xmm7,[rbx+0x90]
+f2 0f 2c c7              # 0x004008b2  cvttsd2si eax,xmm7
+ba 00 01 00 00           # 0x004008b6  mov edx,0x100
+29 c2                    # 0x004008bb  sub edx,eax
+83 fa 24                 # 0x004008bd  cmp edx,0x24
+7d 05                    # 0x004008c0  jge 0x4008c7
+ba 24 00 00 00           # 0x004008c2  mov edx,0x24
+45 85 ed                 # 0x004008c7  test r13d,r13d
+74 06                    # 0x004008ca  je 0x4008d2
+6b d2 03                 # 0x004008cc  imul edx,3
+c1 ea 02                 # 0x004008cf  shr edx,2
+41 89 d5                 # 0x004008d2  mov r13d,edx
+4a 8d 3c a5 00 80 40 00  # 0x004008d5  lea rdi,[r12*4+0x408000]
+31 f6                    # 0x004008dd  xor esi,esi
+44 39 c6                 # 0x004008df  cmp esi,r8d
+7d 2a                    # 0x004008e2  jge 0x40090e
+89 f0                    # 0x004008e4  mov eax,esi
+c1 e8 04                 # 0x004008e6  shr eax,4
+8d 48 0a                 # 0x004008e9  lea ecx,[rax+0xa]
+c1 e1 08                 # 0x004008ec  shl ecx,8
+8d 50 0c                 # 0x004008ef  lea edx,[rax+0xc]
+09 d1                    # 0x004008f2  or ecx,edx
+c1 e1 08                 # 0x004008f4  shl ecx,8
+89 f0                    # 0x004008f7  mov eax,esi
+c1 e8 03                 # 0x004008f9  shr eax,3
+83 c0 1a                 # 0x004008fc  add eax,0x1a
+09 c1                    # 0x004008ff  or ecx,eax
+89 0f                    # 0x00400901  mov [rdi],ecx
+48 81 c7 00 0a 00 00     # 0x00400903  add rdi,0xa00
+ff c6                    # 0x0040090a  inc esi
+eb d1                    # 0x0040090c  jmp 0x4008df
+46 8b 04 b5 40 11 40 00  # 0x0040090e  mov r8d,[r14*4+0x401140]
+44 39 ce                 # 0x00400916  cmp esi,r9d
+0f 8d e9 00 00 00        # 0x00400919  jge 0x400a08
+89 e8                    # 0x0040091f  mov eax,ebp
+c1 e8 10                 # 0x00400921  shr eax,0x10
+83 e0 3f                 # 0x00400924  and eax,0x3f
+44 01 dd                 # 0x00400927  add ebp,r11d
+44 89 ea                 # 0x0040092a  mov edx,r13d
+83 f8 03                 # 0x0040092d  cmp eax,3
+7c 05                    # 0x00400930  jl 0x400937
+83 f8 3c                 # 0x00400932  cmp eax,0x3c
+7e 07                    # 0x00400935  jle 0x40093e
+d1 ea                    # 0x00400937  shr edx,1
+e9 84 00 00 00           # 0x00400939  jmp 0x4009c2
+41 83 fe 02              # 0x0040093e  cmp r14d,2
+75 23                    # 0x00400942  jne 0x400967
+44 89 d1                 # 0x00400944  mov ecx,r10d
+83 e1 07                 # 0x00400947  and ecx,7
+75 04                    # 0x0040094a  jne 0x400950
+d1 ea                    # 0x0040094c  shr edx,1
+eb 72                    # 0x0040094e  jmp 0x4009c2
+83 f9 03                 # 0x00400950  cmp ecx,3
+75 6d                    # 0x00400953  jne 0x4009c2
+83 c2 38                 # 0x00400955  add edx,0x38
+81 fa ff 00 00 00        # 0x00400958  cmp edx,0xff
+7e 62                    # 0x0040095e  jle 0x4009c2
+ba ff 00 00 00           # 0x00400960  mov edx,0xff
+eb 5b                    # 0x00400965  jmp 0x4009c2
+41 83 fe 04              # 0x00400967  cmp r14d,4
+75 22                    # 0x0040096b  jne 0x40098f
+89 c1                    # 0x0040096d  mov ecx,eax
+41 03 4f 44              # 0x0040096f  add ecx,[r15+0x44]
+83 e1 0f                 # 0x00400973  and ecx,0xf
+83 f9 02                 # 0x00400976  cmp ecx,2
+7d 07                    # 0x00400979  jge 0x400982
+ba ff 00 00 00           # 0x0040097b  mov edx,0xff
+eb 40                    # 0x00400980  jmp 0x4009c2
+41 f7 c2 0f 00 00 00     # 0x00400982  test r10d,0xf
+75 37                    # 0x00400989  jne 0x4009c2
+d1 ea                    # 0x0040098b  shr edx,1
+eb 33                    # 0x0040098d  jmp 0x4009c2
+41 83 fe 05              # 0x0040098f  cmp r14d,5
+75 1a                    # 0x00400993  jne 0x4009af
+89 c1                    # 0x00400995  mov ecx,eax
+44 31 d1                 # 0x00400997  xor ecx,r10d
+83 e1 0f                 # 0x0040099a  and ecx,0xf
+75 07                    # 0x0040099d  jne 0x4009a6
+ba ff 00 00 00           # 0x0040099f  mov edx,0xff
+eb 1c                    # 0x004009a4  jmp 0x4009c2
+83 f9 08                 # 0x004009a6  cmp ecx,8
+75 17                    # 0x004009a9  jne 0x4009c2
+d1 ea                    # 0x004009ab  shr edx,1
+eb 13                    # 0x004009ad  jmp 0x4009c2
+a8 0f                    # 0x004009af  test al,0xf
+74 0d                    # 0x004009b1  je 0x4009c0
+89 c1                    # 0x004009b3  mov ecx,eax
+83 e1 10                 # 0x004009b5  and ecx,0x10
+44 01 d1                 # 0x004009b8  add ecx,r10d
+83 e1 1f                 # 0x004009bb  and ecx,0x1f
+75 02                    # 0x004009be  jne 0x4009c2
+d1 ea                    # 0x004009c0  shr edx,1
+44 89 c0                 # 0x004009c2  mov eax,r8d
+c1 e8 10                 # 0x004009c5  shr eax,0x10
+0f af c2                 # 0x004009c8  imul eax,edx
+c1 e8 08                 # 0x004009cb  shr eax,8
+89 c1                    # 0x004009ce  mov ecx,eax
+c1 e1 10                 # 0x004009d0  shl ecx,0x10
+44 89 c0                 # 0x004009d3  mov eax,r8d
+c1 e8 08                 # 0x004009d6  shr eax,8
+25 ff 00 00 00           # 0x004009d9  and eax,0xff
+0f af c2                 # 0x004009de  imul eax,edx
+25 00 ff 00 00           # 0x004009e1  and eax,0xff00
+09 c1                    # 0x004009e6  or ecx,eax
+44 89 c0                 # 0x004009e8  mov eax,r8d
+25 ff 00 00 00           # 0x004009eb  and eax,0xff
+0f af c2                 # 0x004009f0  imul eax,edx
+c1 e8 08                 # 0x004009f3  shr eax,8
+09 c1                    # 0x004009f6  or ecx,eax
+89 0f                    # 0x004009f8  mov [rdi],ecx
+48 81 c7 00 0a 00 00     # 0x004009fa  add rdi,0xa00
+ff c6                    # 0x00400a01  inc esi
+e9 0e ff ff ff           # 0x00400a03  jmp 0x400916
+81 fe 68 01 00 00        # 0x00400a08  cmp esi,0x168
+7d 2e                    # 0x00400a0e  jge 0x400a3e
+8d 86 4c ff ff ff        # 0x00400a10  lea eax,[rsi-0xb4]
+89 c2                    # 0x00400a16  mov edx,eax
+c1 ea 03                 # 0x00400a18  shr edx,3
+8d 4a 10                 # 0x00400a1b  lea ecx,[rdx+0x10]
+c1 e1 08                 # 0x00400a1e  shl ecx,8
+83 c2 13                 # 0x00400a21  add edx,0x13
+09 d1                    # 0x00400a24  or ecx,edx
+c1 e1 08                 # 0x00400a26  shl ecx,8
+c1 e8 02                 # 0x00400a29  shr eax,2
+83 c0 1c                 # 0x00400a2c  add eax,0x1c
+09 c1                    # 0x00400a2f  or ecx,eax
+89 0f                    # 0x00400a31  mov [rdi],ecx
+48 81 c7 00 0a 00 00     # 0x00400a33  add rdi,0xa00
+ff c6                    # 0x00400a3a  inc esi
+eb ca                    # 0x00400a3c  jmp 0x400a08
+41 ff c4                 # 0x00400a3e  inc r12d
+41 81 fc 80 02 00 00     # 0x00400a41  cmp r12d,0x280
+0f 8c 82 fc ff ff        # 0x00400a48  jl 0x4006d0
+41 5e                    # 0x00400a4e  pop r14
+41 5d                    # 0x00400a50  pop r13
+41 5c                    # 0x00400a52  pop r12
+5d                       # 0x00400a54  pop rbp
+5b                       # 0x00400a55  pop rbx
+c3                       # 0x00400a56  ret
