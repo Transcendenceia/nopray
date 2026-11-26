@@ -35,7 +35,15 @@ Escribir bytes crudos una sola vez es un truco curioso. Lograr que **otro agente
 
 Todos los ejemplos viven en [`examples/`](./examples/) y **se reconstruyen byte a byte y se auditan automáticamente** en cada ejecución de `cargo test`.
 
-### 1. Transcendence DOOM — `32 768 B` (`32 KiB`) FPS 3D x86-64 + Audio PCM 24 kHz en vivo
+### 1. VM Bare-Metal `Qwen3-TTS-12Hz-0.6B` — `32 768 B` (`32 KiB`) Síntesis de Voz Neuronal **sin Linux**
+- **Ficha auditada:** `DMCS-1.1` · Nivel **`L3` W^X** · **Multiboot 1 ELF32 → Modo Largo 64 bits + AVX2/FMA/F16C** · **0 syscalls Linux** (¡sin kernel ni SO!) · **12 ranuras hex escritas a mano** · **2 806 instrucciones x86-64 decodificadas** · `nopray audit --strict`: **`0 errores, 0 avisos`**.
+- **Pipeline completo en bare metal:** arranca en QEMU/KVM (`-enable-kvm -cpu host -smp 1`), construye tablas de página de 2 MiB (`0..4 GiB`), salta de 32 a 64 bits (`jmp far 0x08:boot64`), activa `XCR0=7` (AVX2+FMA+F16C), carga `weights.nqts` (`1.042 GiB`, `DMCS-L3`) cero-copia vía `-initrd`, ejecuta **Talker 28L + Code Predictor 5L** + **Speech Tokenizer 12Hz V2 + BigVGAN/SnakeBeta**, emite el WAV 24 kHz S16LE por `isa-debugcon` (`0xE9` `rep outsb`) y apaga limpio.
+- **Audio real verificado (*«Hola Marlon, esto es código máquina puro con nopray, sin Linux y sin compilador.»*):**
+  - 🔊 **Audio bare-metal NOPRAY (`6.40 s`, `301 KiB`):** [`assets/audio/nopray_qwen3_tts_baremetal_es.wav`](./assets/audio/nopray_qwen3_tts_baremetal_es.wav) — **`89.32 dB` SNR / `0.9999999994` coseno** vs NumPy FP32 (`153 359 / 153 600` muestras PCM bit-exactas, diferencia máx. `±1 LSB`).
+  - 🔊 **Referencia oficial `qwen-tts` PyTorch (`6.72 s`, `316 KiB`):** [`assets/audio/official_qwen3_tts_pytorch_es.wav`](./assets/audio/official_qwen3_tts_pytorch_es.wav).
+- **Frente a frente en el mismo AMD Ryzen 7 5825U:** **1 vCPU bare-metal NOPRAY (`41.22 s` síntesis / `53.04 s` cold→WAV / `2.37 GiB` RSS / `32 KiB` ELF / `0` syscalls)** superó a **todas** las configuraciones oficiales de PyTorch CPU — incluida **`8 hilos FP32`** (`54.15 s` / `63.51 s` / `5.52 GiB` RSS / `1.375 GiB` `.venv` / `134 879+` syscalls solo al importar y cargar) y **`8 hilos BF16`** (`411.52 s`). Detalle en [`examples/qwen3-tts-x86_64-baremetal/`](./examples/qwen3-tts-x86_64-baremetal/) y [`references/BENCHMARKS.md`](./references/BENCHMARKS.md#part-3--bare-metal-neural-tts-32-kib-nopray-kvm-vs-official-qwen-tts-pytorch).
+
+### 2. Transcendence DOOM — `32 768 B` (`32 KiB`) FPS 3D x86-64 + Audio PCM 24 kHz en vivo
 - **Ficha auditada:** `DMCS-1.1` · Nivel **`L2` W^X** · `PT_GNU_STACK rw-` · **6 syscalls totales** (`socket`, `connect`, `read`, `write`, `poll`, `exit`) · **2 844 instrucciones x86-64 decodificadas** · **2 844 intenciones `#=` (0 discrepancias)** · `nopray audit --strict`: **`0 errores, 0 avisos`**.
 - **Gráficos:** protocolo X11/Xwayland crudo (`/tmp/.X11-unix/X0`, `640×400` BGRA en 4 franjas `PutImage`), 7 texturas procedurales `64×64` y 6 sprites `32×32` RGBA generados al arranque en `.bss`, suelo y techo en perspectiva en punto fijo `16.16`, raycaster DDA SSE2 de 640 columnas con `zbuffer`, niebla SWAR de 256 niveles e iluminación por fogonazo, cañón de plasma bi-raíl animado, IA de Sentinels + bolas de plasma, puertas blindadas (`E`), HUD completo y radar minimapa (`M`).
 - **Audio PCM directo:** protocolo nativo **PipeWire / PulseAudio** sobre `/run/user/<uid>/pulse/native` (`24 kHz S16LE mono`, cero `libpulse`, cero subprocesos y **cero syscalls adicionales**), con sintetizador de 5 voces en tiempo real (disparo plasma, explosiones con ruido LFSR + sub-grave, arpegio de recogida/puerta, aviso de daño y pulso de bajo industrial en Mi menor) y **mute instantáneo sin clics** (`N` o tecla multimedia `Mute`).
@@ -44,7 +52,7 @@ Todos los ejemplos viven en [`examples/`](./examples/) y **se reconstruyen byte 
 | :---: | :---: | :---: |
 | ![Transcendence DOOM en vivo](./assets/screenshots/doom-live-cachyos.png) | ![Transcendence DOOM disparo](./assets/screenshots/doom-combat-flash.png) | ![Transcendence DOOM mute](./assets/screenshots/doom-muted-hud.png) |
 
-### 2. Otros binarios de referencia verificados
+### 3. Otros binarios de referencia verificados
 
 | `nopray3d` — `8 192 B` Raycaster W^X 60 FPS | `nopray3d` — Sombreado de muros | `calc` — `4 096 B` (1 página OS) GUI X11 |
 | :---: | :---: | :---: |

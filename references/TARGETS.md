@@ -22,6 +22,7 @@ Status labels used below:
 | Target | ISA in `nopray.toml` | Decoder | Emulator here | Status |
 |---|---|---|---|---|
 | Linux x86-64 | `x86-64` | full | native | **RUN**: calc, nopray3d, nopray-doom (X11 + PipeWire PCM), nopray-httpd |
+| **Bare-metal x86-64 (Multiboot 1 → Long Mode + AVX2/FMA/F16C)** | `x86-64`, `bare-metal`, `elf32` | full (`slot.bits = 32/64`, far jump CFG) | `qemu-system-x86_64 -enable-kvm` | **RUN**: `qwen3-tts-x86_64-baremetal` (32 KiB VM running Qwen3-TTS-12Hz-0.6B end-to-end on `/dev/kvm`, 0 Linux syscalls, strict audit 0/0) |
 | Linux AArch64 (Raspberry Pi OS arm64, Pi 3/4/5) | `aarch64` | flow + syscalls | `qemu-aarch64` | **RUN** under qemu-user (hello-aarch64); not yet on a real Pi |
 | Linux RISC-V 64 | `riscv64` | flow + syscalls | `qemu-riscv64` | **RUN** under qemu-user (hello-riscv64) |
 | ESP32-C3 / C6 bare metal | `riscv32`, `bare-metal`, `raw` | flow (no syscalls; MMIO windows) | none (Espressif QEMU fork not installed) | header/watchdog facts **SOURCE**; no image yet |
@@ -52,6 +53,20 @@ check `getconf PAGESIZE` on the device and keep `p_vaddr ≡ p_offset (mod 0x100
 
 Verification: `qemu-aarch64 build/app`, `qemu-riscv64 build/app` (package `qemu-user`), then on
 the real device with `strace -f`.
+
+## 2.5. Bare-metal x86-64 (Multiboot 1 ELF32 → 64-bit Long Mode + AVX2/FMA/F16C)
+
+**RUN** (verified live 2026-11-26 on AMD Ryzen 7 5825U `/dev/kvm`, `examples/qwen3-tts-x86_64-baremetal/`):
+
+- **Container:** `format = "elf32"`, `os = "bare-metal"`, `isa = "x86-64"`, `e_machine = 3` (`EM_386`), two W^X `PT_LOAD` segments (`text_rodata r-x` at `0x100000`, `data_bss rw-` above text), plus the 12-byte Multiboot 1 header (`0x1BADB002`, flags `0x3`, checksum `0xE4524FFB`) aligned inside the first 8 KiB (e.g. `+0x80`). QEMU `-kernel <elf>` boots straight into 32-bit protected mode at `e_entry` (`EAX = 0x2BADB002`, `EBX = multiboot_info_t*`).
+- **32→64 Long Mode bootstrap (`bits = 32` slot):** zero BSS, construct a 4-level identity page map for `0..4 GiB` using 2 MiB huge pages (`PML4[0] → PDPT`, `PDPT[0..3] → PD0..PD3`, mark `>= 0xFE000000` uncacheable for MMIO), enable `CR4.PAE`, set `IA32_EFER.LME` (`MSR 0xC0000080` bit 8), enable `CR0.PG`, `lgdt [gdt64_ptr]`, and execute `jmp far 0x08:boot64` (`ea <u32> 08 00`). `nopray audit` traces `FarBranch32` across the bitness boundary directly to `boot64`.
+- **SIMD / AVX2 / FMA / F16C enablement (64-bit `boot64`):** clear `CR0.EM` (bit 2), set `CR0.MP` (bit 1), set `CR4.OSFXSR | CR4.OSXMMEXCPT | CR4.OSXSAVE` (`0x40600`), then execute `xsetbv` (`0f 01 d1`) with `ecx = 0`, `eax = 7`, `edx = 0` (`XCR0 = x87 | SSE | AVX`), and `ldmxcsr [default_mxcsr]` (`0x1F80`). Missing `XCR0=7` traps with `#UD` on the first VEX instruction.
+- **Zero-copy `DMCS-L3` external data via `-initrd`:** Multiboot info `mods_count` (`[ebx+0x14]`) and `mods_addr` (`[ebx+0x18]`) hand the kernel physical `mod_start` / `mod_end` of `-initrd weights.nqts` in RAM with zero parsing or copy; place the dynamic scratch/KV arena 2 MiB-aligned immediately above `mod_end`.
+- **Verified bare-metal I/O devices under QEMU/KVM:**
+  - `COM1` (`0x3F8`, 115200 8N1) for ASCII telemetry (`-chardev stdio,id=c1 -serial chardev:c1`).
+  - `isa-debugcon` (`0xE9`) with `cld; rep outsb` (`fc f3 6e`) for bulk raw binary output (`-chardev file,id=c2,path=out.wav -device isa-debugcon,iobase=0xe9,chardev=c2`) — **>100× faster** than byte-polled COM2 (`0x2F8`) under KVM because `rep outsb` collapses into batched string-I/O exits.
+  - `PIT Channel 2` (`0x61`/`0x43`/`0x42`, 10 ms gate) to calibrate `RDTSC` ticks/ms.
+  - Clean shutdown via `isa-debug-exit` (`out 0xf4, 0`, exit code `1`) with ACPI S5 (`0x604`/`0xb004`) + `cli; hlt` fallback.
 
 ## 3. ESP32-C3 / C6 (RV32IMC, bare metal)
 

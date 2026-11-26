@@ -64,6 +64,7 @@ date = "2026-11-24"
 [[slot]]
 name = "_start"
 kind = "code"                # header | code | rodata | data
+bits = 64                    # optional on x86-64 code slots: 16 | 32 | 64 (e.g. bits = 32 for Multiboot 1 boot32)
 vaddr = 0x400100
 size = 0x40
 file = "slots/0100_start.hex"
@@ -90,9 +91,13 @@ note = "why this is an entry"
 - `#=` text after it is the **intent** of the item starting at the first byte of that line.
   `annotate` preserves intents and splits lines so every intent keeps its exact offset.
 - Code slot intents are compared with the decoded instruction (numbers, spacing, `ptr`,
-  `short`, `#`, slot/label/`[[state]]` symbol names, x86 string-op implicit `[rdi]`/`[rsi]`
-  operands such as `stosd`/`rep movsb`/`rep stosq`, and x87 implicit `st` in `fld`/`fstp` are
+  `short`, `near`, `far`, `#`, slot/label/`[[state]]` symbol names, x86 jump opcode synonyms
+  `jz`/`jnz`/`jc`/`jnc` ↔ `je`/`jne`/`jb`/`jae`, x86 string/PIO implicit `[rdi]`/`[rsi]`/`[edi]`/`[esi]`/`dx`
+  operands such as `stosd`/`rep movsb`/`rep stosq`/`rep outsb`, and x87 implicit `st` in `fld`/`fstp` are
   normalised). Header slot intents must name the ELF field they sit on (`e_entry`, `p_align`, ...).
+- For bare-metal x86-64 Multiboot 1 kernels (`isa = "x86-64"`, `os = "bare-metal"`, `format = "elf32"`),
+  `e_machine = 3` (`EM_386`) is accepted in `E002`, and `bits = 32` decodes 32-bit boot code while tracing
+  `jmp far 0x08:boot64` across the Long Mode transition into 64-bit code slots.
 - An intent whose bytes disappeared is kept as `# ORPHAN INTENT ...` so the loss is visible.
 
 ## 3. Generated files (`build/`)

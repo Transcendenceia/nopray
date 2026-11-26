@@ -124,6 +124,8 @@ pub enum Coverage {
 pub struct DecodeOpts {
     /// Register holding the state base (e.g. `r15`).
     pub state_register: Option<String>,
+    /// Optional x86 bitness override (`16`, `32`, or `64`); defaults to ISA native width.
+    pub bitness: Option<u32>,
 }
 
 /// Decodes `bytes` placed at `addr` with a linear sweep.

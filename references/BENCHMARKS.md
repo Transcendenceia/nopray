@@ -80,3 +80,26 @@ Task: build a strict RFC 8259 JSON validator with exact byte-offset error report
 2. **Closing the `I001` blind spot (`WARN C017`):** in `nopray-jb-r3`, an agent miscalculated a `rodata` string address by 2 bytes in both bytes and `#=` intent (`mov esi, 0x400e4a` instead of `0x400e4c`). `I001` could not see it because both agreed on the wrong address. We added **`WARN C017`** to `tools/nopray/src/audit.rs`: whenever a `rodata`/`data` slot declares `[[slot.label]]` entries, any code address landing inside it without matching a declared label is flagged with the exact byte delta to the nearest label.
 3. **Banning custom bit-field encoder DSLs:** forensic audit of 12 NOPRAY runs identified agents occasionally writing mini-assemblers in Python (`def movz/add_imm(...)`). `SKILL.md` and `WORKFLOW.md` now explicitly forbid instruction-synthesizing DSLs: helper scripts may resolve `@label` displacements and declared addresses only.
 4. **Live PipeWire/PulseAudio PCM substrate verification:** building `nopray-doom-x86_64-cachyos` proved direct 24 kHz S16LE real-time PCM synthesis over `/run/user/<uid>/pulse/native` using the exact same 6 syscalls as X11 and zero libraries — promoting the audio substrate from `UNVERIFIED` to **VERIFIED** in [`GRAPHICS-SUBSTRATES.md`](./GRAPHICS-SUBSTRATES.md).
+
+---
+
+## Part 3 — Bare-Metal Neural TTS (`32 KiB` NOPRAY KVM vs Official `qwen-tts` PyTorch)
+
+**Workload:** End-to-end synthesis of `"Hola Marlon, esto es código máquina puro con nopray, sin Linux y sin compilador."` (speaker `serena`, language `Spanish`, greedy deterministic `do_sample=False`, `repetition_penalty=1.05`) using **`Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice`** (Talker 28L + Code Predictor 5L + Speech Tokenizer 12Hz V2 Decoder + 4-stage BigVGAN/SnakeBeta Vocoder).
+
+**Silicon:** Exact same physical **AMD Ryzen 7 5825U** (8C/16T Zen 3, AVX2+FMA+F16C, no AVX-512) for every run, executed sequentially with zero contention.
+
+| Engine & Configuration | Cores | Weights Precision | Talker+CP | ms/frame | Decoder+Vocoder | Total Synth | Cold→WAV | RTF (synth) | Peak RSS (`VmHWM`) | Code / Runtime | Weights Disk | Guest Linux Syscalls |
+| :--- | ---: | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| **NOPRAY Bare-Metal KVM (Run 1)** | **1 vCPU** | `Q8_0S` + `F16` + `F32` | **`15.46 s`** | **`193.3 ms`** | `25.75 s` | **`41.22 s`** | **`53.04 s`** | **`6.44×`** | **`2,429 MiB`** (`2.37 GiB`) | **`32 KiB` ELF** | **`1.042 GiB`** | **`0`** (no Linux) |
+| **NOPRAY Bare-Metal KVM (Run 2)** | **1 vCPU** | `Q8_0S` + `F16` + `F32` | **`15.76 s`** | **`197.0 ms`** | `27.07 s` | **`42.83 s`** | **`54.27 s`** | **`6.69×`** | **`2,452 MiB`** (`2.39 GiB`) | **`32 KiB` ELF** | **`1.042 GiB`** | **`0`** (no Linux) |
+| Official `qwen-tts` PyTorch (`1t FP32`) | 1 thread | FP32 | `46.08 s` | `548.6 ms` | **`18.41 s`** | `64.50 s` | `81.42 s` | `9.60×` | `5,637 MiB` (`5.50 GiB`) | `1,375 MiB` `.venv` (+OS) | `2.327 GiB` | `134,879+` (import+load alone) |
+| Official `qwen-tts` PyTorch (`1t BF16`) | 1 thread | BF16 | `61.12 s` | `754.5 ms` | `400.75 s` | `461.86 s` | `472.14 s` | `71.28×` | `3,073 MiB` (`3.00 GiB`) | `1,375 MiB` `.venv` (+OS) | `2.327 GiB` | `134,879+` |
+| Official `qwen-tts` PyTorch (`8t FP32`) | **8 threads** | FP32 | `47.52 s` | `565.7 ms` | **`6.63 s`** | `54.15 s` | `63.51 s` | `8.06×` | `5,648 MiB` (`5.52 GiB`) | `1,375 MiB` `.venv` (+OS) | `2.327 GiB` | `134,879+` |
+| Official `qwen-tts` PyTorch (`8t BF16`) | **8 threads** | BF16 | `24.68 s` | `304.6 ms` | `386.85 s` | `411.52 s` | `420.35 s` | `63.51×` | `3,059 MiB` (`2.99 GiB`) | `1,375 MiB` `.venv` (+OS) | `2.327 GiB` | `134,879+` |
+
+### Key Takeaways & Honest Trade-Offs
+- **Talker 28L + Code Predictor 5L (memory-bandwidth bound):** 1-vCPU NOPRAY (`15.46 s`) beats `1t FP32` by **`2.98×`**, `8t FP32` by **`3.07×`**, `1t BF16` by **`3.95×`**, and `8t BF16` by **`1.60×`** because split-plane `Q8_0S` AVX2+FMA cuts weight bandwidth by `3.56×` vs FP32 with zero Python/HuggingFace dispatch or OpenMP barrier overhead.
+- **BigVGAN Vocoder (compute-bound, ~385 GFLOPs):** Official PyTorch FP32 wins this stage via multi-core oneDNN/OpenBLAS SGEMM (`6.63 s` on 8 threads, `18.41 s` on 1 thread), whereas PyTorch BF16 collapses (`386–400 s`) on Zen 3 due to missing AVX-512 BF16. Our 3.5 KiB single-core AVX2+FMA+F16C `2oc × 48t` tiled Conv1d (`25.75 s`) comes within `1.40×` of single-thread oneDNN FP32 and beats 8-thread BF16 by `15.02×`.
+- **End-to-end result:** 1-vCPU bare-metal NOPRAY (`41.22 s` synth / `53.04 s` cold) beats even 8-thread official PyTorch FP32 (`54.15 s` / `63.51 s`), with **`2.32×` less RAM**, **`~44,000×` smaller executable/runtime**, and **`0` guest Linux syscalls**.
+- **Fidelity & honest caveats:** Bare-metal `nopray_es.wav` achieves **`89.32 dB` SNR / `0.9999999994` cosine** vs FP32 NumPy (`153,359 / 153,600` exact 16-bit PCM samples, max error `±1 LSB`). Packing `weights.nqts` (`DMCS-L3`) is a one-time offline step, and `Q8_0S` greedy argmax emits `80` frames (`6.40 s`) vs `84` (`6.72 s`) in FP32 and `81` (`6.48 s`) in BF16. Full report: [`examples/qwen3-tts-x86_64-baremetal/benchmarks/REPORT.md`](../examples/qwen3-tts-x86_64-baremetal/benchmarks/REPORT.md).

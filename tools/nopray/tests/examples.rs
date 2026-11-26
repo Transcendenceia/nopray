@@ -48,8 +48,8 @@ fn examples_rebuild_to_locked_bytes_and_audit_clean() {
     let bin = env!("CARGO_BIN_EXE_nopray");
     let apps = examples();
     assert!(
-        apps.len() >= 5,
-        "expected the mapped examples, found {apps:?}"
+        apps.len() >= 6,
+        "expected the mapped examples (including qwen3-tts-x86_64-baremetal), found {apps:?}"
     );
     for (i, app) in apps.iter().enumerate() {
         let lock: serde_json::Value = serde_json::from_str(

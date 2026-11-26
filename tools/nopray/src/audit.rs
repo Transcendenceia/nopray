@@ -163,15 +163,16 @@ pub fn run(app: &AppDir, image: &Image, reference: Option<(&str, &[u8])>) -> Rep
     check_policy(&mut cx);
     check_gaps(&mut cx, image);
 
-    let opts = DecodeOpts {
-        state_register: m.target.state_register.clone(),
-    };
     let mut decoded = Vec::new();
     for ls in &image.slots {
         let slot = &m.slots[ls.index];
         if slot.kind != SlotKind::Code {
             continue;
         }
+        let opts = DecodeOpts {
+            state_register: m.target.state_register.clone(),
+            bitness: slot.bits,
+        };
         let (mut insns, coverage) = isa::decode(m.target.isa, &ls.bytes, slot.vaddr, &opts);
         isa::annotate_external(m.target.isa, &mut insns, &ls.bytes, slot.vaddr);
         decoded.push(Decoded {
@@ -409,7 +410,11 @@ fn check_elf(cx: &mut Ctx<'_>, h: &elf::Elf, file_len: u64) {
             "ELF class does not match target.format",
         );
     }
-    if h.machine != m.target.isa.elf_machine() {
+    let multiboot_x86_64 = m.target.isa == Isa::X86_64
+        && m.target.os == Os::BareMetal
+        && m.target.format == Format::Elf32
+        && h.machine == 3;
+    if h.machine != m.target.isa.elf_machine() && !multiboot_x86_64 {
         cx.push(
             Severity::Error,
             "E002",

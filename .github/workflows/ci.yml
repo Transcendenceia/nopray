@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install binutils-multiarch (RISC-V disassembly for annotate --check)
+        run: sudo apt-get update && sudo apt-get install -y binutils-multiarch
+
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -31,3 +34,5 @@ jobs:
           $T audit --strict examples/hello-riscv64-linux
           $T audit --strict examples/nopray-doom-x86_64-cachyos
           $T annotate --check examples/nopray-doom-x86_64-cachyos
+          $T audit --strict examples/qwen3-tts-x86_64-baremetal
+          $T annotate --check examples/qwen3-tts-x86_64-baremetal

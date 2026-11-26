@@ -125,3 +125,20 @@ Every one of these traps causes silent bugs or crashes if overlooked:
     - `andpd xmm, [mem]` (e.g. `abs_mask = 0x7fffffffffffffff` × 2) faults with `SIGSEGV` unless `[mem]` is 16-byte aligned (`vaddr % 16 == 0`). Always place SSE2 masks at `0x10`-aligned labelled `rodata` offsets.
     - **Branchless hot loops:** in branch-heavy loops (e.g. Collatz), `shr rax, 1` (`48 d1 e8`) + `cmovb` (`48 0f 42 ...`) aligned to 16 bytes cuts CPU time ~33% and beats `gcc -O3 -march=native`.
     - **SWAR RGB shading (8 instructions, zero channel bleed):** shade packed `0x00RRGGBB` by `shade ∈ [0..255]` via `rb = (((c & 0x00ff00ff) * shade) >> 8) & 0x00ff00ff` and `g = (((c & 0x0000ff00) * shade) >> 8) & 0x0000ff00`, then `rb | g`.
+13. **2-Byte VEX (`C5`) Cannot Encode `REX.B=1` or `REX.X=1` (`r8`–`r15` Memory Operands):**
+    - `C5` implicitly hardwires `X'=1, B'=1, mmmmm=0F, W=0`. Using `c5 fc 11 4f 40` intending `vmovups [r15+0x40], ymm1` silently encodes `[rdi+0x40]`! Always switch to 3-byte VEX (`C4`) whenever a memory base or SIB index is `r8`–`r15` (`c4 c1 7c 11 4f 40`).
+    - **Double-high SIB trap (`[r12..r15 + r8..r15*scale]`):** VEX Byte 2 bits are `R' X' B' mmmmm` (inverted!). When **both** SIB base and SIB index are `r8`–`r15`, **both** `X'` and `B'` must be `0` (`c4 81` for `0F`, NOT `c4 a1` which sets `B'=1` and turns `r12`/`r13` into `rsp`/`rbp`, nor `c4 c1` which sets `X'=1`). Caught 3× statically by `nopray audit` in `qwen3-tts-x86_64-baremetal`.
+14. **VEX `vvvv` 1's-Complement and `R'` Bit Traps:**
+    - VEX `vvvv` encodes `~reg` (`ymm0 → 1111`, `ymm3 → 1100`, `ymm14 → 0001`, `ymm15 → 0000`) and `R'` is `0` for `ymm8`–`ymm15`. Wrong `vvvv` silently reads/zeros the wrong SIMD register (e.g. `vaddps ymm3, ymm3, [r9]` needs `0x64`, `vxorps xmm3, xmm3, xmm3` needs `c5 e0`, `vdivps ymm9, ymm1, ymm9` needs `c4 41` with `R'=0, B'=0`).
+15. **SIB `mod=00` + `base=5` (`rbp`/`r13`) Drops the Base Register:**
+    - Just like non-SIB `mod=00, rm=5` means `[rip+disp32]`, SIB `mod=00` with `base=5` means `[index*scale + disp32]` with **no base register**! To encode `[rbp+rax]` or `[r13+r14*4]`, ALWAYS use `mod=01` with `disp8 = 0x00` (e.g. `48 8d 74 05 00` = `lea rsi, [rbp+rax]`, `c4 81 7a 10 44 b5 00` = `vmovss xmm0, [r13+r14*4]`).
+16. **Subtle Opcode / ModRM Direction Traps Caught in AVX2 & 64-Bit Loops:**
+    - `vmovaps` (`0F 28`) uses `pp=00` (`c5 f8 28` / `c5 fc 28`), NOT `F3` (`c5 fa`).
+    - Two-operand `imul r64, r/m64` (`0F AF /r`) places the destination in `ModRM.reg` (`REX.R`), NOT `ModRM.rm` (`REX.B`) — `49 0f af ca` decodes `imul rcx, r10`, whereas `imul r9, rdx` is `4c 0f af ca`.
+    - `add r/m64, r64` (`01 /r`) puts the source in `ModRM.reg` (`REX.R`) and destination in `ModRM.rm` (`REX.B`).
+    - SIB scale field is `00=*1, 01=*2, 10=*4, 11=*8` (e.g. `[rdi+r10*2]` needs SIB `0x57`, not `0x97`).
+17. **Bare-Metal AVX2/FMA/F16C Prerequisite & Fast Binary Streaming:**
+    - In bare-metal x86-64 Long Mode, every VEX instruction traps with `#UD` until `CR0.EM=0`, `CR0.MP=1`, `CR4.{OSFXSR,OSXMMEXCPT,OSXSAVE}=1`, and `xsetbv(ecx=0, eax=7, edx=0)` (`XCR0 = 7`) execute.
+    - For streaming multi-hundred-KiB binary outputs (like WAV PCM) out of a bare-metal KVM VM, use QEMU `isa-debugcon` (`port 0xE9`) with `cld; rep outsb` (`fc f3 6e`, 15 B routine) instead of byte-polled 16550A COM2 (`0x2F8`) to avoid hundreds of thousands of single-byte PIO VM-exits.
+18. **Arithmetic Displacement Patchers vs `nopray annotate`:**
+    - When using a pure arithmetic displacement patcher (Rule 1: never encodes opcodes, only patches `rel8`/`rel32`/`rip-disp32` from `#=` intents), parse intents with `line.split("#=", 1)[1]` rather than assuming `#=` starts right after the first `#`, because `nopray annotate` inserts `# 0xaddr disasm` ahead of `#=`.

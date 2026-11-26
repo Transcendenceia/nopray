@@ -27,13 +27,22 @@ fn normalize(text: &str, resolve: &dyn Fn(&str) -> Option<u64>, keep_sizes: bool
                 i += 1;
             }
             let tok: String = chars[start..i].iter().collect();
-            if matches!(tok.as_str(), "ptr" | "short" | "near")
+            if matches!(tok.as_str(), "ptr" | "short" | "near" | "far")
                 || (!keep_sizes && SIZE_WORDS.contains(&tok.as_str()))
             {
                 continue;
             }
-            // AArch64 decoders print MOVZ with a small immediate as its preferred alias MOV.
-            let tok = if tok == "movz" { "mov".to_owned() } else { tok };
+            // Canonicalize standard ISA mnemonic aliases:
+            // - AArch64: MOVZ with a small immediate is printed as MOV.
+            // - x86-64: jz/jnz/jc/jnc are exact opcode synonyms of je/jne/jb/jae.
+            let tok = match tok.as_str() {
+                "movz" => "mov".to_owned(),
+                "jz" => "je".to_owned(),
+                "jnz" => "jne".to_owned(),
+                "jc" => "jb".to_owned(),
+                "jnc" => "jae".to_owned(),
+                _ => tok,
+            };
             match parse_num(&tok).or_else(|| resolve(&tok)) {
                 Some(v) => out.push_str(&v.to_string()),
                 None => out.push_str(&tok),
@@ -89,12 +98,29 @@ fn collapse_aliases(norm: &str) -> String {
             | "cmpsw"
             | "cmpsd"
             | "cmpsq"
+            | "outsb"
+            | "outsw"
+            | "outsd"
+            | "insb"
+            | "insw"
+            | "insd"
     );
     if is_str_op && toks.len() > prefix_len {
         let rest = toks[prefix_len..].join(" ");
         if matches!(
             rest.as_str(),
-            "[rdi ]" | "[rsi ]" | "[rdi ] [rsi ]" | "[rsi ] [rdi ]"
+            "[rdi ]"
+                | "[rsi ]"
+                | "[rdi ] [rsi ]"
+                | "[rsi ] [rdi ]"
+                | "[edi ]"
+                | "[esi ]"
+                | "[edi ] [esi ]"
+                | "[esi ] [edi ]"
+                | "dx [rsi ]"
+                | "dx [esi ]"
+                | "[rdi ] dx"
+                | "[edi ] dx"
         ) {
             return toks[..prefix_len].join(" ");
         }
@@ -163,6 +189,19 @@ mod tests {
         assert!(matches("fld st,qword ptr [r15+0x10]", "fld qword ptr [r15+0x10]", &sym));
         assert!(matches("fstp qword ptr [r15+0x18],st", "fstp qword ptr [r15+0x18]", &sym));
         assert!(!matches("fstp qword ptr [r15+0x20],st", "fstp qword ptr [r15+0x18]", &sym));
+        // Bare-metal x86 32->64, jump aliases, string I/O, and AVX2/FMA/F16C intents:
+        assert!(matches("je 0x101096", "jz 0x101096", &sym));
+        assert!(matches("jne 0x101017", "jnz 0x101017", &sym));
+        assert!(matches("jb 0x1014b1", "jc 0x1014b1", &sym));
+        assert!(matches("jae 0x101500", "jnc 0x101500", &sym));
+        assert!(matches("jmp 0x8:0x100200", "jmp far 0x8:0x100200", &sym));
+        assert!(matches("rep stosd [edi]", "rep stosd", &sym));
+        assert!(matches("rep outsb dx,[rsi]", "rep outsb", &sym));
+        assert!(matches(
+            "vfmadd231ps ymm0,ymm15,[rsi+0x20]",
+            "vfmadd231ps ymm0, ymm15, [rsi + 32]",
+            &sym
+        ));
     }
 
     #[test]

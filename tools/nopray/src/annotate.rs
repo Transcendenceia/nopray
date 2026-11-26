@@ -90,6 +90,7 @@ fn code_lines(app: &AppDir, slot: &Slot, bytes: &[u8]) -> Vec<ListingLine> {
     let m = &app.manifest;
     let opts = DecodeOpts {
         state_register: m.target.state_register.clone(),
+        bitness: slot.bits,
     };
     let (mut insns, coverage) = isa::decode(m.target.isa, bytes, slot.vaddr, &opts);
     if coverage == Coverage::None {

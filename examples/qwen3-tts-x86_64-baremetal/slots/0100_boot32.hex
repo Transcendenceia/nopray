@@ -1,0 +1,54 @@
+# nopray slot `boot32` · code · vaddr 0x100100 · size 0x100 · used 209 bytes
+# purpose: 32-bit Multiboot 1 entry: zeroes BSS, builds 0..4 GiB 2 MiB huge-page identity map, enables PAE/LME/PG, loads GDT64 and far-jumps to boot64
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# boot32:
+fa                             # 0x00100100  cli  #= cli
+fc                             # 0x00100101  cld  #= cld
+89 c6                          # 0x00100102  mov esi,eax  #= mov esi, eax
+89 dd                          # 0x00100104  mov ebp,ebx  #= mov ebp, ebx
+bf 00 c0 10 00                 # 0x00100106  mov edi,0x10c000  → data_zero  #= mov edi, 0x10c000
+b9 00 20 00 00                 # 0x0010010b  mov ecx,0x2000  #= mov ecx, 0x2000
+31 c0                          # 0x00100110  xor eax,eax  #= xor eax, eax
+f3 ab                          # 0x00100112  rep stosd [edi]  #= rep stosd
+89 35 00 c0 10 00              # 0x00100114  mov [0x10c000],esi  #= mov dword [0x10c000], esi
+89 2d 04 c0 10 00              # 0x0010011a  mov [0x10c004],ebp  #= mov dword [0x10c004], ebp
+0f 31                          # 0x00100120  rdtsc  #= rdtsc
+a3 08 c0 10 00                 # 0x00100122  mov [0x10c008],eax  #= mov dword [0x10c008], eax
+89 15 0c c0 10 00              # 0x00100127  mov [0x10c00c],edx  #= mov dword [0x10c00c], edx
+c7 05 00 d0 10 00 03 e0 10 00  # 0x0010012d  mov dword ptr [0x10d000],0x10e003  #= mov dword [0x10d000], 0x10e003
+c7 05 00 e0 10 00 03 f0 10 00  # 0x00100137  mov dword ptr [0x10e000],0x10f003  #= mov dword [0x10e000], 0x10f003
+c7 05 08 e0 10 00 03 00 11 00  # 0x00100141  mov dword ptr [0x10e008],0x110003  #= mov dword [0x10e008], 0x110003
+c7 05 10 e0 10 00 03 10 11 00  # 0x0010014b  mov dword ptr [0x10e010],0x111003  #= mov dword [0x10e010], 0x111003
+c7 05 18 e0 10 00 03 20 11 00  # 0x00100155  mov dword ptr [0x10e018],0x112003  #= mov dword [0x10e018], 0x112003
+bf 00 f0 10 00                 # 0x0010015f  mov edi,0x10f000  #= mov edi, 0x10f000
+31 db                          # 0x00100164  xor ebx,ebx  #= xor ebx, ebx
+31 c9                          # 0x00100166  xor ecx,ecx  #= xor ecx, ecx
+89 d8                          # 0x00100168  mov eax,ebx  #= mov eax, ebx
+81 f9 f0 07 00 00              # 0x0010016a  cmp ecx,0x7f0  #= cmp ecx, 0x7f0
+73 07                          # 0x00100170  jae 0x100179  #= jae 0x100179
+0d 83 00 00 00                 # 0x00100172  or eax,0x83  #= or eax, 0x83
+eb 05                          # 0x00100177  jmp 0x10017e  #= jmp 0x10017e
+0d 9b 00 00 00                 # 0x00100179  or eax,0x9b  #= or eax, 0x9b
+89 07                          # 0x0010017e  mov [edi],eax  #= mov dword [edi], eax
+c7 47 04 00 00 00 00           # 0x00100180  mov dword ptr [edi+4],0  #= mov dword [edi+4], 0
+83 c7 08                       # 0x00100187  add edi,8  #= add edi, 8
+81 c3 00 00 20 00              # 0x0010018a  add ebx,0x200000  #= add ebx, 0x200000
+41                             # 0x00100190  inc ecx  #= inc ecx
+81 f9 00 08 00 00              # 0x00100191  cmp ecx,0x800  #= cmp ecx, 0x800
+72 cf                          # 0x00100197  jb 0x100168  #= jb 0x100168
+b8 00 d0 10 00                 # 0x00100199  mov eax,0x10d000  #= mov eax, 0x10d000
+0f 22 d8                       # 0x0010019e  mov cr3,eax  #= mov cr3, eax
+0f 20 e0                       # 0x001001a1  mov eax,cr4  #= mov eax, cr4
+83 c8 20                       # 0x001001a4  or eax,0x20  #= or eax, 0x20
+0f 22 e0                       # 0x001001a7  mov cr4,eax  #= mov cr4, eax
+b9 80 00 00 c0                 # 0x001001aa  mov ecx,0xc0000080  #= mov ecx, 0xc0000080
+0f 32                          # 0x001001af  rdmsr  #= rdmsr
+0d 00 01 00 00                 # 0x001001b1  or eax,0x100  #= or eax, 0x100
+0f 30                          # 0x001001b6  wrmsr  #= wrmsr
+0f 20 c0                       # 0x001001b8  mov eax,cr0  #= mov eax, cr0
+0d 01 00 00 80                 # 0x001001bb  or eax,0x80000001  #= or eax, 0x80000001
+0f 22 c0                       # 0x001001c0  mov cr0,eax  #= mov cr0, eax
+0f 01 15 18 0c 10 00           # 0x001001c3  lgdt [0x100c18]  #= lgdt [gdt64_ptr]
+ea 00 02 10 00 08 00           # 0x001001ca  jmp far 0x100200,8  → boot64  #= jmp far boot64, 8

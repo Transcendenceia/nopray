@@ -272,6 +272,9 @@ pub struct Slot {
     /// Justification for writes into executable memory (only legal below tier L2).
     #[serde(default)]
     pub self_modifying: Option<String>,
+    /// Optional x86 execution width override (`16`, `32`, or `64`) for bare-metal boot trampolines.
+    #[serde(default)]
+    pub bits: Option<u32>,
 }
 
 impl Slot {
@@ -419,6 +422,20 @@ impl Manifest {
                 }
                 if !names.insert(label.name.as_str()) {
                     bail!("duplicate symbol `{}`", label.name);
+                }
+            }
+            if let Some(b) = slot.bits {
+                if self.target.isa != Isa::X86_64 || slot.kind != SlotKind::Code {
+                    bail!(
+                        "slot `{}` sets `bits = {b}`, which is only valid on x86-64 code slots",
+                        slot.name
+                    );
+                }
+                if !matches!(b, 16 | 32 | 64) {
+                    bail!(
+                        "slot `{}` has invalid `bits = {b}` (expected 16, 32, or 64)",
+                        slot.name
+                    );
                 }
             }
             if slot.file.contains("..") || Path::new(&slot.file).is_absolute() {

@@ -28,7 +28,8 @@ pub(super) fn decode(bytes: &[u8], addr: u64, opts: &DecodeOpts) -> Vec<Insn> {
         .as_deref()
         .and_then(parse_reg)
         .map(Register::full_register);
-    let mut decoder = Decoder::with_ip(64, bytes, addr, DecoderOptions::NONE);
+    let bitness = opts.bitness.unwrap_or(64);
+    let mut decoder = Decoder::with_ip(bitness, bytes, addr, DecoderOptions::NONE);
     let mut formatter = IntelFormatter::new();
     formatter.options_mut().set_hex_prefix("0x");
     formatter.options_mut().set_hex_suffix("");
@@ -125,21 +126,21 @@ fn flow_of(ins: &Instruction) -> Flow {
                 Flow::Next
             }
         }
-        FlowControl::UnconditionalBranch => {
-            if ins.op0_kind() == OpKind::NearBranch64 {
+        FlowControl::UnconditionalBranch => match ins.op0_kind() {
+            OpKind::NearBranch64 | OpKind::NearBranch32 | OpKind::NearBranch16 => {
                 Flow::Jump(ins.near_branch_target())
-            } else {
-                Flow::IndirectJump
             }
-        }
+            OpKind::FarBranch32 => Flow::Jump(u64::from(ins.far_branch32())),
+            OpKind::FarBranch16 => Flow::Jump(u64::from(ins.far_branch16())),
+            _ => Flow::IndirectJump,
+        },
         FlowControl::ConditionalBranch => Flow::CondJump(ins.near_branch_target()),
-        FlowControl::Call => {
-            if ins.op0_kind() == OpKind::NearBranch64 {
+        FlowControl::Call => match ins.op0_kind() {
+            OpKind::NearBranch64 | OpKind::NearBranch32 | OpKind::NearBranch16 => {
                 Flow::Call(ins.near_branch_target())
-            } else {
-                Flow::IndirectCall
             }
-        }
+            _ => Flow::IndirectCall,
+        },
         FlowControl::IndirectBranch => Flow::IndirectJump,
         FlowControl::IndirectCall => Flow::IndirectCall,
         FlowControl::Return => Flow::Return,
@@ -197,6 +198,7 @@ mod tests {
         let code = [0x41, 0xc7, 0x47, 0x40, 0x01, 0, 0, 0];
         let opts = DecodeOpts {
             state_register: Some("r15".into()),
+            bitness: None,
         };
         let v = decode(&code, 0x0040_0100, &opts);
         assert_eq!(
@@ -206,5 +208,26 @@ mod tests {
                 write: true
             }]
         );
+    }
+
+    #[test]
+    fn decodes_32bit_multiboot_far_jump_and_avx2_fma() {
+        // 32-bit protected mode: cli ; jmp 0x08:0x00100200
+        let boot32 = [0xfa, 0xea, 0x00, 0x02, 0x10, 0x00, 0x08, 0x00];
+        let opts32 = DecodeOpts {
+            state_register: None,
+            bitness: Some(32),
+        };
+        let v32 = decode(&boot32, 0x0010_0100, &opts32);
+        assert_eq!(v32.len(), 2);
+        assert_eq!(v32[0].text, "cli");
+        assert_eq!(v32[1].flow, Flow::Jump(0x0010_0200), "got {:?}", v32[1]);
+
+        // 64-bit AVX2 FMA: vfmadd231ps ymm0, ymm1, ymm2 (c4 e2 75 b8 c2)
+        let fma = [0xc4, 0xe2, 0x75, 0xb8, 0xc2];
+        let v64 = decode(&fma, 0x0010_0200, &DecodeOpts::default());
+        assert_eq!(v64.len(), 1);
+        assert!(v64[0].text.contains("vfmadd231ps"), "got {}", v64[0].text);
+        assert!(v64[0].writes.iter().any(|w| w == "zmm0"));
     }
 }

@@ -79,7 +79,7 @@ Finding codes and the manifest format: [references/MANIFEST.md](references/MANIF
 
 | ISA | Built-in decoding | Status of examples |
 |---|---|---|
-| x86-64 | Full (validity, flow, syscalls, memory, registers, contracts, `C017`) | calc, nopray3d, nopray-doom, nopray-httpd v2: byte-identical maps, 0 errors |
+| x86-64 | Full (16/32/64-bit `slot.bits`, AVX2/FMA/F16C, far-jump CFG, Multiboot 1 ELF32 bare metal, syscalls, contracts, `C017`) | calc, nopray3d, nopray-doom, nopray-httpd v2, qwen3-tts-baremetal: byte-identical maps, 0 errors |
 | AArch64 | Validity + flow + `svc`/`x8` syscalls + `adr`/literal refs | hello-aarch64: runs under `qemu-aarch64`, strict audit clean |
 | RISC-V 32/64 (+C) | Lengths, major-opcode validity, flow, `ecall`/`a7`; text via objdump | hello-riscv64: runs under `qemu-riscv64`, strict audit clean |
 | Thumb, Xtensa, AVR | None: bytes are opaque (`X001`), objdump text for annotation only | No example yet; needs external evidence |
@@ -113,4 +113,5 @@ rebuilds all of them and fails if any byte or audit result changes.
 - `examples/calc-x86_64-cachyos/`: 4,096-byte X11 calculator (tier L1, RWX by design, local only).
 - `examples/nopray3d-x86_64-cachyos/`: 8,192-byte W^X raycaster.
 - `examples/nopray-doom-x86_64-cachyos/`: 32,768-byte W^X Transcendence DOOM FPS (640×400 X11, 64×64 procedural wall/floor/ceiling textures, Z-buffered 3D sprites, Sentinel AI + fireballs, plasma cannon, HUD & minimap, direct PipeWire/PulseAudio 24 kHz PCM 5-voice synth with instant mute; 6 syscalls, strict audit 0/0).
+- `examples/qwen3-tts-x86_64-baremetal/`: 32,768-byte bare-metal Multiboot 1 ELF32 → 64-bit Long Mode + AVX2/FMA/F16C VM (`DMCS-1.1` tier L3, `2,806` instructions, **0 Linux syscalls**, strict audit `0/0`) running `Qwen3-TTS-12Hz-0.6B-CustomVoice` end-to-end (Talker 28L + Code Predictor 5L + Speech Tokenizer 12Hz V2 + BigVGAN Vocoder) on `/dev/kvm`.
 - `examples/nopray-httpd-x86_64-linux/v2/`: 40,960-byte W^X SSR HTTP/1.1 server, mapped byte-for-byte with 13-syscall seccomp profile; deployment checklist in the parent README.

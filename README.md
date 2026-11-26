@@ -42,7 +42,15 @@ Natural-language intent ── AI agent ──▶ Mapped machine-code slots (.he
 
 Every demo below lives in [`examples/`](./examples/) and is **rebuilt byte-for-byte and audited automatically** by `cargo test` in CI.
 
-### 1. Transcendence DOOM — `32,768 B` (`32 KiB`) x86-64 3D FPS + Live 24 kHz PCM Audio
+### 1. Bare-Metal `Qwen3-TTS-12Hz-0.6B` VM — `32,768 B` (`32 KiB`) Neural Speech Synthesis with **Zero Linux**
+- **Specs:** `DMCS-1.1` · Tier **`L3` W^X** · **Multiboot 1 ELF32 → 64-bit Long Mode + AVX2/FMA/F16C** · **0 Linux syscalls** (no OS kernel!) · **12 hand-authored hex slots** · **2,806 decoded x86-64 instructions** · `nopray audit --strict`: **`0 errors, 0 warnings`**.
+- **Full End-to-End Pipeline on Bare Metal:** boots straight on QEMU/KVM (`-enable-kvm -cpu host -smp 1`), constructs 4-level 2 MiB identity page tables (`0..4 GiB`), switches 32→64 Long Mode via `jmp far 0x08:boot64`, enables `XCR0=7` AVX2+FMA+F16C, maps `weights.nqts` (`1.042 GiB` `DMCS-L3`) zero-copy from `-initrd`, executes **Talker 28L + Code Predictor 5L** (`Q8_0S` AVX2 GEMV, RoPE, QK-Norm, GQA KV-cache, SwiGLU) + **Speech Tokenizer 12Hz V2 Decoder** (16-codebook RVQ, `pre_conv`, 8-layer sliding-window=72 Pre-Transformer, 2× ConvNeXt, 4-stage BigVGAN/SnakeBeta with `2oc × 48t` tiled AVX2+FMA+F16C convolutions), streams a complete `24 kHz S16LE` RIFF/WAVE via `isa-debugcon` (`0xE9` `rep outsb`), and powers off cleanly (`isa-debug-exit`).
+- **Real Audio Proof (`"Hola Marlon, esto es código máquina puro con nopray, sin Linux y sin compilador."`, speaker `serena`, `Spanish`):**
+  - 🔊 **Bare-metal NOPRAY output (`6.40 s`, `301 KiB`):** [`assets/audio/nopray_qwen3_tts_baremetal_es.wav`](./assets/audio/nopray_qwen3_tts_baremetal_es.wav) — **`89.32 dB` SNR / `0.9999999994` cosine** vs FP32 NumPy (`153,359 / 153,600` bit-identical PCM samples, max diff `±1 LSB`).
+  - 🔊 **Official `qwen-tts` PyTorch reference (`6.72 s`, `316 KiB`):** [`assets/audio/official_qwen3_tts_pytorch_es.wav`](./assets/audio/official_qwen3_tts_pytorch_es.wav).
+- **Head-to-Head on Identical Silicon (AMD Ryzen 7 5825U):** **1-vCPU bare-metal NOPRAY (`41.22 s` synth / `53.04 s` cold / `2.37 GiB` RSS / `32 KiB` ELF / `0` Linux syscalls)** beat **every** official `qwen-tts` PyTorch CPU configuration — including **`8-thread FP32`** (`54.15 s` synth / `63.51 s` cold / `5.52 GiB` RSS / `1.375 GiB` `.venv` / `134,879+` Linux syscalls on import+load alone) and **`8-thread BF16`** (`411.52 s`). Full numbers in [`examples/qwen3-tts-x86_64-baremetal/`](./examples/qwen3-tts-x86_64-baremetal/) and [`references/BENCHMARKS.md`](./references/BENCHMARKS.md#part-3--bare-metal-neural-tts-32-kib-nopray-kvm-vs-official-qwen-tts-pytorch).
+
+### 2. Transcendence DOOM — `32,768 B` (`32 KiB`) x86-64 3D FPS + Live 24 kHz PCM Audio
 - **Specs:** `DMCS-1.1` · Tier **`L2` W^X** · `PT_GNU_STACK rw-` · **6 syscalls total** (`socket`, `connect`, `read`, `write`, `poll`, `exit`) · **2,844 decoded x86-64 instructions** · **2,844 `#=` intents (0 mismatches)** · `nopray audit --strict`: **`0 errors, 0 warnings`**.
 - **Graphics:** Raw X11/Xwayland wire protocol (`/tmp/.X11-unix/X0`, `640×400` BGRA in 4 horizontal `PutImage` strips), 7 procedural `64×64` wall/floor/ceiling textures & 6 procedural `32×32` RGBA sprites generated at startup in `.bss`, `16.16` fixed-point perspective floor/ceiling casting, 640-column SSE2 DDA wall raycaster with per-column Z-buffer, SWAR 256-level distance fog & dynamic muzzle-flash lighting, animated Twin-Rail Plasma Cannon, Sentinel AI + fireballs, interactive blast doors, HUD & radar minimap.
 - **Audio:** Direct real-time **PipeWire / PulseAudio native Unix socket PCM** (`/run/user/<uid>/pulse/native`, `24 kHz S16LE mono`, zero `libpulse`, zero `fork`/`execve`, **zero extra syscalls**) synthesizing 5 live voices (sweeping plasma shot, sub-bass + LFSR noise explosions, rising pickup/door chimes, hurt alert, and an E-minor industrial bass pulse) with instant click-free mute (`N` or `XF86AudioMute`).
@@ -51,7 +59,7 @@ Every demo below lives in [`examples/`](./examples/) and is **rebuilt byte-for-b
 | :---: | :---: | :---: |
 | ![Transcendence DOOM live on CachyOS](./assets/screenshots/doom-live-cachyos.png) | ![Transcendence DOOM combat shot](./assets/screenshots/doom-combat-flash.png) | ![Transcendence DOOM muted HUD](./assets/screenshots/doom-muted-hud.png) |
 
-### 2. More Verified Reference Binaries
+### 3. More Verified Reference Binaries
 
 | `nopray3d` — `8,192 B` W^X 60 FPS Raycaster | `nopray3d` — Textured Wall Shading | `calc` — `4,096 B` (Single OS Page) X11 GUI |
 | :---: | :---: | :---: |
@@ -64,6 +72,7 @@ Every demo below lives in [`examples/`](./examples/) and is **rebuilt byte-for-b
 | [`calc-x86_64-cachyos`](./examples/calc-x86_64-cachyos/) | `4,096 B` | x86-64 X11 | L1 (local) · 6 syscalls | Live desktop screenshots, byte-locked map |
 | [`nopray3d-x86_64-cachyos`](./examples/nopray3d-x86_64-cachyos/) | `8,192 B` | x86-64 X11 | L2 W^X · 6 syscalls | Live desktop screenshots, 60 FPS, byte-locked map |
 | [`nopray-doom-x86_64-cachyos`](./examples/nopray-doom-x86_64-cachyos/) | `32,768 B` | x86-64 X11 + PipeWire PCM | L2 W^X · 6 syscalls | Live CachyOS + active PipeWire PCM stream + strict audit `0/0` |
+| [`qwen3-tts-x86_64-baremetal`](./examples/qwen3-tts-x86_64-baremetal/) | `32,768 B` | x86-64 Bare Metal (Multiboot 1 + AVX2/FMA/F16C) | L3 W^X · **0 syscalls** | Live `/dev/kvm` Spanish WAV (`89.32 dB` SNR) + strict audit `0/0` |
 | [`nopray-httpd-x86_64-linux/v2`](./examples/nopray-httpd-x86_64-linux/) | `40,960 B` | x86-64 Linux SSR HTTP/1.1 | L2 W^X · 13 syscalls | Byte-identical map, systemd + seccomp hardening template |
 
 ---
@@ -125,7 +134,8 @@ cd nopray
 # 1. Run the full tool test suite (rebuilds & audits EVERY example byte-for-byte)
 (cd tools/nopray && cargo test)
 
-# 2. Audit and build Transcendence DOOM (32,768 B, strict 0 errors / 0 warnings)
+# 2. Audit and build the 32 KiB Bare-Metal Qwen3-TTS VM & Transcendence DOOM (strict 0 errors / 0 warnings)
+./tools/nopray.sh audit --strict examples/qwen3-tts-x86_64-baremetal
 ./tools/nopray.sh build examples/nopray-doom-x86_64-cachyos
 ./tools/nopray.sh audit --strict examples/nopray-doom-x86_64-cachyos
 
