@@ -37,6 +37,9 @@ pub fn summary(report: &Report) -> String {
                 .join(", ")
         }
     );
+    if let Some(o) = &report.origin {
+        let _ = writeln!(s, "{}", origin_line(o));
+    }
     for f in &report.findings {
         let loc = match (&f.slot, f.addr) {
             (Some(sl), Some(a)) => format!("{sl}@{a:#x}"),
@@ -54,6 +57,18 @@ pub fn summary(report: &Report) -> String {
         report.count(Severity::Info)
     );
     s
+}
+
+fn origin_line(o: &crate::audit::OriginTotals) -> String {
+    format!(
+        "origin (used bytes): authored {} · reauthored {} · imported {} · undeclared {} · hand-written {}.{}%",
+        o.authored,
+        o.reauthored,
+        o.imported,
+        o.undeclared,
+        o.hand_written_permille() / 10,
+        o.hand_written_permille() % 10
+    )
 }
 
 fn list(set: &std::collections::BTreeSet<String>) -> String {
@@ -92,6 +107,9 @@ pub fn map(app: &AppDir, report: &Report) -> String {
         report.count(Severity::Error),
         report.count(Severity::Warning)
     );
+    if let Some(o) = &report.origin {
+        let _ = writeln!(s, "{}\n", origin_line(o));
+    }
     if let Some(d) = &m.app.description {
         let _ = writeln!(s, "{d}\n");
     }
@@ -165,6 +183,17 @@ pub fn map(app: &AppDir, report: &Report) -> String {
             "- Decoded: {} instructions · coverage {coverage}",
             r.instructions
         );
+        if r.origin.is_some() || r.fields > 0 {
+            let _ = writeln!(
+                s,
+                "- Origin: {} · symbolic fields: {}",
+                r.origin.map_or_else(
+                    || "undeclared".to_owned(),
+                    |o| format!("{o:?}").to_lowercase()
+                ),
+                r.fields
+            );
+        }
         let _ = writeln!(
             s,
             "- Intents: {} declared · {} mismatched",

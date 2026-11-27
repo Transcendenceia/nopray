@@ -70,6 +70,8 @@ vaddr = 0x400100
 size = 0x40
 file = "slots/0100_start.hex"
 purpose = "write(1, msg, 18) then exit(0)"
+origin = "authored"          # authored | imported | reauthored (audit totals the hand-written share)
+evidence = "tests/start.md"  # required for reauthored slots: differential test vs the replaced routine
 indirect = "optional justification for indirect jumps/calls"
 dynamic_syscalls = "optional justification for unresolved syscall numbers"
 self_modifying = "optional, only below tier L2"
@@ -86,9 +88,43 @@ entry = true                 # other slots may branch here
 note = "why this is an entry"
 ```
 
-## 2. Slot files and intents
+## 2. Slot files, symbolic fields and intents
 
 - Bytes: hex digit pairs before the first `#` of each line. Whitespace is free.
+- **Symbolic fields** `{kind @symbol}` stand for one address or displacement field computed
+  from a manifest symbol (slot, label or `[[state]]` field; `@sym+N` / `@sym-N` add an offset).
+  The opcode stays authored: byte kinds replace only the field bytes, word kinds take the whole
+  authored word after `:` with the field bits at zero and fail if any field bit is set.
+  Range, alignment and ISA are checked at build time; `annotate` keeps the token.
+
+  | Kind | Field | `pc` default |
+  |---|---|---|
+  | `rel8` `rel16` `rel32` | signed `target - pc`, little-endian bytes | end of the line (next instruction) |
+  | `abs8` `abs16` `abs32` `abs64` | unsigned address, little-endian bytes | - |
+  | `a64.imm26` | `b`/`bl` word offset, bits 25:0 | the word |
+  | `a64.imm19` | `b.cond`, `cbz`/`cbnz`, `ldr` literal, bits 23:5 | the word |
+  | `a64.imm14` | `tbz`/`tbnz`, bits 18:5 | the word |
+  | `a64.adr` / `a64.adrp` | byte / 4 KiB-page offset in immlo 30:29 + immhi 23:5 | the word |
+  | `a64.add_lo12` | low 12 bits of the address in `add` imm12 (21:10) | - |
+  | `rv.jal` / `rv.branch` | J-type ±1 MiB / B-type ±4 KiB | the word |
+  | `rv.pcrel_hi20` | `auipc` upper part of `target - pc` (rounded for the low part) | the word |
+  | `rv.pcrel_lo12_i` / `rv.pcrel_lo12_s` | I-/S-type low 12 bits of `target - pc` | the word; use `pc=-4` to pair with the preceding `auipc` |
+  | `rv.hi20` / `rv.lo12_i` / `rv.lo12_s` | absolute `lui` + I/S low part | - |
+
+  `pc=±N` (bytes from the field start) or `pc=@symbol` override the base. Examples:
+
+  ```text
+  e8 {rel32 @write_all}                       #= call write_all
+  48 8d 35 {rel32 @msg}                       #= lea rsi, [rip+msg]
+  {a64.imm26 @loop : 00 00 00 14}             #= b loop
+  {a64.adr @msg : 01 00 00 10}                #= adr x1, msg
+  {rv.pcrel_hi20 @msg : 97 05 00 00}          #= auipc a1, 0x0
+  {rv.pcrel_lo12_i @msg pc=-4 : 93 85 05 00}  #= addi a1, a1, 60
+  {abs64 @_start}                             #= e_entry 0x400100
+  ```
+
+  A wrong `pc=` or symbol still decodes to a real instruction, so keep the `#=` intent: `I001`
+  catches it. Thumb, Xtensa and AVR fields are not supported yet.
 - `#=` text after it is the **intent** of the item starting at the first byte of that line.
   `annotate` preserves intents and splits lines so every intent keeps its exact offset.
 - Code slot intents are compared with the decoded instruction (numbers, spacing, `ptr`,
@@ -107,8 +143,8 @@ note = "why this is an entry"
 |---|---|
 | `<output>` | The binary (written with remove-then-create to avoid `ETXTBSY`) |
 | `image.hex` | Plain hex of the whole image, `xxd -r -p image.hex` rebuilds it |
-| `manifest.lock.json` | Tool version, image SHA-256, per-slot used size and SHA-256 |
-| `audit.json` | Every finding, per-slot report, syscall sites |
+| `manifest.lock.json` | Tool version, image SHA-256, per-slot used size, SHA-256 and symbolic field count |
+| `audit.json` | Every finding, per-slot report (origin, fields), syscall sites, origin totals |
 | `MAP.md` | Navigation map: segments, slots, call graph, data refs, state ownership, syscall sites, open findings |
 
 ## 4. Finding codes
@@ -157,8 +193,15 @@ Errors fail `audit`; warnings fail `audit --strict`.
 | C016 | info | Local call to an unlabelled address |
 | C017 | warning | Address lands inside a labelled `rodata`/`data` slot without matching any declared label (catches off-by-N pointer errors) |
 | D001 | info | Code slot with no caller, jump or reference |
-| I001 | warning | Decoded instruction differs from its `#=` intent |
+| I001 | error | Decoded instruction differs from its `#=` intent. The message names the differing operand (numbers as a delta) and, when one exists, the single-bit edit of the authored bytes that decodes as the intent |
 | I002 | error | Intent does not start an instruction / header field (byte boundaries shifted) |
 | I003 | error | Header intent names a different ELF field |
 | X001 | warning / error | No built-in decoder for the ISA (error when exposed) |
 | A001 | warning | Slot comments are stale (`annotate` was not run after a byte change) |
+| P001 | warning | `origin = "reauthored"` without `evidence` |
+| P002 | warning | `evidence` path does not exist relative to the app directory |
+| P003 | info | Some slots declare no `origin`, so the hand-written share is incomplete |
+
+Build errors (not findings) cover malformed slot files: odd hex digits, unknown or unterminated
+`{...}` fields, field bits already set in an authored word, out-of-range or misaligned fields,
+unknown symbols and fields that do not apply to the target ISA.

@@ -49,6 +49,7 @@ align = 4
 
 [[slot]]
 name = "esp_header"
+origin = "authored"
 kind = "header"
 vaddr = 0
 size = 0x20
@@ -57,6 +58,7 @@ purpose = "ESP image header and segment descriptor."
 
 [[slot]]
 name = "literals"
+origin = "authored"
 kind = "rodata"
 vaddr = 0x403c8700
 size = 0x0c
@@ -74,6 +76,7 @@ offset = 8
 
 [[slot]]
 name = "_start"
+origin = "authored"
 kind = "code"
 vaddr = 0x403c870c
 size = 0x33
@@ -97,6 +100,7 @@ offset = 0x30
 
 [[slot]]
 name = "alignment"
+origin = "authored"
 kind = "rodata"
 vaddr = 0x403c873f
 size = 1
@@ -105,6 +109,8 @@ purpose = "Align the standalone routine."
 
 [[slot]]
 name = "gain_to_index"
+origin = "reauthored"
+evidence = "README.md"
 kind = "code"
 vaddr = 0x403c8740
 size = 0x34
@@ -117,6 +123,7 @@ clobbers = ["a3", "a4"]
 
 [[slot]]
 name = "test_inputs"
+origin = "authored"
 kind = "rodata"
 vaddr = 0x403c8774
 size = 0x38
@@ -146,6 +153,7 @@ offset = 48
 
 [[slot]]
 name = "checksum"
+origin = "authored"
 kind = "rodata"
 vaddr = 0xcc
 size = 4
@@ -154,6 +162,7 @@ purpose = "Alignment plus XOR."
 
 [[slot]]
 name = "image_hash"
+origin = "authored"
 kind = "rodata"
 vaddr = 0xd0
 size = 0x20

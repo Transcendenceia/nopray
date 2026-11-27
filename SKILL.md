@@ -1,6 +1,6 @@
 ---
 name: nopray
-description: 'NOPRAY / DMCS-1.1: author, port, modify and audit native programs written directly as machine-code bytes (hex slots + executable headers) with no compiler, assembler, linker or SDK, using the `nopray` tool to lay out, decode, map and audit every byte. Use only when the user explicitly asks for NOPRAY, raw/hand-written machine code, hex-authored binaries, or "no programming language / no compiler" software; when porting an existing binary into a mapped NOPRAY app; when modifying or auditing an existing NOPRAY app; or when targeting bare metal (ESP32-C3/C6/S3, RP2040, Raspberry Pi) this way. Ordinary requests for native programs, CLIs or services follow First Rust instead.'
+description: 'NOPRAY / DMCS-1.1: author, port, improve, modify and audit native programs written directly as machine-code bytes (hex slots + executable headers) with no compiler, assembler, linker or SDK, using the `nopray` tool to lay out, decode, map and audit every byte. Use only when the user explicitly asks for NOPRAY, raw/hand-written machine code, hex-authored binaries, or "no programming language / no compiler" software; when porting, improving or optimizing an existing binary as a mapped NOPRAY app; when modifying or auditing an existing NOPRAY app; or when targeting bare metal (ESP32-C3/C6/S3, RP2040, Raspberry Pi) this way. Ordinary requests for native programs, CLIs or services follow First Rust instead.'
 metadata:
   icon: ./assets/icon.svg
 ---
@@ -8,8 +8,9 @@ metadata:
 # NOPRAY: hand-authored machine code that stays auditable and changeable (`DMCS-1.1`)
 
 The agent writes the bytes. The `nopray` tool never chooses or encodes an instruction: it
-copies authored bytes into declared slots, decodes them back, checks them against the map and
-the security policy, and regenerates the map an agent needs for the next change.
+copies authored bytes into declared slots, fills only declared address/displacement fields
+from manifest symbols, decodes everything back, checks it against the map and the security
+policy, and regenerates the map an agent needs for the next change.
 
 Run the tool through the launcher (builds itself on first use, cache outside the skill):
 
@@ -18,94 +19,117 @@ T=./tools/nopray.sh
 $T audit examples/hello-aarch64-linux        # paths relative to the repo root
 ```
 
+## The agent loop
+
+Measured failure mode: agents reason correctly and slip when **encoding** (a register bit, a
+displacement, a data address). The loop below moves each of those to a tool check.
+
+1. **Orient on one slot:** `$T context APP SLOT` (or `--json`, `--listing`): free bytes,
+   contract, callers to re-test, state fields, symbolic fields, neighbours. Do not load the
+   whole program to change one routine.
+2. **Write the hex** one instruction per line with a `#=` intent. Every branch, call and
+   address load uses a **symbolic field**, never a hand-computed number:
+   `e8 {rel32 @write_all}`, `{a64.imm26 @loop : 00 00 00 14}`, `{abs64 @msg}`
+   ([MANIFEST.md](references/MANIFEST.md) §2 lists the kinds).
+3. `$T annotate APP` and read the decoded listing.
+4. `$T audit APP --strict`. On `I001`, read the hint first: it names the differing operand
+   and, when one exists, the single flipped bit that decodes as your intent. Fix the byte.
+5. Run it (natively, `qemu-<arch>`, emulator), exercise every path and malformed input.
+6. `$T diff OLD NEW`, re-test the callers it lists, deliver the evidence.
+
 ## Non-negotiable rules
 
-1. **Purity is an attestation, not a proof — and custom bit-field encoders are forbidden.** Never
+1. **Purity is an attestation, not a proof, and encoders are forbidden.** Never
    compile/assemble and paste bytes while claiming a DMCS tier, and never write a helper DSL
-   (e.g. `def movz/add_imm/cmp_imm(...)`) that constructs machine instructions from mnemonics or
-   register/opcode arguments. Arithmetic scripts are allowed *only* to compute and patch branch
-   displacements or label addresses into instructions whose opcodes you authored by hand. The
+   (e.g. `def movz/add_imm/cmp_imm(...)`) that builds instructions from mnemonics or register
+   arguments. Symbolic fields are the only sanctioned arithmetic: they fill a declared
+   displacement or address field inside an opcode you wrote, and the build rejects an authored
+   word whose field bits are not zero. Per-app relocation scripts are no longer needed. The
    audit proves what the bytes do, never how they were produced; say so whenever purity is
    claimed. Record `[provenance]` in the manifest.
-2. **Every byte has an owner — and label every referenced data item.** Every file byte belongs to
-   a declared slot (`G001` otherwise). Code, data, headers and padding are mapped in `nopray.toml`.
-   For `rodata`/`data` slots holding multiple strings or tables, declare `[[slot.label]]` for each
-   item: `nopray audit` then enforces `C017`, catching off-by-N pointer errors that `#=` intents
-   alone cannot detect.
+2. **Every byte has an owner, and every referenced data item has a label.** Every file byte
+   belongs to a declared slot (`G001` otherwise). For `rodata`/`data` slots holding multiple
+   strings or tables, declare `[[slot.label]]` for each item and reference it with a field
+   (`{rel32 @err_msg}`); `C017` catches literal off-by-N pointers.
 3. **Declare intent for every instruction you author.** End each byte line with
-   `#= <instruction as you meant it>` (and each header field with `#= <field name> <value>`).
-   `nopray audit` compares it with the decoded bytes; a mismatch is an encoding bug.
-4. **Cross-slot control flow only through declared entries.** Calls and jumps into another slot
+   `#= <instruction as you meant it>` (header fields: `#= <field name> <value>`). A mismatch
+   is the error `I001`; a wrong field symbol or `pc=` still decodes, so the intent is what
+   catches it.
+4. **Say how much is yours.** Declare `origin` on every slot (`authored`, `imported`,
+   `reauthored`). `import` stamps `imported`; a re-written routine is `reauthored` with
+   `evidence` of equivalence (`P001` until then). Report the audit's hand-written share.
+   An imported baseline is never a port.
+5. **Cross-slot control flow only through declared entries.** Calls and jumps into another slot
    must target its start or a label with `entry = true` (`C005`). Fall-through into the next
    slot is reported (`C015`); end every slot with an explicit jump, return or exit.
-5. **Exposure gates.** `exposure = "lan"` or `"internet"` requires tier L2 (W^X), a
+6. **Exposure gates.** `exposure = "lan"` or `"internet"` requires tier L2 (W^X), a
    `[syscalls]` allow-list, zero audit errors and a seccomp filter generated by
    `nopray seccomp`. Publishing anything to the internet additionally requires explicit operator
    approval and reverse-proxy / sandbox containment (see [SECURITY.md](references/SECURITY.md)).
-6. **Changes are reviewed by slot.** After any edit: `annotate`, `audit`, `diff` against the
+7. **Changes are reviewed by slot.** After any edit: `annotate`, `audit`, `diff` against the
    previous version, re-test the callers the diff lists, then run the program.
-7. **Hardware is not a sandbox.** Flashing a microcontroller or writing a boot medium needs
+8. **Hardware is not a sandbox.** Flashing a microcontroller or writing a boot medium needs
    explicit approval, a known recovery path (ROM download mode, BOOTSEL, spare SD) and, when
    possible, a backup of the current firmware. Emulate first.
-8. **Unverified target facts stay marked.** Register addresses, boot headers and keys come from
+9. **Unverified target facts stay marked.** Register addresses, boot headers and keys come from
    primary sources; anything else is labelled UNVERIFIED in the manifest notes and the report.
 
 ## Workflow
 
-Read [references/WORKFLOW.md](references/WORKFLOW.md) before the first app of a session. Summary:
+Read [references/WORKFLOW.md](references/WORKFLOW.md) before the first app of a session.
 
 | Task | Steps |
 |---|---|
-| **Create** | Fingerprint target ([ENV-DISCOVERY](references/ENV-DISCOVERY.md)) → write `nopray.toml` (segments, slots, contracts, syscalls/MMIO, state) → author slot hex with `#=` intents → `annotate` → `build` → `audit --strict` → run (native, `qemu-<arch>`, or emulator) → capture evidence |
-| **Port** an existing binary | `propose --binary` for supported ELF, or map a vendor carrier manually → `import` (byte-identical rebuild) → pin dependency and relocation evidence per function → re-author behavior in literal hex and re-test it separately |
-| **Modify** | Copy the app to a new version dir → edit bytes in one slot (keep its address and size) → `annotate` → `audit` → `diff old new` → re-test listed callers → run |
+| **Create** | Fingerprint target ([ENV-DISCOVERY](references/ENV-DISCOVERY.md)) → write `nopray.toml` (segments, slots with `origin = "authored"`, contracts, syscalls/MMIO, state, labels) → agent loop per slot → capture evidence |
+| **Port** an existing binary | `propose --binary` (ELF) / `propose-esp`, or map a vendor carrier manually → `import` (byte-identical, slots stamped `imported`) → per routine: `context`, re-author with fields + intents, `origin = "reauthored"` + differential `evidence` → report the hand-written share |
+| **Improve** a port or app | Same slot, same contract: shorter or faster bytes (branchless loops, fewer syscalls), equivalence evidence, `diff`, measured gain |
+| **Modify** | Copy the app to a new version dir → `context` → edit bytes in one slot (keep its address and size) → `annotate` → `audit` → `diff old new` → re-test listed callers → run |
 | **Deploy** (Linux) | Tier L2, exposure declared, `audit --strict` clean → `seccomp` → systemd sandbox ([SECURITY](references/SECURITY.md)) → verify every route/feature live → keep rollback |
 
 ## Tool commands
 
 | Command | What it does |
 |---|---|
-| `build DIR` | Lays slots out into `build/<output>`, `build/image.hex` (`xxd -r -p` compatible) and `build/manifest.lock.json` (per-slot SHA-256). |
-| `audit DIR [--binary F] [--strict]` | All checks; writes `build/audit.json` and `build/MAP.md`. `--binary` proves a deployed file equals the map. Exit 1 on errors (or warnings with `--strict`). |
-| `annotate DIR [--check]` | Regenerates comments from the bytes (disassembly, ELF field names, syscall names, `→ symbol`); keeps `#=` intents. |
-| `propose --binary F --name N [--isa I] [--code-end HEX]` | Drafts a manifest for an ELF: segments, header, functions split at calls and NOP padding, cross-slot labels. |
+| `build DIR` | Resolves symbolic fields, lays slots out into `build/<output>`, `build/image.hex` (`xxd -r -p` compatible) and `build/manifest.lock.json` (per-slot SHA-256). |
+| `audit DIR [--binary F] [--strict]` | All checks; writes `build/audit.json` and `build/MAP.md`, prints the origin totals. `--binary` proves a deployed file equals the map. Exit 1 on errors (or warnings with `--strict`). |
+| `annotate DIR [--check]` | Regenerates comments from the bytes (disassembly, ELF field names, syscall names, `→ symbol`); keeps `#=` intents and `{...}` fields. |
+| `context DIR SYMBOL [--json] [--listing]` | One slot (or the slot owning a label): range, free bytes, purpose, origin, contract, labels, callers to re-test, state touched, fields in/out, neighbours, findings. |
+| `propose --binary F --name N [--isa I] [--code-end HEX]` | Drafts a manifest for an ELF: segments, header, functions split at calls and NOP padding, cross-slot labels, `origin = "imported"`. |
 | `propose-esp --binary F --name N --version V --authored-by S --date D` | Drafts a container-granularity manifest for an ESP32-S3 loader image (header, descriptors, segments, XOR, digest; `container = "esp-image"`). Refuses other chip IDs. |
-| `import --binary F --manifest M --out DIR` | Extracts annotated slot files and fails unless the rebuild is byte-identical. |
+| `import --binary F --manifest M --out DIR` | Extracts annotated slot files, stamps missing origins as `imported`, and fails unless the rebuild is byte-identical. |
 | `diff OLD NEW` | Changed/moved slots, callers to re-test, unified diff of the decoded listings. |
 | `seccomp DIR` | systemd `SystemCallFilter=` from the audited syscall sites (fails if any site is unresolved). |
 
-Finding codes and the manifest format: [references/MANIFEST.md](references/MANIFEST.md).
+Finding codes, field kinds and the manifest format: [references/MANIFEST.md](references/MANIFEST.md).
 
 ## Decoder coverage
 
-| ISA | Built-in decoding | Status of examples |
-|---|---|---|
-| x86-64 | Full (16/32/64-bit `slot.bits`, AVX2/FMA/F16C, far-jump CFG, Multiboot 1 ELF32 bare metal, syscalls, contracts, `C017`) | calc, nopray3d, nopray-doom, nopray-httpd v2, qwen3-tts-baremetal: byte-identical maps, 0 errors |
-| AArch64 | Validity + flow + `svc`/`x8` syscalls + `adr`/literal refs | hello-aarch64: runs under `qemu-aarch64`, strict audit clean |
-| RISC-V 32/64 (+C) | Lengths, major-opcode validity, flow, `ecall`/`a7`; text via objdump | hello-riscv64: runs under `qemu-riscv64`, strict audit clean |
-| Xtensa (ESP32-S3) | No built-in decoder (`X001`); QEMU trace is external evidence only. `container = "esp-image"` makes `audit` recompute the XOR and SHA-256 (`E015`/`E016`) | AgujaESP-NOPRAY: 160-byte probe (QEMU SPI + physical RAM); live tailnet node from a mapped, imported flash set with a slot edit installed by OTA |
-| Thumb, AVR | None: bytes are opaque (`X001`), objdump text for annotation only | Needs external evidence |
+| ISA | Built-in decoding | Fields | Status of examples |
+|---|---|---|---|
+| x86-64 | Full (16/32/64-bit `slot.bits`, AVX2/FMA/F16C, far-jump CFG, Multiboot 1 ELF32 bare metal, syscalls, contracts, `C017`) | `rel*`, `abs*` | calc, nopray3d, nopray-doom, nopray-httpd v2, qwen3-tts-baremetal: byte-identical maps, 0 errors |
+| AArch64 | Validity + flow + `svc`/`x8` syscalls + `adr`/literal refs | `a64.*`, `abs*` | hello-aarch64: runs under `qemu-aarch64`, strict audit clean |
+| RISC-V 32/64 (+C) | Lengths, major-opcode validity, flow, `ecall`/`a7`; text via objdump | `rv.*`, `abs*` | hello-riscv64: runs under `qemu-riscv64`, strict audit clean |
+| Xtensa (ESP32-S3) | No built-in decoder (`X001`); `container = "esp-image"` makes `audit` recompute the XOR and SHA-256 (`E015`/`E016`) | `abs*` | AgujaESP-NOPRAY probe, PHY port, live tailnet node from an imported flash set |
+| Thumb, AVR | None: bytes are opaque (`X001`), objdump text for annotation only | `abs*` | Needs external evidence |
 
-For ROM-loaded microcontrollers, pin the SoC revision, image location and external ROM dependency. Exercise the stock ROM boot path with positive and malformed images. Verify I/O separately from instruction decoding. An emulated UART pass never establishes Wi-Fi, hardware timing or deployment suitability. When available, use the stock ROM's volatile load path before touching flash, capture the external UART marker and report RAM execution separately from cold SPI boot. For raw images the generic auditor does not validate the vendor container; validate the header, integrity fields and target load path separately.
-
-For ESP flash sets, map every region that gets written: `propose-esp` for loader images, `format = "data"` for the partition table, `otadata` and NVS (keep secret-bearing maps private). Flash the `nopray build` outputs with esptool `--flash-mode/--flash-freq/--flash-size keep`, read each region back and `audit --binary` it. After a slot edit, refresh the XOR byte and appended SHA-256; `audit` reports stale fields as `E015`/`E016`. For an unsupported ISA or vendor container, call a whole-image, segment-only import a baseline, not a functional port. Pin source/member hashes, symbol extent, relocations, data and calling convention before extracting a routine. Keep an independently checked result for each port, and never treat external execution evidence as if it cleared a native decoder warning. See the [S3 PHY example](examples/agujaesp-nopray-s3/ports/phy-txbbgain/).
-
-Targets, boot formats and what is verified vs documented: [references/TARGETS.md](references/TARGETS.md).
+Without a decoder, intents and `I001` hints cannot check code: treat such slots as needing
+external evidence. Microcontroller boot, flash-set mapping and port procedure:
+[TARGETS.md](references/TARGETS.md) §6.
 
 ## Reference library (load on demand)
 
 | Document | Use it for |
 |---|---|
-| [WORKFLOW.md](references/WORKFLOW.md) | Step-by-step create / port / modify, slot sizing, labels, contracts, intents |
-| [MANIFEST.md](references/MANIFEST.md) | `nopray.toml` fields, slot file format, every finding code |
+| [WORKFLOW.md](references/WORKFLOW.md) | Step-by-step create / port / improve / modify, slot sizing, labels, contracts, intents, fields |
+| [MANIFEST.md](references/MANIFEST.md) | `nopray.toml` fields, slot file format, symbolic field kinds, every finding code |
 | [SECURITY.md](references/SECURITY.md) | Threat model, what the audit proves and does not, exposure gates, deployment and hardware checklists |
-| [TARGETS.md](references/TARGETS.md) | ISA/OS/boot status matrix: Linux x86-64/AArch64/RISC-V, ESP32-C3/C6, RP2040/RP2350, Raspberry Pi bare metal |
+| [TARGETS.md](references/TARGETS.md) | ISA/OS/boot status matrix: Linux x86-64/AArch64/RISC-V, ESP32-C3/C6/S3, RP2040/RP2350, Raspberry Pi bare metal |
 | [ENV-DISCOVERY.md](references/ENV-DISCOVERY.md) | Fingerprinting the execution host |
 | [FIXED-SLOT-ABI.md](references/FIXED-SLOT-ABI.md) | Slot layout and state-register discipline |
 | [ELF64-X86_64-SPEC.md](references/ELF64-X86_64-SPEC.md) | ELF templates, x86-64 syscalls/opcodes, encoding traps |
 | [GRAPHICS-SUBSTRATES.md](references/GRAPHICS-SUBSTRATES.md) | X11, verified PipeWire/PulseAudio PCM audio, Wayland, framebuffer, TTY, TCP wire protocols |
 | [HUMAN-AUDIT-PROTOCOL.md](references/HUMAN-AUDIT-PROTOCOL.md) | Independent verification by a human or another agent |
-| [MANUAL.md](references/MANUAL.md) | Background, verified milestones, honest scope and limits (Spanish) |
+| [MANUAL.md](references/MANUAL.md) | Background, verified milestones with their metrics, honest scope and limits (Spanish) |
 | [BENCHMARKS.md](references/BENCHMARKS.md) | Empirical runtime and multi-model authoring benchmarks vs C, Rust, Go, JS and Python |
 | [BENCHMARK-PLAN.md](references/BENCHMARK-PLAN.md) | Original benchmark methodology plan |
 
@@ -113,12 +137,15 @@ Targets, boot formats and what is verified vs documented: [references/TARGETS.md
 
 Each example directory is an app: `nopray.toml`, annotated `slots/`, and generated `build/`
 (`MAP.md`, `audit.json`, `manifest.lock.json`, binary). `tools/nopray/tests/examples.rs`
-rebuilds all of them and fails if any byte or audit result changes.
+rebuilds all of them and fails if any byte or audit result changes; it also rewrites
+DOOM, hello-aarch64 and hello-riscv64 with symbolic fields and proves the bytes stay identical.
 
-- [`examples/agujaesp-nopray-s3/`](examples/agujaesp-nopray-s3/): hand-authored 160-byte S3 image with ROM-to-UART proof in QEMU and RAM-only proof on N16R8 hardware. Its [`node/`](examples/agujaesp-nopray-s3/node/) is the live Headscale node: the La Aguja flash set imported byte-identically, flashed with `keep` headers and read back, then a 27-byte slot edit installed over the tailnet. Wi-Fi/TLS/WireGuard bytes are imported, not hand-authored.
-- `examples/hello-aarch64-linux/`, `examples/hello-riscv64-linux/`: minimal fully-intented apps; start here.
-- `examples/calc-x86_64-cachyos/`: 4,096-byte X11 calculator (tier L1, RWX by design, local only).
-- `examples/nopray3d-x86_64-cachyos/`: 8,192-byte W^X raycaster.
-- `examples/nopray-doom-x86_64-cachyos/`: 32,768-byte W^X Transcendence DOOM FPS (640×400 X11, 64×64 procedural wall/floor/ceiling textures, Z-buffered 3D sprites, Sentinel AI + fireballs, plasma cannon, HUD & minimap, direct PipeWire/PulseAudio 24 kHz PCM 5-voice synth with instant mute; 6 syscalls, strict audit 0/0).
-- `examples/qwen3-tts-x86_64-baremetal/`: 32,768-byte bare-metal Multiboot 1 ELF32 → 64-bit Long Mode + AVX2/FMA/F16C VM (`DMCS-1.1` tier L3, `2,806` instructions, **0 Linux syscalls**, strict audit `0/0`) running `Qwen3-TTS-12Hz-0.6B-CustomVoice` end-to-end (Talker 28L + Code Predictor 5L + Speech Tokenizer 12Hz V2 + BigVGAN Vocoder) on `/dev/kvm`.
-- `examples/nopray-httpd-x86_64-linux/v2/`: 40,960-byte W^X SSR HTTP/1.1 server, mapped byte-for-byte with 13-syscall seccomp profile; deployment checklist in the parent README.
+- **Start here:** `examples/hello-aarch64-linux/`, `examples/hello-riscv64-linux/` (minimal, fully intented).
+- `examples/calc-x86_64-cachyos/`: 4 KiB X11 calculator (tier L1, RWX by design, local only).
+- `examples/nopray3d-x86_64-cachyos/`: 8 KiB W^X raycaster.
+- `examples/nopray-doom-x86_64-cachyos/`: 32 KiB W^X FPS with X11 and native PipeWire/PulseAudio PCM.
+- `examples/qwen3-tts-x86_64-baremetal/`: 32 KiB bare-metal VM running Qwen3-TTS-0.6B on `/dev/kvm`.
+- `examples/nopray-httpd-x86_64-linux/v2/`: 40 KiB W^X SSR HTTP/1.1 server with a 13-syscall seccomp profile.
+- `examples/agujaesp-nopray-s3/`: ESP32-S3 160-byte probe, the PHY routine port (`ports/`, reauthored + evidence) and the live node (`node/`, imported flash set).
+
+Sizes, instruction counts and benchmark figures live in [MANUAL.md](references/MANUAL.md).

@@ -32,6 +32,7 @@ align = 1
 
 [[slot]]
 name = "partition-table"
+origin = "imported"
 kind = "rodata"
 vaddr = 0x0
 size = 0xc00

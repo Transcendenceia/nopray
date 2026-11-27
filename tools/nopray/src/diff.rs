@@ -26,7 +26,7 @@ fn listing(app: &AppDir, name: &str, img: &image::Image) -> String {
         .iter()
         .find(|l| l.index == i)
         .expect("slot loaded");
-    annotate::render_slot(app, slot, &ls.bytes, &ls.intents)
+    annotate::render_slot(app, slot, &ls.bytes, &ls.intents, &ls.fixups)
         .lines()
         .filter(|l| !l.starts_with("# nopray slot") && !l.starts_with("# purpose"))
         .collect::<Vec<_>>()

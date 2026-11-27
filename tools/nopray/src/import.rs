@@ -153,7 +153,7 @@ pub fn propose(binary: &[u8], opts: &ProposeOpts) -> Result<String> {
     let slot = |s: &mut String, name: &str, kind: &str, vaddr: u64, size: u64, purpose: &str| {
         let _ = writeln!(
             s,
-            "[[slot]]\nname = \"{name}\"\nkind = \"{kind}\"\nvaddr = {vaddr:#x}\nsize = {size:#x}\nfile = \"slots/{:04x}_{name}.hex\"\npurpose = \"{purpose}\"\n",
+            "[[slot]]\norigin = \"imported\"\nname = \"{name}\"\nkind = \"{kind}\"\nvaddr = {vaddr:#x}\nsize = {size:#x}\nfile = \"slots/{:04x}_{name}.hex\"\npurpose = \"{purpose}\"\n",
             vaddr - base
         );
     };
@@ -221,12 +221,35 @@ fn serde_plain_isa(isa: Isa) -> &'static str {
 }
 
 /// Extracts slot bytes from `binary` into `out` using the manifest at `manifest_path`.
+/// Marks every slot that declares no `origin` as `imported`: the bytes come from the binary.
+fn stamp_imported(text: &str, manifest: &Manifest) -> String {
+    let mut out = String::with_capacity(text.len() + manifest.slots.len() * 20);
+    let mut index = 0;
+    for line in text.lines() {
+        out.push_str(line);
+        out.push('\n');
+        if line.trim() == "[[slot]]" {
+            if manifest
+                .slots
+                .get(index)
+                .is_some_and(|s| s.origin.is_none())
+            {
+                out.push_str("origin = \"imported\"\n");
+            }
+            index += 1;
+        }
+    }
+    out
+}
+
 pub fn import(binary: &[u8], manifest_path: &Path, out: &Path) -> Result<AppDir> {
     let text = fs::read_to_string(manifest_path)
         .with_context(|| format!("reading {}", manifest_path.display()))?;
     let manifest: Manifest = toml::from_str(&text).context("parsing manifest")?;
     manifest.validate()?;
     fs::create_dir_all(out.join("slots")).with_context(|| format!("creating {}", out.display()))?;
+    let text = stamp_imported(&text, &manifest);
+    let manifest: Manifest = toml::from_str(&text).context("re-parsing stamped manifest")?;
     fs::write(out.join(MANIFEST_FILE), &text)?;
     let app = AppDir {
         root: out.to_path_buf(),
@@ -258,7 +281,10 @@ pub fn import(binary: &[u8], manifest_path: &Path, out: &Path) -> Result<AppDir>
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
         }
-        fs::write(&path, annotate::render_slot(&app, slot, &raw[..used], &[]))?;
+        fs::write(
+            &path,
+            annotate::render_slot(&app, slot, &raw[..used], &[], &[]),
+        )?;
     }
     let built = image::build(&app)?;
     if built.bytes != binary {

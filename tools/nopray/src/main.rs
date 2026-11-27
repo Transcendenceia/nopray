@@ -5,9 +5,11 @@
 
 mod annotate;
 mod audit;
+mod context;
 mod diff;
 mod elf;
 mod esp;
+mod fixup;
 mod hexfile;
 mod image;
 mod import;
@@ -98,6 +100,18 @@ enum Command {
     },
     /// Slot-level review of the changes between two app directories.
     Diff { old: PathBuf, new: PathBuf },
+    /// Everything needed to change one slot: contract, callers, state, free room, fields.
+    Context {
+        dir: PathBuf,
+        /// Slot or label name.
+        symbol: String,
+        /// Machine-readable output.
+        #[arg(long)]
+        json: bool,
+        /// Append the slot's current annotated listing.
+        #[arg(long)]
+        listing: bool,
+    },
     /// Print a systemd `SystemCallFilter=` allow-list from the audited syscall sites.
     Seccomp { dir: PathBuf },
 }
@@ -276,6 +290,44 @@ fn run(cli: Cli) -> Result<ExitCode> {
             let old = AppDir::load(&old)?;
             let new = AppDir::load(&new)?;
             print!("{}", diff::run(&old, &new)?);
+            Ok(ExitCode::SUCCESS)
+        }
+        Command::Context {
+            dir,
+            symbol,
+            json,
+            listing,
+        } => {
+            let app = AppDir::load(&dir)?;
+            let img = image::build(&app)?;
+            let report = audit::run(&app, &img, None);
+            let ctx = context::build(&app, &img, &report, &symbol)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&ctx)?);
+            } else {
+                print!("{}", context::render(&ctx));
+            }
+            if listing {
+                let index = app
+                    .manifest
+                    .slots
+                    .iter()
+                    .position(|s| s.name == ctx.slot)
+                    .expect("context slot exists");
+                let ls = img
+                    .slots
+                    .iter()
+                    .find(|l| l.index == index)
+                    .expect("slot loaded");
+                let text = annotate::render_slot(
+                    &app,
+                    &app.manifest.slots[index],
+                    &ls.bytes,
+                    &ls.intents,
+                    &ls.fixups,
+                );
+                println!("\n```text\n{text}```");
+            }
             Ok(ExitCode::SUCCESS)
         }
         Command::Seccomp { dir } => {

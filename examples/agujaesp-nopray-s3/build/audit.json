@@ -6,7 +6,7 @@
   "exposure": "local",
   "size": 160,
   "sha256": "2bac9d92778dc26866288ac50fc842654022dd02791322c122304c52b9b25b86",
-  "reference": "examples/agujaesp-nopray-s3/build/agujaesp-s3-uart.bin",
+  "reference": "./build/agujaesp-s3-uart.bin",
   "findings": [
     {
       "severity": "warning",
@@ -24,7 +24,7 @@
     {
       "severity": "info",
       "code": "R000",
-      "message": "examples/agujaesp-nopray-s3/build/agujaesp-s3-uart.bin is byte-identical to the map (160 bytes)"
+      "message": "./build/agujaesp-s3-uart.bin is byte-identical to the map (160 bytes)"
     }
   ],
   "slots": [
@@ -49,7 +49,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     },
     {
       "name": "uart_literal",
@@ -72,7 +73,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     },
     {
       "name": "_start",
@@ -95,7 +97,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     },
     {
       "name": "checksum",
@@ -118,7 +121,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     },
     {
       "name": "image_digest",
@@ -141,9 +145,16 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     }
   ],
   "syscall_sites": [],
-  "syscall_set": []
+  "syscall_set": [],
+  "origin": {
+    "authored": 160,
+    "reauthored": 0,
+    "imported": 0,
+    "undeclared": 0
+  }
 }

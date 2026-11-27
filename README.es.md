@@ -99,4 +99,11 @@ cd nopray
 ./examples/nopray-doom-x86_64-cachyos/build/nopray-doom
 ```
 
+### Ayudas para agentes de IA (la herramienta nunca codifica instrucciones)
+
+- **Campos simbólicos:** `e8 {rel32 @write_all}`, `{a64.imm26 @loop : 00 00 00 14}`: el agente escribe el opcode y la herramienta rellena solo el desplazamiento o la dirección declarada, con comprobación de rango.
+- **Pistas de `I001`:** el error dice qué operando difiere y, si existe, qué bit invertido de tus bytes decodifica como tu intención.
+- **`nopray context APP RANURA`:** contrato, llamadores a re-probar, estado, espacio libre y vecinas de una ranura, sin cargar todo el programa.
+- **`origin`/`evidence` por ranura:** la auditoría informa del porcentaje escrito a mano; una importación no se presenta como port.
+
 Documentación detallada en español: [`references/MANUAL.md`](./references/MANUAL.md). Licencia MIT — © 2026 [TranscendenceIA](https://github.com/Transcendenceia).

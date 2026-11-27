@@ -158,6 +158,27 @@ marker to UART0 FIFO at `0x60000000` (primary citations and negative checksum te
 The Xtensa decoder gap and writable/executable IRAM still fail strict audit. The emulator fixture
 is not a physical WROOM flash profile. The same payload ran on an N16R8 via ROM RAM load; neither that nor emulated Ethernet establishes Wi-Fi or cold SPI boot on hardware.
 
+### ROM-loaded microcontrollers and ESP flash sets: procedure
+
+- Pin the SoC revision, image location and external ROM dependency. Exercise the stock ROM boot
+  path with positive and malformed images. Verify I/O separately from instruction decoding. An
+  emulated UART pass never establishes Wi-Fi, hardware timing or deployment suitability.
+- When available, use the stock ROM's volatile load path before touching flash, capture the
+  external UART marker and report RAM execution separately from cold SPI boot. For raw images
+  the generic auditor does not validate the vendor container; validate the header, integrity
+  fields and target load path separately.
+- Map every flash region that gets written: `propose-esp` for loader images, `format = "data"`
+  for the partition table, `otadata` and NVS (keep secret-bearing maps private). Flash the
+  `nopray build` outputs with esptool `--flash-mode/--flash-freq/--flash-size keep`, read each
+  region back and `audit --binary` it. After a slot edit, refresh the XOR byte and appended
+  SHA-256; `audit` reports stale fields as `E015`/`E016`.
+- A whole-image or segment-only import of an unsupported ISA or vendor container is a
+  **baseline** (`origin = "imported"`), not a functional port. Before extracting a routine, pin
+  source/member hashes, symbol extent, relocations, data and calling convention. Keep an
+  independently checked result for each port (`origin = "reauthored"` + `evidence`), and never
+  treat external execution evidence as if it cleared a native decoder warning. See the
+  [S3 PHY example](../examples/agujaesp-nopray-s3/ports/phy-txbbgain/).
+
 ## 7. Tooling roadmap for microcontrollers
 
 Allowed tooling never encodes instructions; it lays out, checksums and decodes.
@@ -165,6 +186,8 @@ Allowed tooling never encodes instructions; it lays out, checksums and decodes.
 1. `nopray pack esp` (planned): wrap `raw` slots into `esp_image_header_t` + segments +
    checksum + optional SHA-256, with chip ID and revision fields from the manifest.
 2. Thumb decoder (planned; `yaxpeax-arm` has an ARMv7/Thumb decoder) to lift RP2040 from `X001`.
+   Xtensa decoder (planned) for the ESP32/S3: without it, `#=` intents and the `I001` hints
+   cannot check Xtensa code. Symbolic field kinds for Thumb and Xtensa follow each decoder.
 3. Prefer a pinned, digest-verified portable Espressif QEMU archive for lab validation; host installation needs approval. The S3 proof above records the exact version and invocation.
 4. First bare-metal app: ESP32-C3 "UART hello + LED blink", emulator first, then hardware with a
    firmware backup.

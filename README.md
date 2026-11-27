@@ -157,6 +157,19 @@ Drop this repository into your agent's skills directory (OpenClaw, Claude Code, 
 
 > *"Use the `nopray` skill. Fingerprint the target and build `<application>` in hand-authored machine code, tier L2, exposure `local`. Deliver `nopray.toml`, slots with `#=` intents, a clean `audit --strict`, `MAP.md`, and live execution evidence."*
 
+To port or improve an existing binary:
+
+> *"Use the `nopray` skill. Import `<binary>` as a byte-identical baseline, then re-author `<routines>` slot by slot with symbolic fields and `#=` intents, each with differential evidence. Report the audit's hand-written share."*
+
+What the tool gives an agent (it never encodes an instruction):
+
+| Aid | What it removes |
+|---|---|
+| Symbolic fields: `e8 {rel32 @write_all}`, `{a64.imm26 @loop : 00 00 00 14}`, `{rv.pcrel_hi20 @msg : 97 05 00 00}` | Hand-computed branch displacements and data addresses, and the per-app relocation scripts |
+| `I001` hints: `operand 1: bytes give x1, intent x9 ... byte +0 bit 3 (0xe1 -> 0xe9)` | Re-deriving a whole encoding to find one wrong bit |
+| `nopray context APP SLOT [--json]` | Loading the whole program to change one routine |
+| `origin` / `evidence` per slot + audit totals | Calling an imported baseline a port |
+
 ---
 
 ## Documentation Library

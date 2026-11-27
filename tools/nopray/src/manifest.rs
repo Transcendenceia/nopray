@@ -263,6 +263,19 @@ pub enum SlotKind {
     Data,
 }
 
+/// Where a slot's bytes came from. The audit totals these so a port states how much of it is
+/// really written by hand.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Origin {
+    /// Written as literal hex by the author for this app.
+    Authored,
+    /// Copied byte for byte from an existing binary (a mapped baseline, not a port).
+    Imported,
+    /// Re-written by hand to replace imported behaviour; needs `evidence` of equivalence.
+    Reauthored,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Slot {
@@ -289,6 +302,13 @@ pub struct Slot {
     /// Optional x86 execution width override (`16`, `32`, or `64`) for bare-metal boot trampolines.
     #[serde(default)]
     pub bits: Option<u32>,
+    /// Provenance of the bytes (`authored`, `imported`, `reauthored`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<Origin>,
+    /// Evidence for the slot's behaviour (path relative to the app, or a URL), required for
+    /// `reauthored` slots: the differential test against the routine it replaces.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence: Option<String>,
 }
 
 impl Slot {
@@ -539,12 +559,8 @@ impl Manifest {
     /// Address of any named symbol usable in `#=` intents: slots, labels, or `[[state]]` fields.
     #[must_use]
     pub fn intent_symbol(&self, name: &str) -> Option<u64> {
-        self.symbol(name).or_else(|| {
-            self.state
-                .iter()
-                .find(|f| f.name == name)
-                .map(|f| f.vaddr)
-        })
+        self.symbol(name)
+            .or_else(|| self.state.iter().find(|f| f.name == name).map(|f| f.vaddr))
     }
 
     /// Addresses other slots may legally call or jump to: every slot start plus `entry` labels.
