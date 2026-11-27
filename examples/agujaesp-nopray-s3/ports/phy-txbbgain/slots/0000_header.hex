@@ -1,0 +1,22 @@
+# nopray slot `esp_header` · header · vaddr 0x0 · size 0x20 · used 32 bytes
+# purpose: ESP image header and segment descriptor.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# esp_header:
+e9                                               # 0x00000000  |... ..<@........|  #= magic 0xe9
+01                                               # 0x00000001  (continued: an intent starts inside this item)  #= segment_count 1
+02                                               # 0x00000002  (continued: an intent starts inside this item)  #= spi_mode DIO
+20                                               # 0x00000003  (continued: an intent starts inside this item)  #= spi_speed_size 40MHz/4MiB emulator fixture
+0c 87 3c 40                                      # 0x00000004  (continued: an intent starts inside this item)  #= entry_addr 0x403c870c
+ee                                               # 0x00000008  (continued: an intent starts inside this item)  #= wp_pin disabled
+00 00 00                                         # 0x00000009  (continued: an intent starts inside this item)  #= spi_pin_drv default
+09 00                                            # 0x0000000c  (continued: an intent starts inside this item)  #= chip_id 9 (ESP32-S3)
+00                                               # 0x0000000e  (continued: an intent starts inside this item)  #= min_chip_rev 0
+00                                               # 0x0000000f  (continued: an intent starts inside this item)  #= min_chip_rev_full 0
+00                                               # 0x00000010  |..........<@....|
+ff ff                                            # 0x00000011  (continued: an intent starts inside this item)  #= max_chip_rev_full 65535
+00 00 00 00                                      # 0x00000013  (continued: an intent starts inside this item)  #= reserved 0
+01                                               # 0x00000017  (continued: an intent starts inside this item)  #= hash_appended 1
+00 87 3c 40                                      # 0x00000018  (continued: an intent starts inside this item)  #= load_addr 0x403c8700
+ac 00 00 00                                      # 0x0000001c  (continued: an intent starts inside this item)  #= data_len 172

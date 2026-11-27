@@ -15,3 +15,11 @@ La Aguja ya aporta un referente de comportamiento: aprovisionamiento local, Wi�
 El camino restante es: **identificar y respaldar el módulo → probar el arranque físico → conseguir asociación Wi‑Fi e IP → demostrar alta y persistencia de identidad → probar tráfico y administración → instalar y revertir una imagen nueva**. Se comprueba cada etapa por separado, sin tomar un alta registrada como prueba de túnel ni tomar un túnel como permiso para instalar código. No hace falta habilitar salida a Internet para otros nodos ni anunciar rutas de la casa.
 
 Para seguir leyendo: [arquitectura, límites y criterios de aceptación](DESIGN.md). El [README técnico](README.md) incluye la receta para modificar una instrucción, actualizar los sellos de integridad y repetir la prueba.
+
+## Primer port del software de radio
+
+El [binario de referencia de La Aguja](reference-import/) se reconstruye byte por byte en
+17 ranuras de carga. Eso conserva su estructura, no convierte el binario ESP-IDF en firmware
+escrito a mano ni recupera sus funciones. Por separado, la [rutina del PHY portada](ports/phy-txbbgain/)
+sí está escrita en hex literal y pasa siete casos en QEMU y en el N16R8 por RAM. Traduce un
+valor de ganancia digital a un índice; **no inicializa la radio ni se asocia a Wi‑Fi**.

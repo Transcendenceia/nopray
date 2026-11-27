@@ -11,20 +11,32 @@ import time
 import esptool
 from esptool import cmds
 
-IMAGE_SHA256 = "2bac9d92778dc26866288ac50fc842654022dd02791322c122304c52b9b25b86"
-MARKER = b"NOPRAY-S3 OK\n"
+PROFILES = {
+    "uart": (
+        "build/agujaesp-s3-uart.bin", 160,
+        "2bac9d92778dc26866288ac50fc842654022dd02791322c122304c52b9b25b86",
+        b"NOPRAY-S3 OK\n",
+    ),
+    "phy-gain": (
+        "ports/phy-txbbgain/build/phy-txbbgain.bin", 240,
+        "f4cd821a7f02e6d42214f50388889ccb1af10acc91d1260cf793ec94751050d9",
+        b"P",
+    ),
+}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", required=True, help="Explicit, idle USB-UART device")
-    parser.add_argument("--image", type=Path, default=Path(__file__).parent / "build/agujaesp-s3-uart.bin")
+    parser.add_argument("--image", type=Path)
+    parser.add_argument("--profile", choices=PROFILES, default="uart")
     args = parser.parse_args()
 
     if esptool.__version__ != "5.7.0":
         parser.error("requires esptool 5.7.0 (serial capture uses its private transport attribute)")
-    data = args.image.read_bytes()
-    if len(data) != 160 or hashlib.sha256(data).hexdigest() != IMAGE_SHA256:
+    path, size, digest, marker = PROFILES[args.profile]
+    data = (args.image or Path(__file__).parent / path).read_bytes()
+    if len(data) != size or hashlib.sha256(data).hexdigest() != digest:
         parser.error("not the pinned probe image; board not touched")
 
     esp = esptool.detect_chip(args.port, baud=115200, connect_attempts=3)
@@ -45,11 +57,11 @@ def main():
         cmds.load_ram(esp, data)
         port.timeout = 0.25
         until = time.monotonic() + 3
-        while MARKER not in samples and time.monotonic() < until:
+        while time.monotonic() < until:
             port.read(min(port.in_waiting, 256) or 1)
-        if MARKER not in samples:
+        if not samples.endswith(marker):
             raise SystemExit(f"FAIL: no marker in {len(samples)} sampled bytes (contents withheld)")
-        print(f"PASS: hardware UART marker {MARKER.strip().decode()} / hex {MARKER.hex()}")
+        print(f"PASS: hardware UART marker {marker.strip().decode()} / hex {marker.hex()}")
     finally:
         port.read = original_read
         try:

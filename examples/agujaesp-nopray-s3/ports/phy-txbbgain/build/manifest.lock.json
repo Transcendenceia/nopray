@@ -1,0 +1,73 @@
+{
+  "tool": "nopray 1.1.0",
+  "app": "AgujaESP PHY gain port",
+  "version": "0.1.0",
+  "size": 240,
+  "sha256": "f4cd821a7f02e6d42214f50388889ccb1af10acc91d1260cf793ec94751050d9",
+  "slots": [
+    {
+      "name": "esp_header",
+      "vaddr": "0x0",
+      "size": 32,
+      "used": 32,
+      "sha256_used": "f2ac0b5ec6202d265474fb0274da6d5ee75116de5775324ff8b9418e598af08b",
+      "sha256_padded": "f2ac0b5ec6202d265474fb0274da6d5ee75116de5775324ff8b9418e598af08b"
+    },
+    {
+      "name": "literals",
+      "vaddr": "0x403c8700",
+      "size": 12,
+      "used": 12,
+      "sha256_used": "352631965ffe07a0b57cc6a4642ccfeaa48719b862013f41b0c0ca4dd11e9ed5",
+      "sha256_padded": "352631965ffe07a0b57cc6a4642ccfeaa48719b862013f41b0c0ca4dd11e9ed5"
+    },
+    {
+      "name": "_start",
+      "vaddr": "0x403c870c",
+      "size": 51,
+      "used": 51,
+      "sha256_used": "74bcf0c42121810446faee55a5560fcaabba63d9bb8dad881e6b356b3a20bd10",
+      "sha256_padded": "74bcf0c42121810446faee55a5560fcaabba63d9bb8dad881e6b356b3a20bd10"
+    },
+    {
+      "name": "alignment",
+      "vaddr": "0x403c873f",
+      "size": 1,
+      "used": 1,
+      "sha256_used": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+      "sha256_padded": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d"
+    },
+    {
+      "name": "gain_to_index",
+      "vaddr": "0x403c8740",
+      "size": 52,
+      "used": 52,
+      "sha256_used": "9258c0af9dfa8c3a7a57eca7ad8b3611ad934f45ee6aeb3ec6d3ea353405fd50",
+      "sha256_padded": "9258c0af9dfa8c3a7a57eca7ad8b3611ad934f45ee6aeb3ec6d3ea353405fd50"
+    },
+    {
+      "name": "test_inputs",
+      "vaddr": "0x403c8774",
+      "size": 56,
+      "used": 56,
+      "sha256_used": "e2b6503a22fb5039b3544c7cde5569dfaa4056b735ec214769b2f8efa540863b",
+      "sha256_padded": "e2b6503a22fb5039b3544c7cde5569dfaa4056b735ec214769b2f8efa540863b"
+    },
+    {
+      "name": "checksum",
+      "vaddr": "0xcc",
+      "size": 4,
+      "used": 4,
+      "sha256_used": "389b510e3abaedaeb234d0f72de7b3aa9829bb6a5edd90463c942f1abae285da",
+      "sha256_padded": "389b510e3abaedaeb234d0f72de7b3aa9829bb6a5edd90463c942f1abae285da"
+    },
+    {
+      "name": "image_hash",
+      "vaddr": "0xd0",
+      "size": 32,
+      "used": 32,
+      "sha256_used": "b2ced530a4d14c62aec7d158ac8a73a9286c5989a3246b857f2dd9253b92c6c6",
+      "sha256_padded": "b2ced530a4d14c62aec7d158ac8a73a9286c5989a3246b857f2dd9253b92c6c6"
+    }
+  ]
+}

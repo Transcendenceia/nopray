@@ -1,0 +1,167 @@
+[app]
+name = "AgujaESP PHY gain port"
+version = "0.1.0"
+standard = "DMCS-1.1"
+tier = "L1"
+exposure = "local"
+description = "Behavioral port of S3 TX baseband gain-to-index mapping. UART P/F self-test; no radio MMIO or Wi-Fi."
+
+[target]
+isa = "xtensa"
+os = "bare-metal"
+format = "raw"
+base = 0
+entry = "_start"
+output = "phy-txbbgain.bin"
+file_size = 0xf0
+
+[provenance]
+authored_by = "Angie"
+method = "Literal, hand-authored CALL0 port of the mapping observed in Espressif's pre-existing rom_txbbgain_to_index (ESP-IDF v5.5 S3 libphy.a); original instructions not embedded."
+date = "2026-11-27"
+
+[[segment]]
+name = "container_header"
+vaddr = 0
+offset = 0
+file_size = 0x20
+mem_size = 0x20
+perms = "r--"
+align = 4
+
+[[segment]]
+name = "iram"
+vaddr = 0x403c8700
+offset = 0x20
+file_size = 0xac
+mem_size = 0xac
+perms = "rwx"
+align = 4
+
+[[segment]]
+name = "trailer"
+vaddr = 0xcc
+offset = 0xcc
+file_size = 0x24
+mem_size = 0x24
+perms = "r--"
+align = 4
+
+[[slot]]
+name = "esp_header"
+kind = "header"
+vaddr = 0
+size = 0x20
+file = "slots/0000_header.hex"
+purpose = "ESP image header and segment descriptor."
+
+[[slot]]
+name = "literals"
+kind = "rodata"
+vaddr = 0x403c8700
+size = 0x0c
+file = "slots/0020_literals.hex"
+purpose = "UART0 FIFO, function pointer and table pointer."
+[[slot.label]]
+name = "uart_base"
+offset = 0
+[[slot.label]]
+name = "gain_entry"
+offset = 4
+[[slot.label]]
+name = "vectors_base"
+offset = 8
+
+[[slot]]
+name = "_start"
+kind = "code"
+vaddr = 0x403c870c
+size = 0x33
+file = "slots/002c_selftest.hex"
+purpose = "Run seven independent vectors through the port, send P or F through UART0, spin."
+[slot.contract]
+calls = ["gain_to_index"]
+noreturn = true
+[[slot.label]]
+name = "check_next"
+offset = 0x0f
+[[slot.label]]
+name = "failure"
+offset = 0x2a
+[[slot.label]]
+name = "report"
+offset = 0x2d
+[[slot.label]]
+name = "stop"
+offset = 0x30
+
+[[slot]]
+name = "alignment"
+kind = "rodata"
+vaddr = 0x403c873f
+size = 1
+file = "slots/005f_padding.hex"
+purpose = "Align the standalone routine."
+
+[[slot]]
+name = "gain_to_index"
+kind = "code"
+vaddr = 0x403c8740
+size = 0x34
+file = "slots/0060_gain.hex"
+purpose = "CALL0 leaf: map low 16 bits of a2 to gain index in a2; no memory or side effects."
+[slot.contract]
+inputs = ["a2: raw gain (low 16 bits)"]
+outputs = ["a2: gain index"]
+clobbers = ["a3", "a4"]
+
+[[slot]]
+name = "test_inputs"
+kind = "rodata"
+vaddr = 0x403c8774
+size = 0x38
+file = "slots/0094_vectors.hex"
+purpose = "Seven aligned pairs (raw input, expected index) as little-endian u32."
+[[slot.label]]
+name = "vector_0"
+offset = 0
+[[slot.label]]
+name = "vector_1"
+offset = 8
+[[slot.label]]
+name = "vector_2"
+offset = 16
+[[slot.label]]
+name = "vector_3"
+offset = 24
+[[slot.label]]
+name = "vector_4"
+offset = 32
+[[slot.label]]
+name = "vector_5"
+offset = 40
+[[slot.label]]
+name = "vector_6"
+offset = 48
+
+[[slot]]
+name = "checksum"
+kind = "rodata"
+vaddr = 0xcc
+size = 4
+file = "slots/00cc_checksum.hex"
+purpose = "Alignment plus XOR."
+
+[[slot]]
+name = "image_hash"
+kind = "rodata"
+vaddr = 0xd0
+size = 0x20
+file = "slots/00d0_digest.hex"
+purpose = "Image SHA-256, not a signature."
+
+[[mmio]]
+name = "uart0_fifo"
+base = 0x60000000
+size = 4
+note = "Only the self-test writes this; the radio helper performs no MMIO."

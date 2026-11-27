@@ -38,3 +38,46 @@ ACK rates and other helpers. This is third-party evidence, not reproduced here. 
 publishes [precompiled RF libraries](https://github.com/espressif/esp-phy-lib); their presence
 does not establish that an independently authored radio is impossible. No ROM-only S3 radio
 initialization and calibration contract has yet been validated for the NOPRAY image.
+
+## Port track
+
+1. Preserve the known baseline as an [exact container import](reference-import/). It is not a
+   replacement executable and does not settle code coverage.
+2. For each function, pin an existing object and symbol, enumerate relocations and data,
+   recover the ABI and side effects, and compare separately. The first demonstrated
+   [port of the gain-to-index helper](ports/phy-txbbgain/) has seven hardware vectors.
+3. Recover the dependencies of the actual channel/RF initialization path next: caller ABI,
+   `g_phyFuns` dispatch, `chip_v7_set_chan`, calibration state and timeout behavior.
+   Do not call these on real hardware based only on static offsets. Reading fields and
+   classifying side effects are not evidence of calibrated or compliant radio transmission.
+4. Association and DHCP are still the first networking gate. Identity, data path and signed
+   remote update remain subsequent and separate acceptance gates.
+
+### Verified channel-path frontier
+
+Static inspection of the same pinned archive: `phy_rfpll.o:set_chanfreq` loads
+`g_phyFuns` from a relocation, dereferences it and calls the function pointer at
+byte offset 92 (windowed `callx8`). A separate relocation names
+`chip_v7_set_chan`, also in `phy_rfpll.o`. The archive defines `g_phyFuns`
+as a four-byte BSS symbol in `phy_init.o`, which also contains
+`register_chipv7_phy` and `register_chipv7_phy_init_param`. This is a live
+state dependency, not a drop-in RF routine.
+
+The next self-contained candidate is `phy_rfpll.o:rfpll_set_freq`: its observed
+body performs integer arithmetic using a literal 3000, returns three bytes via
+its caller-supplied pointer, and contains no observed MMIO instruction or external
+call. This only separates the frequency arithmetic from programming the radio.
+Do not treat register writes, analog calibration, initialization order or
+association as recovered by that candidate.
+
+A read-only probe on the physical rev 0.2 silicon, in the mask-ROM download state,
+observed `[0x3fcef3d4] = 0x3fcef3d8` and
+`[0x3fcef3d8 + 0x5c] = 0x40038fc8`. The S3 rev0 symbol ELF from Espressif's
+`esp-rom-elfs/20260528` (SHA-256
+`c0ce0f338d1de1bdc6efbef1591779a2a42c1ab7d759d3c6ae8ae63a7dd34cfd`) names this
+address `rom_mhz2ieee`. The object loads the table pointer via `phy_get_romfuncs`,
+whose ROM body returns the word at `0x3fcef3d4`; the inspected loader setup
+overrides some entries but not offset `0x5c`. This resolves only the initial
+frequency-to-channel mapping. It does not execute that function, prove the table
+throughout runtime, or validate the second call `chip_v7_set_chan`. No RF calls,
+flash writes, or other memory ranges were used to obtain this observation.

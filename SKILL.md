@@ -57,7 +57,7 @@ Read [references/WORKFLOW.md](references/WORKFLOW.md) before the first app of a 
 | Task | Steps |
 |---|---|
 | **Create** | Fingerprint target ([ENV-DISCOVERY](references/ENV-DISCOVERY.md)) → write `nopray.toml` (segments, slots, contracts, syscalls/MMIO, state) → author slot hex with `#=` intents → `annotate` → `build` → `audit --strict` → run (native, `qemu-<arch>`, or emulator) → capture evidence |
-| **Port** an existing binary | `propose --binary` → rename slots, write purposes and contracts → `import` (proves byte-identical rebuild) → `audit` → fix findings in a new version |
+| **Port** an existing binary | `propose --binary` for supported ELF, or map a vendor carrier manually → `import` (byte-identical rebuild) → pin dependency and relocation evidence per function → re-author behavior in literal hex and re-test it separately |
 | **Modify** | Copy the app to a new version dir → edit bytes in one slot (keep its address and size) → `annotate` → `audit` → `diff old new` → re-test listed callers → run |
 | **Deploy** (Linux) | Tier L2, exposure declared, `audit --strict` clean → `seccomp` → systemd sandbox ([SECURITY](references/SECURITY.md)) → verify every route/feature live → keep rollback |
 
@@ -86,6 +86,8 @@ Finding codes and the manifest format: [references/MANIFEST.md](references/MANIF
 | Thumb, AVR | None: bytes are opaque (`X001`), objdump text for annotation only | Needs external evidence |
 
 For ROM-loaded microcontrollers, pin the SoC revision, image location and external ROM dependency. Exercise the stock ROM boot path with positive and malformed images. Verify I/O separately from instruction decoding. An emulated UART pass never establishes Wi-Fi, hardware timing or deployment suitability. When available, use the stock ROM's volatile load path before touching flash, capture the external UART marker and report RAM execution separately from cold SPI boot. For raw images the generic auditor does not validate the vendor container; validate the header, integrity fields and target load path separately.
+
+For an unsupported ISA or vendor container, call a whole-image, segment-only import a baseline, not a functional port. Pin source/member hashes, symbol extent, relocations, data and calling convention before extracting a routine. Keep an independently checked result for each port, and never treat external execution evidence as if it cleared a native decoder warning. See the [S3 PHY example](examples/agujaesp-nopray-s3/ports/phy-txbbgain/).
 
 Targets, boot formats and what is verified vs documented: [references/TARGETS.md](references/TARGETS.md).
 
