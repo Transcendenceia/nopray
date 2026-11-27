@@ -234,8 +234,12 @@ fn data_images_skip_entry_checks_and_reject_code() {
 /// Rewrites every slot file of a scratch app with `edit(line) -> Option<new line>`.
 fn rewrite_slots(dir: &Path, edit: impl Fn(&str) -> Option<String>) -> usize {
     let mut changed = 0;
-    for e in fs::read_dir(dir.join("slots")).expect("slots dir") {
-        let p = e.expect("slot entry").path();
+    let mut paths: Vec<PathBuf> = fs::read_dir(dir.join("slots"))
+        .expect("slots dir")
+        .map(|e| e.expect("slot entry").path())
+        .collect();
+    paths.sort(); // read_dir order differs between filesystems
+    for p in paths {
         let text = fs::read_to_string(&p).expect("slot text");
         let mut out = String::new();
         for line in text.lines() {
@@ -357,28 +361,31 @@ fn intent_mismatch_is_an_error_with_a_bit_hint() {
         // AArch64: bytes encode `adr x1, msg`; the author meant x9 (Rd bit 3).
         (
             "hello-aarch64-linux",
+            "slots/0100_start.hex",
             "#= adr x1, msg",
             "#= adr x9, msg",
             "instruction bit 3",
         ),
-        // x86-64: `call fill_rect` whose intent is 4 bytes further on (displacement bit 2).
+        // x86-64: `e8 d9 fc ff ff` = call fill_rect; the intent is 4 bytes further on
+        // (displacement byte 0xd9 vs 0xdd: bit 2).
         (
             "nopray-doom-x86_64-cachyos",
+            "slots/3680_render_hud.hex",
             "#= call fill_rect",
             "#= call 0x403384",
             "intent +0x4",
         ),
     ];
-    for (i, (name, from, to, hint)) in cases.iter().enumerate() {
+    for (i, (name, file, from, to, hint)) in cases.iter().enumerate() {
         let dir = scratch_copy(&root.join(name), &format!("hint{i}"));
-        let done = std::cell::Cell::new(false);
-        rewrite_slots(&dir, |line| {
-            (!done.get() && line.contains(from)).then(|| {
-                done.set(true);
-                line.replace(from, to)
-            })
-        });
-        assert!(done.get(), "{name}: line `{from}` not found");
+        let path = dir.join(file);
+        let text = fs::read_to_string(&path).expect("slot file");
+        let line = text
+            .lines()
+            .find(|l| l.contains(from))
+            .unwrap_or_else(|| panic!("{name}: line `{from}` not found in {file}"));
+        let edited = text.replacen(line, &line.replace(from, to), 1);
+        fs::write(&path, edited).expect("write slot");
         let out = Command::new(bin)
             .arg("audit")
             .arg(&dir)
