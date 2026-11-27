@@ -5,39 +5,65 @@ metadata:
   icon: ./assets/icon.svg
 ---
 
-# NOPRAY: hand-authored machine code that stays auditable and changeable (`DMCS-1.1`)
+# NOPRAY: talking to the machine without intermediaries (`DMCS-1.1`)
 
-The agent writes the bytes. The `nopray` tool never chooses or encodes an instruction: it
-copies authored bytes into declared slots, fills only declared address/displacement fields
-from manifest symbols, decodes everything back, checks it against the map and the security
-policy, and regenerates the map an agent needs for the next change.
+**Goal of this skill: you learn to program the machine directly.** You write the bytes the
+CPU executes, with no compiler, assembler, linker or SDK between your intent and the silicon.
+You may build a new program, port an existing one, make it faster, change it later, or take
+it to bare metal. The examples in this repository (calculator, raycaster, DOOM, an HTTP
+server, bare-metal Qwen3-TTS, an ESP32-S3 node) are *uses* of the method, not the method
+itself. The method is what lets you solve the next problem, which none of them covers.
 
-Run the tool through the launcher (builds itself on first use, cache outside the skill):
+The skill is organised like a textbook. Each chapter of [`book/`](book/) gives a principle,
+a procedure, the traps that cost time before, worked examples with real evidence, problems
+with acceptance checks, and the current state of knowledge. Study the chapters your task
+needs, use the examples as solved exercises, and then solve your own.
+
+The `nopray` tool never chooses or encodes an instruction. It:
+
+- copies authored bytes into declared slots
+- fills only declared address and displacement fields from manifest symbols
+- decodes everything back and checks it against the map and the security policy
+- regenerates the map an agent needs for the next change
+
+Run it through the launcher, which builds itself on first use and keeps its cache outside the
+skill:
 
 ```bash
 T=./tools/nopray.sh
 $T audit examples/hello-aarch64-linux        # paths relative to the repo root
 ```
 
-## The agent loop
+## How to study for a task
 
-Measured failure mode: agents reason correctly and slip when **encoding** (a register bit, a
-displacement, a data address). The loop below moves each of those to a tool check.
+Always read chapters 1 and 2. Then read the row for your task.
 
-1. **Orient on one slot:** `$T context APP SLOT` (or `--json`, `--listing`): free bytes,
-   contract, callers to re-test, state fields, symbolic fields, neighbours. Do not load the
-   whole program to change one routine.
-2. **Write the hex** one instruction per line with a `#=` intent. Every branch, call and
-   address load uses a **symbolic field**, never a hand-computed number:
-   `e8 {rel32 @write_all}`, `{a64.imm26 @loop : 00 00 00 14}`, `{abs64 @msg}`
-   ([MANIFEST.md](references/MANIFEST.md) §2 lists the kinds).
-3. `$T annotate APP` and read the decoded listing.
-4. `$T audit APP --strict`. On `I001`, read the hint first: it names the differing operand
-   and, when one exists, the single flipped bit that decodes as your intent. Fix the byte.
-5. Run it (natively, `qemu-<arch>`, emulator), exercise every path and malformed input.
-6. `$T diff OLD NEW`, re-test the callers it lists, deliver the evidence.
+| Your task | Read | Solved exercises to imitate |
+|---|---|---|
+| A new program on Linux | [3](book/03-talking-to-an-os.md) | hello-aarch64, hello-riscv64, calc, httpd v2 |
+| A new program with no OS (VM, board) | [4](book/04-no-os.md), [9](book/09-hardware-and-evidence.md) | Qwen3-TTS bare metal, AgujaESP probe |
+| Port existing software (behaviour, binary or ISA) | [5](book/05-porting.md), plus 3 or 4 for the destination | Qwen (behaviour), AgujaESP PHY and node, jstat to AArch64 |
+| Make it faster | [6](book/06-performance.md) | `nopray-opt`, Qwen kernels (and the vocoder loss) |
+| Change a working program | [7](book/07-changing-a-program.md) | AgujaESP OTA edit, jstat Phase B |
+| Expose it (LAN, internet, a tailnet) | [8](book/08-exposure.md) | httpd v2 behind Caddy, AgujaESP node |
+| Write to real hardware | [9](book/09-hardware-and-evidence.md) | AgujaESP, rung by rung |
 
-## Non-negotiable rules
+## The book
+
+| Chapter | Teaches |
+|---|---|
+| [1 · The map](book/01-the-map.md) | Fixed slots, the manifest, contracts, labels, state: every byte has an owner |
+| [2 · Encoding without mistakes](book/02-encoding.md) | The three classes of encoding slip, and the check that catches each one |
+| [3 · Talking to an OS](book/03-talking-to-an-os.md) | Syscalls and wire protocols (X11, PulseAudio, HTTP) without libraries |
+| [4 · Without an OS](book/04-no-os.md) | The obligations an OS used to meet: boot, mode, memory, I/O, time, exit |
+| [5 · Porting](book/05-porting.md) | Original, oracle, criterion. Routes A (behaviour), B (import then re-author) and C (ISA) |
+| [6 · Making it fast](book/06-performance.md) | Find the bound, choose the structure, measure honestly |
+| [7 · Changing a program](book/07-changing-a-program.md) | Local edits, derived bytes, callers re-tested, hand-offs |
+| [8 · Exposure](book/08-exposure.md) | Bounded parsers inside, containment outside, gates before publishing |
+| [9 · Hardware and evidence](book/09-hardware-and-evidence.md) | The fidelity ladder, owner approval, what counts as proof |
+| [Editions](book/EDITIONS.md) | How the book grows after every job, and the open questions |
+
+## The commandments
 
 1. **Purity is an attestation, not a proof, and encoders are forbidden.** Never
    compile/assemble and paste bytes while claiming a DMCS tier, and never write a helper DSL
@@ -74,19 +100,50 @@ displacement, a data address). The loop below moves each of those to a tool chec
 9. **Unverified target facts stay marked.** Register addresses, boot headers and keys come from
    primary sources; anything else is labelled UNVERIFIED in the manifest notes and the report.
 
-## Workflow
+## The agent loop
+
+Measured failure mode: agents reason correctly and slip when **encoding** (a register bit, a
+displacement, a data address). The loop below moves each of those to a tool check.
+
+1. **Orient on one slot:** `$T context APP SLOT` (or `--json`, `--listing`): free bytes,
+   contract, callers to re-test, state fields, symbolic fields, neighbours. Do not load the
+   whole program to change one routine.
+2. **Write the hex** one instruction per line with a `#=` intent. Every branch, call and
+   address load uses a **symbolic field**, never a hand-computed number:
+   `e8 {rel32 @write_all}`, `{a64.imm26 @loop : 00 00 00 14}`, `{abs64 @msg}`
+   ([MANIFEST.md](references/MANIFEST.md) §2 lists the kinds).
+3. `$T annotate APP` and read the decoded listing.
+4. `$T audit APP --strict`. On `I001`, read the hint first: it names the differing operand
+   and, when one exists, the single flipped bit that decodes as your intent. Fix the byte.
+5. Run it (natively, `qemu-<arch>`, emulator), exercise every path and malformed input.
+6. `$T diff OLD NEW`, re-test the callers it lists, deliver the evidence.
+
+## Procedures at a glance
 
 Read [references/WORKFLOW.md](references/WORKFLOW.md) before the first app of a session.
 
 | Task | Steps |
 |---|---|
 | **Create** | Fingerprint target ([ENV-DISCOVERY](references/ENV-DISCOVERY.md)) → write `nopray.toml` (segments, slots with `origin = "authored"`, contracts, syscalls/MMIO, state, labels) → agent loop per slot → capture evidence |
-| **Port** an existing binary | `propose --binary` (ELF) / `propose-esp`, or map a vendor carrier manually → `import` (byte-identical, slots stamped `imported`) → per routine: `context`, re-author with fields + intents, `origin = "reauthored"` + differential `evidence` → report the hand-written share |
+| **Port** ([chapter 5](book/05-porting.md)) | Name the original, the oracle and the equivalence criterion first. Route A (behaviour): new map, the original is the oracle. Route B (binary): `propose --binary` (ELF) / `propose-esp`, or map a vendor carrier manually → `import` (byte-identical, slots stamped `imported`) → per routine: `context`, re-author with fields + intents, `origin = "reauthored"` + differential `evidence`. Route C (ISA): same map and contracts, every slot re-encoded. Report the hand-written share |
 | **Improve** a port or app | Same slot, same contract: shorter or faster bytes (branchless loops, fewer syscalls), equivalence evidence, `diff`, measured gain |
 | **Modify** | Copy the app to a new version dir → `context` → edit bytes in one slot (keep its address and size) → `annotate` → `audit` → `diff old new` → re-test listed callers → run |
 | **Deploy** (Linux) | Tier L2, exposure declared, `audit --strict` clean → `seccomp` → systemd sandbox ([SECURITY](references/SECURITY.md)) → verify every route/feature live → keep rollback |
 
-## Tool commands
+## This book is alive
+
+NOPRAY is young, and the book is written along the way. Before closing any NOPRAY job, follow
+[EDITIONS.md](book/EDITIONS.md). Each lesson goes into the chapter that owns the step:
+
+- a new trap → **Traps**
+- a verified case → **Worked examples**
+- a new verified fact → **State of knowledge**
+- a good exercise → **Problems**
+
+Write the general rule, not only the incident. An unverified claim stays out or is marked
+UNVERIFIED.
+
+## Appendix A · Tool commands
 
 | Command | What it does |
 |---|---|
@@ -102,7 +159,7 @@ Read [references/WORKFLOW.md](references/WORKFLOW.md) before the first app of a 
 
 Finding codes, field kinds and the manifest format: [references/MANIFEST.md](references/MANIFEST.md).
 
-## Decoder coverage
+## Appendix B · Decoder coverage
 
 | ISA | Built-in decoding | Fields | Status of examples |
 |---|---|---|---|
@@ -116,7 +173,7 @@ Without a decoder, intents and `I001` hints cannot check code: treat such slots 
 external evidence. Microcontroller boot, flash-set mapping and port procedure:
 [TARGETS.md](references/TARGETS.md) §6.
 
-## Reference library (load on demand)
+## Appendix C · Reference library (load on demand)
 
 | Document | Use it for |
 |---|---|
@@ -133,7 +190,7 @@ external evidence. Microcontroller boot, flash-set mapping and port procedure:
 | [BENCHMARKS.md](references/BENCHMARKS.md) | Empirical runtime and multi-model authoring benchmarks vs C, Rust, Go, JS and Python |
 | [BENCHMARK-PLAN.md](references/BENCHMARK-PLAN.md) | Original benchmark methodology plan |
 
-## Examples
+## Appendix D · Examples (the solved exercises)
 
 Each example directory is an app: `nopray.toml`, annotated `slots/`, and generated `build/`
 (`MAP.md`, `audit.json`, `manifest.lock.json`, binary). `tools/nopray/tests/examples.rs`

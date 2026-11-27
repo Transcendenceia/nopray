@@ -1,6 +1,6 @@
 # AgujaESP-NOPRAY · nodo vivo de la tailnet en un ESP32-S3 N16R8
 
-[English](README.md) · [Prueba y diseño](../README.es.md) · [Evidencia](../EVIDENCE.md#live-node-2026-11-27)
+[English](README.md) · [Prueba y diseño](../README.es.md) · [Evidencia](../EVIDENCE.md#live-node--2026-11-27)
 
 ![Flash mapeada, nodo vivo y cambio por ranura instalado por la tailnet](flow.svg)
 

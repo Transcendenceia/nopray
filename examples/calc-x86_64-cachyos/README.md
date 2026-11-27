@@ -106,7 +106,8 @@ DISPLAY=:0 ./calc
 
 ### Archivos de Esta Referencia
 - [`calc.hex`](./calc.hex) — Los 4,096 bytes exactos en hexadecimal crudo.
-- [`calc.disasm.txt`](./calc.disasm.txt) — Desensamblado completo verificado con `objdump -D -M intel`.
+- [`slots/`](./slots/) — Desensamblado anotado por ranura, regenerado desde los bytes con `nopray annotate`.
+- [`build/MAP.md`](./build/MAP.md) — Mapa generado por `nopray audit`: ranuras, contratos y sitios de syscall.
 - [`evidence/`](./evidence/) — Las 7 capturas reales de validación sobre Hyprland.
 
 ---
