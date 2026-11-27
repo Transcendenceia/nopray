@@ -8,15 +8,23 @@ use anyhow::{Context, Result, bail};
 
 use crate::audit::resolve_syscall;
 use crate::elf;
+use crate::fixup::{self, Fixup};
 use crate::hexfile::{self, ListingLine};
 use crate::isa::{self, Coverage, DecodeOpts, Flow};
 use crate::manifest::{AppDir, Format, Os, Slot, SlotKind};
 use crate::syscalls;
 
-/// Renders the annotated listing for one slot from its authored bytes.
+/// Renders the annotated listing for one slot from its resolved bytes.
+/// `intents` are `(slot offset, text)` pairs preserved from the previous listing; `fixups`
+/// are symbolic fields re-emitted as their `{...}` token.
 #[must_use]
-/// `intents` are `(slot offset, text)` pairs preserved from the previous listing.
-pub fn render_slot(app: &AppDir, slot: &Slot, bytes: &[u8], intents: &[(u64, String)]) -> String {
+pub fn render_slot(
+    app: &AppDir,
+    slot: &Slot,
+    bytes: &[u8],
+    intents: &[(u64, String)],
+    fixups: &[Fixup],
+) -> String {
     let m = &app.manifest;
     let header = vec![
         format!("nopray slot `{}` · {} · vaddr {:#x} · size {:#x} · used {} bytes", slot.name, format!("{:?}", slot.kind).to_lowercase(), slot.vaddr, slot.size, bytes.len()),
@@ -40,12 +48,15 @@ pub fn render_slot(app: &AppDir, slot: &Slot, bytes: &[u8], intents: &[(u64, Str
     } else {
         hexfile::data_lines(slot.vaddr, bytes)
     };
-    let _ = m;
     let absolute: Vec<(u64, String)> = intents
         .iter()
         .map(|(o, t)| (slot.vaddr + o, t.clone()))
         .collect();
-    hexfile::render(&header, &lines, &labels, &absolute)
+    let fields: Vec<hexfile::FieldToken<'_>> = fixups
+        .iter()
+        .map(|f| (slot.vaddr + f.offset, f.kind.size(), f.token.as_str()))
+        .collect();
+    hexfile::render(&header, &lines, &labels, &absolute, &fields)
 }
 
 /// One line per ELF field, so a misplaced field is visible by name; other bytes as data.
@@ -165,12 +176,29 @@ pub fn run(app: &AppDir, check_only: bool) -> Result<Vec<(String, Annotation)>> 
         let path = app.slot_path(slot);
         let text =
             fs::read_to_string(&path).with_context(|| format!("reading {}", path.display()))?;
-        let bytes = hexfile::parse(&text).with_context(|| format!("parsing {}", path.display()))?;
+        let parsed =
+            hexfile::parse_full(&text).with_context(|| format!("parsing {}", path.display()))?;
+        let mut bytes = parsed.bytes.clone();
+        fixup::apply(&mut bytes, &parsed.fixups, &app.manifest, slot.vaddr)
+            .with_context(|| format!("resolving fields in {}", path.display()))?;
         let intents = hexfile::parse_intents(&text);
-        let rendered = render_slot(app, slot, &bytes, &intents);
-        if hexfile::parse(&rendered)? != bytes {
+        let rendered = render_slot(app, slot, &bytes, &intents, &parsed.fixups);
+        let again = hexfile::parse_full(&rendered)?;
+        let same_fields = again.fixups.len() == parsed.fixups.len()
+            && again
+                .fixups
+                .iter()
+                .zip(&parsed.fixups)
+                .all(|(a, b)| a.offset == b.offset && a.token == b.token);
+        if again.bytes != parsed.bytes || !same_fields {
             bail!(
-                "internal error: annotation of `{}` would change its bytes",
+                "internal error: annotation of `{}` would change its bytes or fields",
+                slot.name
+            );
+        }
+        if hexfile::parse_intents(&rendered) != intents {
+            bail!(
+                "internal error: annotation of `{}` would move or drop an intent",
                 slot.name
             );
         }

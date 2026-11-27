@@ -11,6 +11,7 @@ use anyhow::{Context, Result, bail};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 
+use crate::fixup::{self, Fixup};
 use crate::hexfile;
 use crate::manifest::{AppDir, SlotKind};
 
@@ -18,11 +19,13 @@ use crate::manifest::{AppDir, SlotKind};
 #[derive(Debug, Clone)]
 pub struct LoadedSlot {
     pub index: usize,
-    /// Authored bytes (without padding).
+    /// Authored bytes (without padding), with every `{...}` field resolved.
     pub bytes: Vec<u8>,
     pub file_offset: u64,
     /// Authoring intents `(slot offset, text)` declared with `#=`.
     pub intents: Vec<(u64, String)>,
+    /// Symbolic fields filled from manifest symbols (`{rel32 @f}`, `{a64.imm26 @f : ...}`).
+    pub fixups: Vec<Fixup>,
 }
 
 /// The laid-out image and per-slot provenance.
@@ -40,6 +43,17 @@ pub struct SlotLock {
     pub used: u64,
     pub sha256_used: String,
     pub sha256_padded: String,
+    /// Number of symbolic fields resolved by the tool (omitted when zero).
+    #[serde(skip_serializing_if = "is_zero")]
+    pub fields: usize,
+}
+
+#[allow(
+    clippy::trivially_copy_pass_by_ref,
+    reason = "serde skip_serializing_if signature"
+)]
+fn is_zero(n: &usize) -> bool {
+    *n == 0
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -68,8 +82,16 @@ pub fn build(app: &AppDir) -> Result<Image> {
         let path = app.slot_path(slot);
         let text = fs::read_to_string(&path)
             .with_context(|| format!("reading slot `{}` ({})", slot.name, path.display()))?;
-        let bytes = hexfile::parse(&text)
+        let parsed = hexfile::parse_full(&text)
             .with_context(|| format!("parsing slot `{}` ({})", slot.name, path.display()))?;
+        let mut bytes = parsed.bytes;
+        fixup::apply(&mut bytes, &parsed.fixups, m, slot.vaddr).with_context(|| {
+            format!(
+                "resolving fields in slot `{}` ({})",
+                slot.name,
+                path.display()
+            )
+        })?;
         if bytes.len() as u64 > slot.size {
             bail!(
                 "slot `{}` holds {} bytes but is declared {} bytes (overflow by {})",
@@ -107,6 +129,7 @@ pub fn build(app: &AppDir) -> Result<Image> {
             bytes,
             file_offset,
             intents: hexfile::parse_intents(&text),
+            fixups: parsed.fixups,
         });
     }
     let size = m.target.file_size.unwrap_or(end);
@@ -161,6 +184,7 @@ impl Image {
                         used: ls.bytes.len() as u64,
                         sha256_used: sha256_hex(&ls.bytes),
                         sha256_padded: sha256_hex(self.padded(app, ls.index)),
+                        fields: ls.fixups.len(),
                     }
                 })
                 .collect(),

@@ -33,8 +33,11 @@ Compare the objdump listing with the slot listings and the syscall table in `bui
 3. Are there indirect branches? Where can their targets come from?
 4. Is any segment writable and executable? Is the stack non-executable?
 5. Does every cross-slot branch hit a declared entry? Any fall-through (`C015`) left?
-6. Do the intents match? Any `I001` left, and is the explanation convincing?
-7. What was run, where, with which inputs (including malformed ones), and what was observed?
+6. Do the intents match? Any `I001` left, and is the explanation convincing? Does every
+   symbolic field point at the symbol its intent names?
+7. What does the audit's `origin` line say, and does each `reauthored` slot's `evidence`
+   really compare it with the routine it replaces?
+8. What was run, where, with which inputs (including malformed ones), and what was observed?
 
 ## 4. Runtime evidence
 

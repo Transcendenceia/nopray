@@ -28,7 +28,10 @@ Proves, for the exact bytes audited:
 - code decodes, no branch lands in padding, data, mid-instruction or an undeclared entry;
 - the complete statically resolvable syscall surface (x86-64, AArch64, RISC-V Linux);
 - memory permissions: W^X, no writes into code or read-only segments for absolute addresses;
-- intents: the bytes encode what the author said they encode.
+- intents: the bytes encode what the author said they encode;
+- symbolic fields: each `{kind @symbol}` resolved to the declared symbol, fits its field, and
+  the authored word left that field at zero (the tool fills displacement/address bits only);
+- origin totals: how many used bytes the manifest declares authored, reauthored or imported.
 
 Cannot prove:
 - **how the bytes were produced.** Compiler output with headers rebuilt by hand passes every
@@ -37,6 +40,12 @@ Cannot prove:
   need tests, fuzzing and review of every input path.
 - **anything about Thumb, Xtensa or AVR code** (no built-in decoder yet: `X001`).
 - **target facts**: a correct UART address or boot header is only as good as its source.
+- **that `origin` is true.** Like purity tiers, it is a declaration; `import` stamps
+  `imported` automatically, and `reauthored` needs `evidence` (`P001`), but only the evidence
+  and review establish equivalence.
+
+The `I001` hint flips single bits of the authored bytes and asks the decoder what they mean.
+It locates a typo; it never maps a mnemonic to bits, so it is not an encoder.
 
 Never write "mathematical certainty" or "proven safe". Write what was checked and how.
 

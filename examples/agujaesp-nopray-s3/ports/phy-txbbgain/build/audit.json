@@ -69,7 +69,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     },
     {
       "name": "literals",
@@ -92,7 +93,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     },
     {
       "name": "_start",
@@ -115,7 +117,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     },
     {
       "name": "alignment",
@@ -138,7 +141,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     },
     {
       "name": "gain_to_index",
@@ -161,7 +165,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "reauthored"
     },
     {
       "name": "test_inputs",
@@ -184,7 +189,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     },
     {
       "name": "checksum",
@@ -207,7 +213,8 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     },
     {
       "name": "image_hash",
@@ -230,9 +237,16 @@
       "state_writes": [],
       "indirect_branches": 0,
       "intents": 0,
-      "intent_mismatches": 0
+      "intent_mismatches": 0,
+      "origin": "authored"
     }
   ],
   "syscall_sites": [],
-  "syscall_set": []
+  "syscall_set": [],
+  "origin": {
+    "authored": 188,
+    "reauthored": 52,
+    "imported": 0,
+    "undeclared": 0
+  }
 }

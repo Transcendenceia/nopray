@@ -154,6 +154,55 @@ fn parse_num(tok: &str) -> Option<u64> {
     None
 }
 
+/// Explains a mismatch token by token: which operands differ and, for numbers, by how much.
+///
+/// Both sides go through the same normalisation as [`matches`], so the tokens shown are the
+/// ones actually compared (registers lowercase, numbers in decimal, symbols resolved).
+#[must_use]
+pub fn explain(decoded: &str, intent: &str, resolve: &dyn Fn(&str) -> Option<u64>) -> String {
+    let lower = decoded.to_lowercase();
+    let sized = lower
+        .split(|c: char| !c.is_ascii_alphanumeric())
+        .any(|w| SIZE_WORDS.contains(&w));
+    let a = normalize(decoded, resolve, sized);
+    let b = normalize(intent, resolve, sized);
+    let ta: Vec<&str> = a.split(' ').collect();
+    let tb: Vec<&str> = b.split(' ').collect();
+    if ta.len() != tb.len() || ta.first() != tb.first() {
+        return format!("compared as `{a}` vs `{b}`");
+    }
+    let bare = |t: &str| {
+        t.trim_matches(|c: char| !c.is_ascii_alphanumeric())
+            .to_owned()
+    };
+    let diffs: Vec<String> = ta
+        .iter()
+        .zip(&tb)
+        .enumerate()
+        .filter(|(_, (x, y))| x != y)
+        .take(3)
+        .map(|(i, (x, y))| {
+            let (bx, by) = (bare(x), bare(y));
+            match (bx.parse::<i128>(), by.parse::<i128>()) {
+                (Ok(vx), Ok(vy)) => {
+                    let d = vy - vx;
+                    let sign = if d < 0 { "-" } else { "+" };
+                    format!(
+                        "operand {i}: bytes give {vx:#x}, intent {vy:#x} (intent {sign}{:#x})",
+                        d.unsigned_abs()
+                    )
+                }
+                _ => format!("operand {i}: bytes give `{bx}`, intent `{by}`"),
+            }
+        })
+        .collect();
+    if diffs.is_empty() {
+        format!("compared as `{a}` vs `{b}`")
+    } else {
+        diffs.join("; ")
+    }
+}
+
 /// Whether `intent` describes the same instruction as the decoded `text`.
 #[must_use]
 pub fn matches(decoded: &str, intent: &str, resolve: &dyn Fn(&str) -> Option<u64>) -> bool {
@@ -186,9 +235,21 @@ mod tests {
         assert!(matches("stosd [rdi]", "stosd", &sym));
         assert!(matches("rep movsb [rdi],[rsi]", "rep movsb", &sym));
         assert!(matches("rep stosq [rdi]", "rep stosq", &sym));
-        assert!(matches("fld st,qword ptr [r15+0x10]", "fld qword ptr [r15+0x10]", &sym));
-        assert!(matches("fstp qword ptr [r15+0x18],st", "fstp qword ptr [r15+0x18]", &sym));
-        assert!(!matches("fstp qword ptr [r15+0x20],st", "fstp qword ptr [r15+0x18]", &sym));
+        assert!(matches(
+            "fld st,qword ptr [r15+0x10]",
+            "fld qword ptr [r15+0x10]",
+            &sym
+        ));
+        assert!(matches(
+            "fstp qword ptr [r15+0x18],st",
+            "fstp qword ptr [r15+0x18]",
+            &sym
+        ));
+        assert!(!matches(
+            "fstp qword ptr [r15+0x20],st",
+            "fstp qword ptr [r15+0x18]",
+            &sym
+        ));
         // Bare-metal x86 32->64, jump aliases, string I/O, and AVX2/FMA/F16C intents:
         assert!(matches("je 0x101096", "jz 0x101096", &sym));
         assert!(matches("jne 0x101017", "jnz 0x101017", &sym));
@@ -202,6 +263,16 @@ mod tests {
             "vfmadd231ps ymm0, ymm15, [rsi + 32]",
             &sym
         ));
+    }
+
+    #[test]
+    fn explanations_name_the_differing_operand() {
+        let e = explain("cmp w1, #0x5", "cmp w9, #5", &sym);
+        assert!(e.contains("`w1`") && e.contains("`w9`"), "{e}");
+        let e = explain("jmp 0x400140", "jmp 0x400144", &sym);
+        assert!(e.contains("+0x4"), "{e}");
+        let e = explain("mov eax,1", "add eax,1", &sym);
+        assert!(e.starts_with("compared as"), "{e}");
     }
 
     #[test]

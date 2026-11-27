@@ -105,6 +105,7 @@ align = 1
 
 [[slot]]
 name = "esp_header"
+origin = "imported"
 kind = "header"
 vaddr = 0x0
 size = 0x18
@@ -113,6 +114,7 @@ purpose = "ESP image header and extended header. File coordinates only."
 
 [[slot]]
 name = "descriptor_0"
+origin = "imported"
 kind = "header"
 vaddr = 0x18
 size = 0x8
@@ -121,6 +123,7 @@ purpose = "ESP segment descriptor. File coordinates only."
 
 [[slot]]
 name = "seg0_dram"
+origin = "imported"
 kind = "data"
 vaddr = 0x3fce2820
 size = 0x1030
@@ -129,6 +132,7 @@ purpose = "Loader segment; function boundaries not recovered."
 
 [[slot]]
 name = "descriptor_1"
+origin = "imported"
 kind = "header"
 vaddr = 0x1050
 size = 0x8
@@ -137,6 +141,7 @@ purpose = "ESP segment descriptor. File coordinates only."
 
 [[slot]]
 name = "seg1_iram"
+origin = "imported"
 kind = "code"
 vaddr = 0x403c8700
 size = 0xb30
@@ -149,6 +154,7 @@ entry = true
 
 [[slot]]
 name = "descriptor_2"
+origin = "imported"
 kind = "header"
 vaddr = 0x1b88
 size = 0x8
@@ -157,6 +163,7 @@ purpose = "ESP segment descriptor. File coordinates only."
 
 [[slot]]
 name = "seg2_iram"
+origin = "imported"
 kind = "code"
 vaddr = 0x403cb700
 size = 0x2d70
@@ -165,6 +172,7 @@ purpose = "Loader segment; function boundaries not recovered."
 
 [[slot]]
 name = "alignment_checksum"
+origin = "imported"
 kind = "rodata"
 vaddr = 0x4900
 size = 0x10
@@ -173,6 +181,7 @@ purpose = "Padding and ESP segment-data XOR byte. File coordinates only."
 
 [[slot]]
 name = "appended_digest"
+origin = "imported"
 kind = "rodata"
 vaddr = 0x4910
 size = 0x20

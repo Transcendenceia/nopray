@@ -12,6 +12,8 @@
 | SHA-256 | `2bac9d92778dc26866288ac50fc842654022dd02791322c122304c52b9b25b86` |
 | Audit | 0 errors · 2 warnings |
 
+origin (used bytes): authored 160 · reauthored 0 · imported 0 · undeclared 0 · hand-written 100.0%
+
 ESP32-S3 emulation-only ROM-to-UART boot probe; no network, no SDK or second-stage library.
 
 ## Segments
@@ -39,6 +41,7 @@ ESP32-S3 emulation-only ROM-to-UART boot probe; no network, no SDK or second-sta
 - Purpose: Write the 13-byte fixed UART marker once, then spin. No stack, calls, or inputs.
 - Contract: in - · out - · clobbers a2, a3 · noreturn
 - Decoded: 0 instructions · coverage None
+- Origin: authored · symbolic fields: 0
 - Intents: 0 declared · 0 mismatched
 - Calls: - · Jumps to: -
 - Called by: - · Referenced by: -

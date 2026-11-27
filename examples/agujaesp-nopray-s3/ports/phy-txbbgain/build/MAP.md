@@ -12,6 +12,8 @@
 | SHA-256 | `f4cd821a7f02e6d42214f50388889ccb1af10acc91d1260cf793ec94751050d9` |
 | Audit | 0 errors · 4 warnings |
 
+origin (used bytes): authored 188 · reauthored 52 · imported 0 · undeclared 0 · hand-written 100.0%
+
 Behavioral port of S3 TX baseband gain-to-index mapping. UART P/F self-test; no radio MMIO or Wi-Fi.
 
 ## Segments
@@ -42,6 +44,7 @@ Behavioral port of S3 TX baseband gain-to-index mapping. UART P/F self-test; no 
 - Purpose: Run seven independent vectors through the port, send P or F through UART0, spin.
 - Contract: in - · out - · clobbers - · noreturn
 - Decoded: 0 instructions · coverage None
+- Origin: authored · symbolic fields: 0
 - Intents: 0 declared · 0 mismatched
 - Calls: - · Jumps to: -
 - Called by: - · Referenced by: -
@@ -55,6 +58,7 @@ Behavioral port of S3 TX baseband gain-to-index mapping. UART P/F self-test; no 
 - Purpose: CALL0 leaf: map low 16 bits of a2 to gain index in a2; no memory or side effects.
 - Contract: in a2: raw gain (low 16 bits) · out a2: gain index · clobbers a3, a4
 - Decoded: 0 instructions · coverage None
+- Origin: reauthored · symbolic fields: 0
 - Intents: 0 declared · 0 mismatched
 - Calls: - · Jumps to: -
 - Called by: - · Referenced by: -

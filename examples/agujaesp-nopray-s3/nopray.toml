@@ -50,6 +50,7 @@ align = 4
 
 [[slot]]
 name = "esp_image_header"
+origin = "authored"
 kind = "header"
 vaddr = 0
 size = 0x20
@@ -58,6 +59,7 @@ purpose = "24-byte ESP image header plus 8-byte segment descriptor."
 
 [[slot]]
 name = "uart_literal"
+origin = "authored"
 kind = "rodata"
 vaddr = 0x403c8700
 size = 4
@@ -69,6 +71,7 @@ offset = 0
 
 [[slot]]
 name = "_start"
+origin = "authored"
 kind = "code"
 vaddr = 0x403c8704
 size = 0x54
@@ -83,6 +86,7 @@ offset = 0x51
 
 [[slot]]
 name = "checksum"
+origin = "authored"
 kind = "rodata"
 vaddr = 0x78
 size = 8
@@ -97,6 +101,7 @@ note = "Write-only for this probe; no status polling and no hardware UART timing
 
 [[slot]]
 name = "image_digest"
+origin = "authored"
 kind = "rodata"
 vaddr = 0x80
 size = 0x20

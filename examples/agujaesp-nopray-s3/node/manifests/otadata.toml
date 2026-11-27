@@ -32,6 +32,7 @@ align = 1
 
 [[slot]]
 name = "otadata"
+origin = "imported"
 kind = "rodata"
 vaddr = 0x0
 size = 0x2000

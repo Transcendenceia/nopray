@@ -6,6 +6,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
+use std::fmt::Write as _;
 
 use serde::Serialize;
 
@@ -14,7 +15,7 @@ use crate::esp;
 use crate::image::{Image, sha256_hex};
 use crate::intent;
 use crate::isa::{self, Coverage, DecodeOpts, Flow, Insn, SyscallReg};
-use crate::manifest::{AppDir, Container, Exposure, Format, Isa, Os, Slot, SlotKind, Tier};
+use crate::manifest::{AppDir, Container, Exposure, Format, Isa, Origin, Os, Slot, SlotKind, Tier};
 use crate::syscalls;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
@@ -88,6 +89,11 @@ pub struct SlotReport {
     pub indirect_branches: usize,
     pub intents: usize,
     pub intent_mismatches: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub origin: Option<Origin>,
+    /// Symbolic `{...}` fields resolved in this slot (omitted when zero).
+    #[serde(skip_serializing_if = "is_zero")]
+    pub fields: usize,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -104,6 +110,38 @@ pub struct Report {
     pub slots: Vec<SlotReport>,
     pub syscall_sites: Vec<SyscallSite>,
     pub syscall_set: BTreeSet<String>,
+    /// Used bytes per declared origin; present once any slot declares `origin`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub origin: Option<OriginTotals>,
+}
+
+/// Used bytes by provenance: how much of the app is hand-written vs carried over.
+#[derive(Debug, Clone, Copy, Default, Serialize)]
+pub struct OriginTotals {
+    pub authored: u64,
+    pub reauthored: u64,
+    pub imported: u64,
+    pub undeclared: u64,
+}
+
+impl OriginTotals {
+    /// Share of used bytes written by hand (authored + reauthored), in tenths of a percent.
+    #[must_use]
+    pub fn hand_written_permille(&self) -> u64 {
+        let total = self.authored + self.reauthored + self.imported + self.undeclared;
+        if total == 0 {
+            return 0;
+        }
+        ((self.authored + self.reauthored) * 1000 + total / 2) / total
+    }
+}
+
+#[allow(
+    clippy::trivially_copy_pass_by_ref,
+    reason = "serde skip_serializing_if signature"
+)]
+fn is_zero(n: &usize) -> bool {
+    *n == 0
 }
 
 impl Report {
@@ -211,6 +249,8 @@ pub fn run(app: &AppDir, image: &Image, reference: Option<(&str, &[u8])>) -> Rep
                 used: ls.bytes.len() as u64,
                 sha256: sha256_hex(image.padded(app, i)),
                 purpose: s.purpose.clone(),
+                origin: s.origin,
+                fields: ls.fixups.len(),
                 ..SlotReport::default()
             }
         })
@@ -293,6 +333,7 @@ pub fn run(app: &AppDir, image: &Image, reference: Option<(&str, &[u8])>) -> Rep
         }
     }
 
+    let origin = check_origins(&mut cx, &slot_reports);
     let syscall_set = sites
         .iter()
         .filter_map(|s: &SyscallSite| s.name.clone())
@@ -312,7 +353,55 @@ pub fn run(app: &AppDir, image: &Image, reference: Option<(&str, &[u8])>) -> Rep
         slots: slot_reports,
         syscall_sites: sites,
         syscall_set,
+        origin,
     }
+}
+
+/// `reauthored` slots must point at evidence; totals used bytes per origin.
+fn check_origins(cx: &mut Ctx<'_>, reports: &[SlotReport]) -> Option<OriginTotals> {
+    let m = &cx.app.manifest;
+    if m.slots.iter().all(|s| s.origin.is_none()) {
+        return None;
+    }
+    let mut t = OriginTotals::default();
+    for (slot, r) in m.slots.iter().zip(reports) {
+        match slot.origin {
+            Some(Origin::Authored) => t.authored += r.used,
+            Some(Origin::Reauthored) => t.reauthored += r.used,
+            Some(Origin::Imported) => t.imported += r.used,
+            None => t.undeclared += r.used,
+        }
+        match (&slot.origin, &slot.evidence) {
+            (Some(Origin::Reauthored), None) => cx.push(
+                Severity::Warning,
+                "P001",
+                Some(&slot.name),
+                None,
+                "reauthored slot without `evidence`: point it at the differential test against the routine it replaces",
+            ),
+            (_, Some(e)) if !e.contains("://") && !cx.app.root.join(e).exists() => cx.push(
+                Severity::Warning,
+                "P002",
+                Some(&slot.name),
+                None,
+                format!("evidence `{e}` does not exist relative to the app directory"),
+            ),
+            _ => {}
+        }
+    }
+    if t.undeclared > 0 {
+        cx.push(
+            Severity::Info,
+            "P003",
+            None,
+            None,
+            format!(
+                "{} used byte(s) in slots without `origin`; declare it on every slot so the hand-written share is exact",
+                t.undeclared
+            ),
+        );
+    }
+    Some(t)
 }
 
 /// Slot that owns a symbol (slot name or label).
@@ -1063,19 +1152,70 @@ fn check_intents(
             continue;
         }
         if !intent::matches(&insn.text, text, &resolve) {
-            cx.push(
-                Severity::Warning,
-                "I001",
-                Some(&slot.name),
-                Some(addr),
-                format!(
-                    "bytes decode as `{}` but the intent says `{text}`",
-                    insn.text
-                ),
+            let mut msg = format!(
+                "bytes decode as `{}` but the intent says `{text}`: {}",
+                insn.text,
+                intent::explain(&insn.text, text, &resolve)
             );
+            let flips = one_bit_neighbours(m, slot, insn, text, &resolve);
+            if !flips.is_empty() {
+                let _ = write!(
+                    msg,
+                    ". 1-bit neighbour that decodes as the intent: {}",
+                    flips.join(" or ")
+                );
+            }
+            cx.push(Severity::Error, "I001", Some(&slot.name), Some(addr), msg);
             report.intent_mismatches += 1;
         }
     }
+}
+
+/// Single-bit edits of an instruction that make it decode as `intent`.
+///
+/// This only flips bits of the authored bytes and asks the decoder what they mean; it never
+/// maps a mnemonic to bits. It pinpoints the typical hand-encoding slip (one register or
+/// displacement bit), and the author still edits the byte.
+fn one_bit_neighbours(
+    m: &crate::manifest::Manifest,
+    slot: &Slot,
+    insn: &Insn,
+    intent: &str,
+    resolve: &dyn Fn(&str) -> Option<u64>,
+) -> Vec<String> {
+    let opts = DecodeOpts {
+        state_register: m.target.state_register.clone(),
+        bitness: slot.bits,
+    };
+    let word = matches!(insn.bytes.len(), 2 | 4) && m.target.isa != Isa::X86_64;
+    let mut out = Vec::new();
+    for byte in 0..insn.bytes.len() {
+        for bit in 0..8 {
+            let mut b = insn.bytes.clone();
+            b[byte] ^= 1 << bit;
+            let (mut ins, _) = isa::decode(m.target.isa, &b, insn.addr, &opts);
+            isa::annotate_external(m.target.isa, &mut ins, &b, insn.addr);
+            let Some(first) = ins.first() else { continue };
+            if first.bytes.len() != insn.bytes.len()
+                || first.text.is_empty()
+                || !intent::matches(&first.text, intent, resolve)
+            {
+                continue;
+            }
+            let mut s = format!(
+                "byte +{byte} bit {bit} ({:#04x} -> {:#04x})",
+                insn.bytes[byte], b[byte]
+            );
+            if word {
+                let _ = write!(s, " = instruction bit {}", byte * 8 + bit);
+            }
+            out.push(s);
+            if out.len() == 3 {
+                return out;
+            }
+        }
+    }
+    out
 }
 
 /// Intents in the ELF header slot must sit on the field they name.

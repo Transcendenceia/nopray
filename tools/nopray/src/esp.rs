@@ -255,7 +255,7 @@ pub fn propose(b: &[u8], o: &ProposeOpts) -> Result<String> {
     for (name, vaddr, off, size, kind, _, purpose) in &items {
         writeln!(
             t,
-            "\n[[slot]]\nname = \"{name}\"\nkind = \"{kind}\"\nvaddr = {vaddr:#x}\nsize = {size:#x}\nfile = \"slots/{off:06x}_{name}.hex\"\npurpose = \"{purpose}\""
+            "\n[[slot]]\norigin = \"imported\"\nname = \"{name}\"\nkind = \"{kind}\"\nvaddr = {vaddr:#x}\nsize = {size:#x}\nfile = \"slots/{off:06x}_{name}.hex\"\npurpose = \"{purpose}\""
         )?;
         if let Some((ename, eoff)) = &entry_label {
             if ename == name {

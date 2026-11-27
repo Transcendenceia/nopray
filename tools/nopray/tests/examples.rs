@@ -230,3 +230,265 @@ fn data_images_skip_entry_checks_and_reject_code() {
     );
     let _ = fs::remove_dir_all(&dir);
 }
+
+/// Rewrites every slot file of a scratch app with `edit(line) -> Option<new line>`.
+fn rewrite_slots(dir: &Path, edit: impl Fn(&str) -> Option<String>) -> usize {
+    let mut changed = 0;
+    let mut paths: Vec<PathBuf> = fs::read_dir(dir.join("slots"))
+        .expect("slots dir")
+        .map(|e| e.expect("slot entry").path())
+        .collect();
+    paths.sort(); // read_dir order differs between filesystems
+    for p in paths {
+        let text = fs::read_to_string(&p).expect("slot text");
+        let mut out = String::new();
+        for line in text.lines() {
+            if let Some(new) = edit(line) {
+                out.push_str(&new);
+                changed += 1;
+            } else {
+                out.push_str(line);
+            }
+            out.push('\n');
+        }
+        fs::write(&p, out).expect("write slot");
+    }
+    changed
+}
+
+fn locked_sha(app: &Path) -> String {
+    let lock: serde_json::Value = serde_json::from_str(
+        &fs::read_to_string(app.join("build/manifest.lock.json")).expect("lock"),
+    )
+    .expect("lock JSON");
+    lock["sha256"].as_str().expect("sha256").to_owned()
+}
+
+fn run_ok(args: &[&str], dir: &Path) -> String {
+    let out = Command::new(env!("CARGO_BIN_EXE_nopray"))
+        .args(args)
+        .arg(dir)
+        .output()
+        .expect("run nopray");
+    let text = format!(
+        "{}{}",
+        String::from_utf8_lossy(&out.stdout),
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert!(out.status.success(), "nopray {args:?} failed:\n{text}");
+    text
+}
+
+type Edit = Box<dyn Fn(&str) -> Option<String>>;
+
+/// Symbolic fields must reproduce the hand-computed displacements byte for byte, survive
+/// `annotate`, and audit clean.
+#[test]
+fn symbolic_fields_rebuild_byte_identical() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples");
+    let cases: Vec<(&str, Edit)> = vec![
+        (
+            "nopray-doom-x86_64-cachyos",
+            Box::new(|line: &str| {
+                let (code, comment) = line.split_once('#')?;
+                let name = line.split("#= call ").nth(1)?.trim();
+                let hex: Vec<&str> = code.split_whitespace().collect();
+                (hex.len() == 5 && hex[0] == "e8" && !comment.is_empty())
+                    .then(|| format!("e8 {{rel32 @{name}}}  #= call {name}"))
+            }),
+        ),
+        (
+            "hello-aarch64-linux",
+            Box::new(|line: &str| {
+                if line.contains("#= adr x1, msg") {
+                    Some("{a64.adr @msg : 01 00 00 10}  #= adr x1, msg".into())
+                } else if line.contains("#= e_entry 0x400100") {
+                    Some("{abs64 @_start}  #= e_entry 0x400100".into())
+                } else {
+                    None
+                }
+            }),
+        ),
+        (
+            "hello-riscv64-linux",
+            Box::new(|line: &str| {
+                if line.contains("#= auipc a1,0x0") {
+                    Some("{rv.pcrel_hi20 @msg : 97 05 00 00}  #= auipc a1,0x0".into())
+                } else if line.contains("#= addi a1,a1,60") {
+                    Some("{rv.pcrel_lo12_i @msg pc=-4 : 93 85 05 00}  #= addi a1,a1,60".into())
+                } else {
+                    None
+                }
+            }),
+        ),
+    ];
+    for (i, (name, edit)) in cases.iter().enumerate() {
+        let app = root.join(name);
+        let dir = scratch_copy(&app, &format!("fields{i}"));
+        let changed = rewrite_slots(&dir, edit);
+        assert!(
+            changed >= 2,
+            "{name}: expected lines to symbolize, got {changed}"
+        );
+        let built = run_ok(&["build"], &dir);
+        assert!(
+            built.contains(&locked_sha(&app)),
+            "{name}: symbolic fields changed the bytes: {built}"
+        );
+        run_ok(&["annotate"], &dir);
+        run_ok(&["annotate", "--check"], &dir);
+        let kept: usize = fs::read_dir(dir.join("slots"))
+            .expect("slots")
+            .map(|e| {
+                fs::read_to_string(e.expect("entry").path())
+                    .expect("slot")
+                    .matches(" @")
+                    .count()
+            })
+            .sum();
+        assert!(kept >= changed, "{name}: annotate dropped field tokens");
+        run_ok(&["audit", "--strict"], &dir);
+        let _ = fs::remove_dir_all(&dir);
+    }
+}
+
+/// A register typo in an authored word is an error, and the hint names the bit to fix.
+#[test]
+fn intent_mismatch_is_an_error_with_a_bit_hint() {
+    let bin = env!("CARGO_BIN_EXE_nopray");
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples");
+    let cases = [
+        // AArch64: bytes encode `adr x1, msg`; the author meant x9 (Rd bit 3).
+        (
+            "hello-aarch64-linux",
+            "slots/0100_start.hex",
+            "#= adr x1, msg",
+            "#= adr x9, msg",
+            "instruction bit 3",
+        ),
+        // x86-64: `e8 d9 fc ff ff` = call fill_rect; the intent is 4 bytes further on
+        // (displacement byte 0xd9 vs 0xdd: bit 2).
+        (
+            "nopray-doom-x86_64-cachyos",
+            "slots/3680_render_hud.hex",
+            "#= call fill_rect",
+            "#= call 0x403384",
+            "intent +0x4",
+        ),
+    ];
+    for (i, (name, file, from, to, hint)) in cases.iter().enumerate() {
+        let dir = scratch_copy(&root.join(name), &format!("hint{i}"));
+        let path = dir.join(file);
+        let text = fs::read_to_string(&path).expect("slot file");
+        let line = text
+            .lines()
+            .find(|l| l.contains(from))
+            .unwrap_or_else(|| panic!("{name}: line `{from}` not found in {file}"));
+        let edited = text.replacen(line, &line.replace(from, to), 1);
+        fs::write(&path, edited).expect("write slot");
+        let out = Command::new(bin)
+            .arg("audit")
+            .arg(&dir)
+            .output()
+            .expect("audit");
+        let text = String::from_utf8_lossy(&out.stdout);
+        assert!(
+            !out.status.success() && text.contains("ERROR I001") && text.contains(hint),
+            "{name}: expected an I001 error mentioning `{hint}`:\n{text}"
+        );
+        assert!(
+            text.contains("1-bit neighbour"),
+            "{name}: expected a 1-bit hint:\n{text}"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+}
+
+#[test]
+fn context_lists_what_a_change_must_retest() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples");
+    let doom = root.join("nopray-doom-x86_64-cachyos");
+    let out = Command::new(env!("CARGO_BIN_EXE_nopray"))
+        .args(["context"])
+        .arg(&doom)
+        .args(["fill_rect", "--json"])
+        .output()
+        .expect("context");
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let v: serde_json::Value = serde_json::from_slice(&out.stdout).expect("context JSON");
+    assert_eq!(v["slot"], "draw_primitives", "labels resolve to their slot");
+    assert!(v["free"].as_u64().expect("free") > 0);
+    let retest: Vec<&str> = v["retest"]
+        .as_array()
+        .expect("retest")
+        .iter()
+        .filter_map(|x| x.as_str())
+        .collect();
+    assert!(retest.contains(&"render_hud"), "{retest:?}");
+}
+
+#[test]
+fn origins_are_totalled_and_reauthored_slots_need_evidence() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../examples");
+    let app = root.join("hello-aarch64-linux");
+    let dir = scratch_copy(&app, "origin");
+    let toml = fs::read_to_string(dir.join("nopray.toml")).expect("manifest");
+    let mut origins = ["imported", "reauthored", "authored"].into_iter();
+    let stamped: String = toml
+        .lines()
+        .map(|l| {
+            if l.trim() == "[[slot]]" {
+                format!(
+                    "{l}\norigin = \"{}\"\n",
+                    origins.next().expect("three slots")
+                )
+            } else {
+                format!("{l}\n")
+            }
+        })
+        .collect();
+    fs::write(dir.join("nopray.toml"), stamped).expect("write manifest");
+    let out = Command::new(env!("CARGO_BIN_EXE_nopray"))
+        .args(["audit", "--strict"])
+        .arg(&dir)
+        .output()
+        .expect("audit");
+    let text = String::from_utf8_lossy(&out.stdout);
+    assert!(
+        !out.status.success()
+            && text.contains("P001")
+            && text.contains("origin (used bytes): authored 18"),
+        "{text}"
+    );
+
+    // `import` marks every slot of a mapped binary as imported.
+    run_ok(&["build"], &dir);
+    let built = dir.join("build/hello-aarch64");
+    let manifest = app.join("nopray.toml");
+    let imported = std::env::temp_dir().join(format!("nopray-test-{}-import", std::process::id()));
+    let _ = fs::remove_dir_all(&imported);
+    let out = Command::new(env!("CARGO_BIN_EXE_nopray"))
+        .args(["import", "--binary"])
+        .arg(&built)
+        .arg("--manifest")
+        .arg(&manifest)
+        .arg("--out")
+        .arg(&imported)
+        .output()
+        .expect("import");
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let m = fs::read_to_string(imported.join("nopray.toml")).expect("imported manifest");
+    assert_eq!(m.matches("origin = \"imported\"").count(), 3, "{m}");
+    let audit = run_ok(&["audit"], &imported);
+    assert!(audit.contains("hand-written 0.0%"), "{audit}");
+    let _ = fs::remove_dir_all(&imported);
+    let _ = fs::remove_dir_all(&dir);
+}

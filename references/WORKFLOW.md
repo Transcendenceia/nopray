@@ -53,9 +53,14 @@ b8 01 00 00 00   # 0x004000b5  mov eax,1    #= mov eax,1
 3. **Author the header slot field by field**, one field per line, each with `#= <field> <value>`.
    The audit names every ELF field and rejects intents that sit on the wrong field (`I003`) or
    in the middle of one (`I002`). Copy the template from `examples/hello-aarch64-linux`.
-4. **Author code slots** one instruction per line with `#=` intents. Compute every branch as
-   `target - address_of_next_instruction` (x86) or `target - address_of_instruction` (AArch64,
-   RISC-V). Call other slots only at their start or at a label with `entry = true`.
+4. **Author code slots** one instruction per line with `#=` intents. Write every branch,
+   call and address load with a **symbolic field** instead of a hand-computed number:
+   `e8 {rel32 @write_all}`, `48 8d 35 {rel32 @msg}`, `{a64.imm26 @loop : 00 00 00 14}`,
+   `{rv.pcrel_hi20 @msg : 97 05 00 00}` (kinds in [MANIFEST.md](MANIFEST.md) §2). You still
+   author every opcode bit; the tool fills only the declared field and rejects it if it does
+   not fit. Compute by hand only where no field kind exists (Thumb, Xtensa, AVR), as
+   `target - address_of_next_instruction` (x86) or `target - address_of_instruction`
+   (AArch64, RISC-V). Call other slots only at their start or at a label with `entry = true`.
 5. `$T annotate .` then read the regenerated listing: does every line decode to what you meant?
 6. `$T build .` then `$T audit . --strict`. Fix every error and warning, or justify it in the
    manifest (`indirect`, `dynamic_syscalls`, `self_modifying`) when it is deliberate.
@@ -78,15 +83,30 @@ $T audit app/ --binary app.elf
   splits that are reached by local jumps, and turns the remaining cross-slot targets into
   `entry` labels: each one is an explicit coupling to review.
 - `import` refuses to finish unless the rebuild is byte-identical, so the map is exact from
-  day one. Porting to another ISA means a new app that keeps the same slot names, purposes and
+  day one, and it stamps `origin = "imported"` on every slot. That is a **baseline**, not a
+  port: the audit line `origin (used bytes): ... hand-written N%` says how much is really
+  yours.
+- **Port function by function.** For each routine: `nopray context app/ <slot>` (contract,
+  callers, state, free room), re-author it in literal hex with fields and intents, set
+  `origin = "reauthored"` and `evidence = "<differential test>"` (same inputs into the old
+  and new routine, outputs compared; `P001` until it exists), audit, re-test the callers
+  `context` lists. Repeat until the share is what was promised; report the share either way.
+- **Improve while porting:** a re-authored slot may be smaller or faster than the import
+  (branchless loops, fewer syscalls, tighter buffers). Keep the contract, prove equivalence,
+  and record the gain in the evidence.
+- Porting to another ISA means a new app that keeps the same slot names, purposes and
   contracts; compare behaviour, not bytes.
 
 ## 4. Modify an app safely
 
 1. Copy the app to a new directory (`app-v1.1/`); never edit the deployed version in place.
+   Start with `$T context app-v1.1 <slot>` (add `--json` or `--listing`): free bytes, contract,
+   callers to re-test, state fields, symbolic fields in and out, neighbours.
 2. Edit bytes inside **one** slot. Keep the slot's address and size: the fixed-slot layout is what
    makes local edits safe. If it no longer fits, grow it into the next slot's padding only by
    moving that slot and every reference to it, then expect `diff` to report "moved".
+   References written as symbolic fields follow the move on rebuild (`context` lists them
+   under "pointing here"); literal ones must be edited by hand.
 3. Update the `#=` intents for the lines you touched, then `$T annotate` and read the result.
 4. `$T audit app-v1.1 --strict` and `$T diff app app-v1.1`.
 5. Re-test every slot that `diff` lists under "Re-verify callers/referrers", then the whole
@@ -112,14 +132,21 @@ $T audit app/ --binary app.elf
   build wide constants in 16-bit chunks. **Watch bit 8 (`Rn[9:5]` high bit) in `subs`/`cmp imm12`:**
   an off-by-1 in bit 8 silently turns `w9` into `w1` or `w24` into `w16` (the #1 real error
   observed across multi-replica AArch64 benchmarks). Always write `#=` intents so `I001` catches it.
-- **Label every string/table in `rodata`/`data` slots:** `I001` cannot catch a miscalculated data
-  address when both bytes and `#=` repeat the wrong address (proven in `nopray-jb-r3`). Declaring
-  `[[slot.label]]` on each data item activates `C017`, which flags unlabelled interior addresses
-  and prints the byte delta to the nearest declared label.
-- **No custom bit-field encoder DSLs:** helper scripts may resolve `@label` displacements into
-  hand-written hex bytes, never synthesize instructions from `def movz/add_imm(...)` functions.
-- RISC-V: `auipc` + `addi` for addresses (the low 12 bits are sign-extended: add 0x1000 to the
-  `auipc` part when bit 11 is set); declare whether compressed (C) instructions are used.
+- **Read the `I001` hint before re-deriving the encoding.** It names the operand that differs
+  (`bytes give w1, intent w9`; numbers as a delta) and, when a single flipped bit of your bytes
+  decodes as the intent, that bit (`byte +1 bit 0 (0x15 -> 0x14) = instruction bit 8`). The hint
+  only decodes neighbours of your bytes; check it against the encoding table, then edit the byte.
+- **Label every string/table in `rodata`/`data` slots and point at labels with fields:**
+  `I001` cannot catch a miscalculated data address when both bytes and `#=` repeat the wrong
+  address (proven in `nopray-jb-r3`). `{abs64 @err_msg}`, `{rel32 @err_msg}` or
+  `{a64.adr @err_msg : ...}` take the address from the label, so that class of error cannot
+  be typed; `[[slot.label]]` on each data item also activates `C017` for literal addresses.
+- **No custom bit-field encoder DSLs, and no relocation scripts:** symbolic fields replace the
+  per-app `relocate.py`/`layout.py` helpers. Never synthesize instructions from
+  `def movz/add_imm(...)` functions.
+- RISC-V: `auipc` + `addi` for addresses: `{rv.pcrel_hi20 @x : ...}` then
+  `{rv.pcrel_lo12_i @x pc=-4 : ...}` handles the sign-extended low part; declare whether
+  compressed (C) instructions are used (no field kinds for C forms).
 - Every input-driven buffer write has an explicit bound check against a declared limit.
 - Write intents in the decoder's canonical spelling (run `annotate` once and copy its style).
   Symbols are accepted: `call write_all` matches `call 0x4000b0`.
@@ -128,6 +155,8 @@ $T audit app/ --binary app.elf
 
 - `build/MAP.md`, `build/audit.json` (0 errors; every warning explained), `manifest.lock.json`.
 - Proof that the shipped file equals the map: `audit --binary <shipped file>` shows `R000`.
+- For ports and imports: the audit's `origin (used bytes)` line, and the evidence file of
+  every `reauthored` slot. Never call an imported baseline a port.
 - Run transcript: commands, outputs, exit codes; `strace` for Linux; screenshots for GUIs.
 - For deployments: seccomp filter applied, sandbox settings, live checks of every route or
   feature, rollback command.
