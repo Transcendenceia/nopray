@@ -23,7 +23,7 @@ A future hybrid using vendor wireless code is a separate provenance profile, not
 | Gate | Evidence required | Status |
 |---|---|---|
 | ROM boot / UART in lab | SPI ROM loading + byte-exact UART marker + MMIO trace; mutated checksum rejected | **PASS in Espressif QEMU** |
-| Physical bring-up | Exact module + matching original flash backup and reachable recovery; UART after cold boot | Unknown; no hardware access claimed |
+| Physical bring-up | Exact memory profile + matching original flash backup and reachable recovery; UART after cold boot | ROM identification passed (N16R8 memory profile); no backup, flash write, or NOPRAY boot on hardware yet |
 | Wi-Fi / IP | Supported radio boundary established; real association, authenticated network join, IP and recovery after reconnect | Not implemented |
 | Headscale / data | Own identity and node record, persistence on reboot, authorized traffic, denied peer | Not implemented |
 | Remote config / OTA | Authz, versioned config, image signature check, successful upgrade and previous-image rollback | Not implemented |

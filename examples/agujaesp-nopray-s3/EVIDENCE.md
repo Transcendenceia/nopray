@@ -65,3 +65,13 @@ edited image booted and UART returned `NOPRAY-S3 O!`. Its SHA-256 was
 
 Repository verification: `cargo test --locked` for the host-side auditor passed all 17 tests, including
 the locked-byte example suite. `shellcheck verify-qemu.sh` passed. The 160-byte image was never compiled.
+
+## Physical target identification · 2026-11-27
+
+Read-only ROM commands with esptool 5.7.0, `--no-stub flash-id` and
+`--no-stub get-security-info` (115200 baud, hardware reset to enter and leave the ROM loader).
+Observed: ESP32-S3 QFN56 rev v0.2, chip ID 9, 40 MHz crystal, 16 MB quad-SPI flash at 3.3 V,
+8 MB embedded PSRAM (AP_3v3), Secure Boot and Flash Encryption disabled.
+The memory profile matches N16R8 in the [Espressif WROOM-1/1U datasheet](https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf);
+this probe cannot distinguish the module's onboard-antenna versus external-antenna variant.
+No flash or eFuse writes, no backup, and no NOPRAY code executed on the real board.
