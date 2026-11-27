@@ -1,0 +1,316 @@
+# Baseline map only. Not a hand-authored firmware and not a completed function-level port.
+[app]
+name = "La Aguja IoT S3 prebuilt reference"
+version = "1.4.0"
+standard = "DMCS-1.1"
+tier = "L1"
+exposure = "local"
+description = "Byte-exact loader-segment import of an ESP-IDF-built S3 application; opaque reference only."
+
+[target]
+isa = "xtensa"
+os = "bare-metal"
+format = "raw"
+container = "esp-image"
+base = 0
+entry = "app_entry"
+output = "aguja-iot-s3-reference.bin"
+file_size = 0x11d1c0
+
+[provenance]
+authored_by = "La Aguja IoT upstream, not Angie"
+method = "Imported pre-existing compilation, ESP-IDF v5.5.6; only loader-segment bounds are mapped. SHA-256 e8a1c9dddfbc31d574071f3460df2636a2bf13daca29c33af8b4211b20cafbf3."
+date = "2026-11-27"
+
+[[segment]]
+name = "esp_header"
+vaddr = 0x0
+offset = 0x0
+file_size = 0x18
+mem_size = 0x18
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "descriptor_0"
+vaddr = 0x18
+offset = 0x18
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "drom"
+vaddr = 0x3c0d0020
+offset = 0x20
+file_size = 0x3a324
+mem_size = 0x3a324
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "descriptor_1"
+vaddr = 0x3a344
+offset = 0x3a344
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "dram"
+vaddr = 0x3fc9e200
+offset = 0x3a34c
+file_size = 0x582c
+mem_size = 0x582c
+perms = "rw-"
+align = 1
+
+[[segment]]
+name = "descriptor_2"
+vaddr = 0x3fb78
+offset = 0x3fb78
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "iram_vectors"
+vaddr = 0x40374000
+offset = 0x3fb80
+file_size = 0x498
+mem_size = 0x498
+perms = "rwx"
+align = 1
+
+[[segment]]
+name = "descriptor_3"
+vaddr = 0x40018
+offset = 0x40018
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "irom"
+vaddr = 0x42000020
+offset = 0x40020
+file_size = 0xc338c
+mem_size = 0xc338c
+perms = "r-x"
+align = 1
+
+[[segment]]
+name = "descriptor_4"
+vaddr = 0x1033ac
+offset = 0x1033ac
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "iram_main"
+vaddr = 0x40374498
+offset = 0x1033b4
+file_size = 0x19d54
+mem_size = 0x19d54
+perms = "rwx"
+align = 1
+
+[[segment]]
+name = "descriptor_5"
+vaddr = 0x11d108
+offset = 0x11d108
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "rtc_data"
+vaddr = 0x50000000
+offset = 0x11d110
+file_size = 0x20
+mem_size = 0x20
+perms = "rw-"
+align = 1
+
+[[segment]]
+name = "descriptor_6"
+vaddr = 0x11d130
+offset = 0x11d130
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "rtc_fast"
+vaddr = 0x600fe000
+offset = 0x11d138
+file_size = 0x60
+mem_size = 0x60
+perms = "rw-"
+align = 1
+
+[[segment]]
+name = "alignment_checksum"
+vaddr = 0x11d198
+offset = 0x11d198
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "appended_digest"
+vaddr = 0x11d1a0
+offset = 0x11d1a0
+file_size = 0x20
+mem_size = 0x20
+perms = "r--"
+align = 1
+
+[[slot]]
+name = "esp_header"
+kind = "header"
+vaddr = 0x0
+size = 0x18
+file = "slots/000000_esp_header.hex"
+purpose = "ESP application image header. File coordinates only."
+
+[[slot]]
+name = "descriptor_0"
+kind = "header"
+vaddr = 0x18
+size = 0x8
+file = "slots/000018_descriptor_0.hex"
+purpose = "ESP segment descriptor. File coordinates only."
+
+[[slot]]
+name = "drom"
+kind = "rodata"
+vaddr = 0x3c0d0020
+size = 0x3a324
+file = "slots/000020_drom.hex"
+purpose = "Loader segment; function and dependency boundaries not yet recovered."
+
+[[slot]]
+name = "descriptor_1"
+kind = "header"
+vaddr = 0x3a344
+size = 0x8
+file = "slots/03a344_descriptor_1.hex"
+purpose = "ESP segment descriptor. File coordinates only."
+
+[[slot]]
+name = "dram"
+kind = "data"
+vaddr = 0x3fc9e200
+size = 0x582c
+file = "slots/03a34c_dram.hex"
+purpose = "Loader segment; function and dependency boundaries not yet recovered."
+
+[[slot]]
+name = "descriptor_2"
+kind = "header"
+vaddr = 0x3fb78
+size = 0x8
+file = "slots/03fb78_descriptor_2.hex"
+purpose = "ESP segment descriptor. File coordinates only."
+
+[[slot]]
+name = "iram_vectors"
+kind = "code"
+vaddr = 0x40374000
+size = 0x498
+file = "slots/03fb80_iram_vectors.hex"
+purpose = "Loader segment; function and dependency boundaries not yet recovered."
+
+[[slot]]
+name = "descriptor_3"
+kind = "header"
+vaddr = 0x40018
+size = 0x8
+file = "slots/040018_descriptor_3.hex"
+purpose = "ESP segment descriptor. File coordinates only."
+
+[[slot]]
+name = "irom"
+kind = "code"
+vaddr = 0x42000020
+size = 0xc338c
+file = "slots/040020_irom.hex"
+purpose = "Loader segment; function and dependency boundaries not yet recovered."
+
+[[slot]]
+name = "descriptor_4"
+kind = "header"
+vaddr = 0x1033ac
+size = 0x8
+file = "slots/1033ac_descriptor_4.hex"
+purpose = "ESP segment descriptor. File coordinates only."
+
+[[slot]]
+name = "iram_main"
+kind = "code"
+vaddr = 0x40374498
+size = 0x19d54
+file = "slots/1033b4_iram_main.hex"
+purpose = "Loader segment; function and dependency boundaries not yet recovered."
+[[slot.label]]
+name = "app_entry"
+offset = 0x1394
+entry = true
+
+[[slot]]
+name = "descriptor_5"
+kind = "header"
+vaddr = 0x11d108
+size = 0x8
+file = "slots/11d108_descriptor_5.hex"
+purpose = "ESP segment descriptor. File coordinates only."
+
+[[slot]]
+name = "rtc_data"
+kind = "data"
+vaddr = 0x50000000
+size = 0x20
+file = "slots/11d110_rtc_data.hex"
+purpose = "Loader segment; function and dependency boundaries not yet recovered."
+
+[[slot]]
+name = "descriptor_6"
+kind = "header"
+vaddr = 0x11d130
+size = 0x8
+file = "slots/11d130_descriptor_6.hex"
+purpose = "ESP segment descriptor. File coordinates only."
+
+[[slot]]
+name = "rtc_fast"
+kind = "data"
+vaddr = 0x600fe000
+size = 0x60
+file = "slots/11d138_rtc_fast.hex"
+purpose = "Loader segment; function and dependency boundaries not yet recovered."
+
+[[slot]]
+name = "alignment_checksum"
+kind = "rodata"
+vaddr = 0x11d198
+size = 0x8
+file = "slots/11d198_alignment_checksum.hex"
+purpose = "Padding and ESP segment-data XOR. File coordinates only."
+
+[[slot]]
+name = "appended_digest"
+kind = "rodata"
+vaddr = 0x11d1a0
+size = 0x20
+file = "slots/11d1a0_appended_digest.hex"
+purpose = "SHA-256 of carrier through the XOR byte. File coordinates only."

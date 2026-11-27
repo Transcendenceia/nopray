@@ -1,0 +1,39 @@
+# Data-only import. Not hand-authored; see [provenance].
+[app]
+name = "La Aguja IoT S3 partition-table"
+version = "1.4.0"
+standard = "DMCS-1.1"
+tier = "L1"
+exposure = "local"
+description = "Byte-exact data import of partition-table.bin; sha256 8f24b37d6d7e42b08a08be3e5634c964808d730f161ae17aa43bcec987eeb396."
+
+[target]
+isa = "xtensa"
+os = "bare-metal"
+format = "data"
+base = 0
+entry = "partition-table"
+output = "partition-table.bin"
+file_size = 0xc00
+
+[provenance]
+authored_by = "La Aguja IoT upstream build, not Angie"
+method = "Imported pre-existing build output as one data slot. SHA-256 8f24b37d6d7e42b08a08be3e5634c964808d730f161ae17aa43bcec987eeb396."
+date = "2026-11-27"
+
+[[segment]]
+name = "partition-table"
+vaddr = 0x0
+offset = 0x0
+file_size = 0xc00
+mem_size = 0xc00
+perms = "r--"
+align = 1
+
+[[slot]]
+name = "partition-table"
+kind = "rodata"
+vaddr = 0x0
+size = 0xc00
+file = "slots/000000_partition-table.hex"
+purpose = "ESP-IDF partition table: 32-byte entries plus MD5 entry. Data only."

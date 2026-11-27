@@ -1,0 +1,27 @@
+# nopray slot `gain_to_index` · code · vaddr 0x403c8740 · size 0x34 · used 52 bytes
+# purpose: CALL0 leaf: map low 16 bits of a2 to gain index in a2; no memory or side effects.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# gain_to_index:
+20 30 f4                                         # 0x403c8740  | 0.B..G..B..G..B|  #= extui a3, a2, 0, 16
+42 a0 80                                         # 0x403c8743  (continued: an intent starts inside this item)  #= movi a4, 128
+47 13 16                                         # 0x403c8746  (continued: an intent starts inside this item)  #= beq a3, a4, 0x403c8760
+42 a1 00                                         # 0x403c8749  (continued: an intent starts inside this item)  #= movi a4, 256
+47 13 15                                         # 0x403c874c  (continued: an intent starts inside this item)  #= beq a3, a4, 0x403c8765
+42                                               # 0x403c874f  (continued: an intent starts inside this item)  #= movi a4, 32
+a0 20                                            # 0x403c8750  |. G..B..G.."....|
+47 13 14                                         # 0x403c8752  (continued: an intent starts inside this item)  #= beq a3, a4, 0x403c876a
+42 a0 a0                                         # 0x403c8755  (continued: an intent starts inside this item)  #= movi a4, 160
+47 13 13                                         # 0x403c8758  (continued: an intent starts inside this item)  #= beq a3, a4, 0x403c876f
+22 a0 00                                         # 0x403c875b  (continued: an intent starts inside this item)  #= movi a2, 0
+0d f0                                            # 0x403c875e  (continued: an intent starts inside this item)  #= ret.n
+22 a0 01                                         # 0x403c8760  |"...."...."...."|  #= movi a2, 1
+0d f0                                            # 0x403c8763  (continued: an intent starts inside this item)  #= ret.n
+22 a0 02                                         # 0x403c8765  (continued: an intent starts inside this item)  #= movi a2, 2
+0d f0                                            # 0x403c8768  (continued: an intent starts inside this item)  #= ret.n
+22 a0 03                                         # 0x403c876a  (continued: an intent starts inside this item)  #= movi a2, 3
+0d f0                                            # 0x403c876d  (continued: an intent starts inside this item)  #= ret.n
+22                                               # 0x403c876f  (continued: an intent starts inside this item)  #= movi a2, 4
+a0 04                                            # 0x403c8770  |....|
+0d f0                                            # 0x403c8772  (continued: an intent starts inside this item)  #= ret.n

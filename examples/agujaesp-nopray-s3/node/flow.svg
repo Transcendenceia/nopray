@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 980" role="img" aria-labelledby="title desc">
+  <title id="title">AgujaESP-NOPRAY node: mapped flash set, live tailnet node and slot edit installed over the tailnet</title>
+  <desc id="desc">Lane one: the La Aguja 1.4.0 build is imported byte for byte into NOPRAY slots, rebuilt, audited and flashed over USB, then read back identical. Lane two: the ESP32-S3 boots, joins the home Wi-Fi and registers with Headscale as node 47 at 100.70.0.35. Lane three: bytes are edited in the drom slot, the XOR and SHA-256 integrity fields are refreshed, the diff is reviewed and the image is installed through the authenticated OTA endpoint over WireGuard; the board boots ota_1 and the readback matches the map. A footer separates hand-authored, imported and private bytes.</desc>
+  <defs>
+    <marker id="cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#28d9f7"/></marker>
+    <marker id="violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#d9afff"/></marker>
+    <marker id="ember" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#ffad8a"/></marker>
+    <style>
+      text {font-family:Inter,"Noto Sans",sans-serif;fill:#f7f6f1}
+      .eyebrow {font-size:17px;font-weight:700;letter-spacing:2px}
+      .heading {font-size:46px;font-weight:760;letter-spacing:-1px}
+      .label {font-size:21px;font-weight:700}
+      .body {font-size:16px;fill:#c2c4ce}
+      .mono {font-family:"JetBrains Mono","DejaVu Sans Mono",monospace;font-size:14px;fill:#a5baff}
+      .box {fill:#191d26;stroke:#887299;stroke-width:1.25}
+      .cyan {fill:#28d9f7}
+      .violet {fill:#d9afff}
+      .warm {fill:#ffad8a}
+      .data {stroke:#28d9f7;stroke-width:2.5;fill:none;marker-end:url(#cyan)}
+      .net {stroke:#d9afff;stroke-width:2.5;fill:none;marker-end:url(#violet)}
+      .edit {stroke:#ffad8a;stroke-width:2.5;fill:none;marker-end:url(#ember)}
+    </style>
+  </defs>
+  <rect width="1100" height="980" rx="14" fill="#090b10"/>
+  <line x1="46" x2="1054" y1="30" y2="30" stroke="#ff4b0a" stroke-width="2"/>
+  <text x="46" y="65" class="eyebrow" fill="#ffad8a">NOPRAY / ESP32-S3 N16R8 / 2026-11-27</text>
+  <text x="46" y="118" class="heading">Every flashed byte has an owner</text>
+
+  <!-- Lane 1 -->
+  <rect x="46" y="142" width="1008" height="212" rx="12" fill="#11141b"/>
+  <text x="70" y="178" class="eyebrow cyan">01 / MAP, BUILD, FLASH, READ BACK</text>
+  <g class="box">
+    <rect x="70" y="200" width="222" height="128" rx="9"/>
+    <rect x="320" y="200" width="222" height="128" rx="9"/>
+    <rect x="570" y="200" width="222" height="128" rx="9"/>
+    <rect x="820" y="200" width="210" height="128" rx="9"/>
+  </g>
+  <path d="M292 264H318" class="data"/>
+  <path d="M542 264H568" class="data"/>
+  <path d="M792 264H818" class="data"/>
+  <text x="90" y="236" class="label">La Aguja 1.4.0</text>
+  <text x="90" y="263" class="body">4 prebuilt images</text>
+  <text x="90" y="288" class="body">SHA-256 pinned</text>
+  <text x="90" y="313" class="mono">esp32s3-oct</text>
+  <text x="340" y="236" class="label">nopray import</text>
+  <text x="340" y="263" class="body">17 + 9 + 1 + 1 slots</text>
+  <text x="340" y="288" class="body">rebuild byte-identical</text>
+  <text x="340" y="313" class="mono">propose-esp · data</text>
+  <text x="590" y="236" class="label">build + audit</text>
+  <text x="590" y="263" class="body">R000 · 0 errors</text>
+  <text x="590" y="288" class="body">+ private NVS map</text>
+  <text x="590" y="313" class="mono">XOR / SHA-256 checked</text>
+  <text x="840" y="236" class="label">esptool USB</text>
+  <text x="840" y="263" class="body">headers kept as-is</text>
+  <text x="840" y="288" class="body">readback = map</text>
+  <text x="840" y="313" class="mono">no eFuse writes</text>
+
+  <!-- Lane 2 -->
+  <rect x="46" y="372" width="1008" height="212" rx="12" fill="#11141b"/>
+  <text x="70" y="408" class="eyebrow violet">02 / LIVE NODE</text>
+  <g class="box">
+    <rect x="70" y="430" width="222" height="128" rx="9"/>
+    <rect x="320" y="430" width="222" height="128" rx="9"/>
+    <rect x="570" y="430" width="222" height="128" rx="9"/>
+    <rect x="820" y="430" width="210" height="128" rx="9"/>
+  </g>
+  <path d="M292 494H318" class="net"/>
+  <path d="M542 494H568" class="net"/>
+  <path d="M792 494H818" class="net"/>
+  <text x="90" y="466" class="label">SPI cold boot</text>
+  <text x="90" y="493" class="body">ROM → bootloader</text>
+  <text x="90" y="518" class="body">→ app on ota_0</text>
+  <text x="90" y="543" class="mono">rst POWERON</text>
+  <text x="340" y="466" class="label">Home Wi-Fi</text>
+  <text x="340" y="493" class="body">WPA2-PSK · ch 1</text>
+  <text x="340" y="518" class="body">DHCP lease</text>
+  <text x="340" y="543" class="mono">192.168.1.71</text>
+  <text x="590" y="466" class="label">Headscale</text>
+  <text x="590" y="493" class="body">TLS + Noise IK</text>
+  <text x="590" y="518" class="body">single-use key</text>
+  <text x="590" y="543" class="mono">node 47</text>
+  <text x="840" y="466" class="label">Tailnet</text>
+  <text x="840" y="493" class="body">WireGuard direct</text>
+  <text x="840" y="518" class="body">API: token, 401 without</text>
+  <text x="840" y="543" class="mono">100.70.0.35</text>
+
+  <!-- Lane 3 -->
+  <rect x="46" y="602" width="1008" height="212" rx="12" fill="#11141b"/>
+  <text x="70" y="638" class="eyebrow warm">03 / CHANGE BY SLOT, INSTALL OVER THE TAILNET</text>
+  <g class="box">
+    <rect x="70" y="660" width="222" height="128" rx="9"/>
+    <rect x="320" y="660" width="222" height="128" rx="9"/>
+    <rect x="570" y="660" width="222" height="128" rx="9"/>
+    <rect x="820" y="660" width="210" height="128" rx="9"/>
+  </g>
+  <path d="M292 724H318" class="edit"/>
+  <path d="M542 724H568" class="edit"/>
+  <path d="M792 724H818" class="edit"/>
+  <text x="90" y="696" class="label">Edit hex</text>
+  <text x="90" y="723" class="body">version + web title</text>
+  <text x="90" y="748" class="body">in slot drom</text>
+  <text x="90" y="773" class="mono">same length</text>
+  <text x="340" y="696" class="label">Integrity fields</text>
+  <text x="340" y="723" class="body">XOR 0x6b → 0x1b</text>
+  <text x="340" y="748" class="body">SHA-256 refreshed</text>
+  <text x="340" y="773" class="mono">stale → E015 / E016</text>
+  <text x="590" y="696" class="label">annotate · diff</text>
+  <text x="590" y="723" class="body">3 slots changed</text>
+  <text x="590" y="748" class="body">0 audit errors</text>
+  <text x="590" y="773" class="mono">1.4.0-nopray.1</text>
+  <text x="840" y="696" class="label">OTA over WG</text>
+  <text x="840" y="723" class="body">ota_1 boots, valid</text>
+  <text x="840" y="748" class="body">readback = map</text>
+  <text x="840" y="773" class="mono">POST /api/v1/ota</text>
+
+  <!-- Provenance footer -->
+  <rect x="46" y="832" width="1008" height="122" rx="12" fill="#191d26" stroke="#887299" stroke-width="1.25"/>
+  <text x="70" y="866" class="eyebrow" fill="#ff9dcc">WHO WROTE THE BYTES</text>
+  <text x="70" y="896" class="body"><tspan fill="#f7f6f1" font-weight="700">Hand-authored hex:</tspan> 160-byte ROM probe · 52-byte PHY port · 27 data bytes of 1.4.0-nopray.1 (+33 recomputed integrity).</text>
+  <text x="70" y="921" class="body"><tspan fill="#f7f6f1" font-weight="700">Imported, mapped, audited (compiler provenance):</tspan> bootloader, app with ESP-IDF Wi-Fi and MicroLink.</text>
+  <text x="70" y="946" class="body"><tspan fill="#f7f6f1" font-weight="700">Private, never committed:</tspan> NVS with Wi-Fi profiles, enrollment and API token.</text>
+</svg>

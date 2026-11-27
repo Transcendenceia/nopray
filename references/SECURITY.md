@@ -105,6 +105,10 @@ security headers.
 - Watchdogs, clocks and pin mux come from primary sources cited in `[[mmio]].note`; anything
   else is UNVERIFIED.
 - Never write eFuses, secure-boot or flash-encryption settings from a NOPRAY image.
+- A bare-metal node on a tailnet or LAN cannot satisfy the Linux parts of the exposure gate
+  (seccomp, W^X on writable IRAM, a native Xtensa decode). Deploy it only on the owner's explicit
+  request, record that the gate is unmet, and state the compensating controls: API bound to the
+  tailnet with a token, LAN and SoftAP off, no approved routes ([example](../examples/agujaesp-nopray-s3/node/)).
 
 ## 7. Incident record
 

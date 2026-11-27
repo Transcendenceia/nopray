@@ -1,0 +1,11 @@
+# nopray slot `literals` · rodata · vaddr 0x403c8700 · size 0xc · used 12 bytes
+# purpose: UART0 FIFO, function pointer and table pointer.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# uart_base:
+#
+# literals:
+00 00 00 60                          # 0x403c8700  |...`@.<@t.<@|  #= UART0 FIFO 0x60000000
+40 87 3c 40                          # 0x403c8704  (continued: an intent starts inside this item)  #= gain_to_index 0x403c8740
+74 87 3c 40                          # 0x403c8708  (continued: an intent starts inside this item)  #= test_inputs 0x403c8774

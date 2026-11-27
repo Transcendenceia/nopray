@@ -1,0 +1,9 @@
+# nopray slot `uart_literal` · rodata · vaddr 0x403c8700 · size 0x4 · used 4 bytes
+# purpose: 4-byte aligned UART0 FIFO address for L32R.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# uart0_fifo_addr:
+#
+# uart_literal:
+00 00 00 60  # 0x403c8700  |...`|  #= UART0 FIFO MMIO 0x60000000

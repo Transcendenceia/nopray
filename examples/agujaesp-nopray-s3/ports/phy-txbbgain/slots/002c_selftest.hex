@@ -1,0 +1,27 @@
+# nopray slot `_start` · code · vaddr 0x403c870c · size 0x33 · used 51 bytes
+# purpose: Run seven independent vectors through the port, send P or F through UART0, spin.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# _start:
+a1 fd ff                                         # 0x403c870c  |......Q..r....."|  #= l32r a10, 0x403c8700
+81 fd ff                                         # 0x403c870f  (continued: an intent starts inside this item)  #= l32r a8, 0x403c8704
+51 fd ff                                         # 0x403c8712  (continued: an intent starts inside this item)  #= l32r a5, 0x403c8708
+72 a0 07                                         # 0x403c8715  (continued: an intent starts inside this item)  #= movi a7, 7
+92 a0 00                                         # 0x403c8718  (continued: an intent starts inside this item)  #= movi a9, 0
+22                                               # 0x403c871b  (continued: an intent starts inside this item)  #= l32i a2, a5, 0
+25 00                                            # 0x403c871c  |%.b%....g..R..r.|
+62 25 01                                         # 0x403c871e  (continued: an intent starts inside this item)  #= l32i a6, a5, 4
+c0 08 00                                         # 0x403c8721  (continued: an intent starts inside this item)  #= callx0 a8
+67 92 0e                                         # 0x403c8724  (continued: an intent starts inside this item)  #= bne a2, a6, 0x403c8736
+52 c5 08                                         # 0x403c8727  (continued: an intent starts inside this item)  #= addi a5, a5, 8
+72 c7                                            # 0x403c872a  (continued: an intent starts inside this item)  #= addi a7, a7, -1
+ff                                               # 0x403c872c  |....2.P...2.F2j.|
+97 97 ea                                         # 0x403c872d  (continued: an intent starts inside this item)  #= bne a7, a9, 0x403c871b
+32 a0 50                                         # 0x403c8730  (continued: an intent starts inside this item)  #= movi a3, 80
+86 00 00                                         # 0x403c8733  (continued: an intent starts inside this item)  #= j 0x403c8739
+32 a0 46                                         # 0x403c8736  (continued: an intent starts inside this item)  #= movi a3, 70
+32 6a 00                                         # 0x403c8739  (continued: an intent starts inside this item)  #= s32i a3, a10, 0
+#
+# stop:
+06 ff ff                                         # 0x403c873c  |...|  #= j 0x403c873c

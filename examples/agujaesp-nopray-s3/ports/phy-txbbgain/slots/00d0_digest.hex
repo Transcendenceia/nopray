@@ -1,0 +1,8 @@
+# nopray slot `image_hash` · rodata · vaddr 0xd0 · size 0x20 · used 32 bytes
+# purpose: Image SHA-256, not a signature.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# image_hash:
+ed 90 84 98 34 d6 de 4d bb 1e 41 50 85 f9 74 c5  # 0x000000d0  |....4..M..AP..t.|  #= container SHA-256
+73 95 c0 9b 70 81 42 e5 85 d2 05 82 ba c1 41 c4  # 0x000000e0  |s...p.B.......A.|

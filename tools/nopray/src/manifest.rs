@@ -165,6 +165,17 @@ pub enum Format {
     Elf32,
     /// Flat image: file offset 0 maps to `target.base`.
     Raw,
+    /// Flat, non-executable image (partition table, OTA selector, NVS): no code slots,
+    /// no executable segments, and `target.entry` names the slot the loader reads first.
+    Data,
+}
+
+/// Vendor container whose integrity fields `audit` recomputes from the built bytes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum Container {
+    /// ESP32 loader image: segment-data XOR byte and optional appended SHA-256.
+    EspImage,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -179,6 +190,9 @@ pub struct Target {
     pub entry: String,
     /// Output file name written to `build/`.
     pub output: String,
+    /// Vendor container to validate (`esp-image`); omitted for plain images.
+    #[serde(default)]
+    pub container: Option<Container>,
     /// Total image size in bytes; defaults to the end of the last slot.
     #[serde(default)]
     pub file_size: Option<u64>,
@@ -450,6 +464,14 @@ impl Manifest {
         for pair in sorted.windows(2) {
             if pair[0].end() > pair[1].vaddr {
                 bail!("slots `{}` and `{}` overlap", pair[0].name, pair[1].name);
+            }
+        }
+        if self.target.format == Format::Data {
+            if let Some(code) = self.slots.iter().find(|s| s.kind == SlotKind::Code) {
+                bail!("data image declares code slot `{}`", code.name);
+            }
+            if let Some(seg) = self.segments.iter().find(|s| s.perms.contains('x')) {
+                bail!("data image declares executable segment `{}`", seg.name);
             }
         }
         if self.symbol(&self.target.entry).is_none() {

@@ -77,6 +77,10 @@ Every demo below lives in [`examples/`](./examples/) and is **rebuilt byte-for-b
 
 ---
 
+### 4. AgujaESP-NOPRAY · ESP32-S3 ROM boot probe
+
+A [160-byte hand-authored image](examples/agujaesp-nopray-s3/) boots from simulated SPI flash in Espressif QEMU and emits a UART marker. See the byte map, MMIO trace and ROM checksum rejection. **Emulation only; no Wi-Fi, tailnet registration or OTA.**
+
 ## The Reality of Realities: Empirical Benchmarks (No Hype)
 
 We ran a full, reproducible benchmark suite comparing **NOPRAY** against **C (`gcc 14.2 -O2 -static`)**, **Rust (`rustc --release`)**, **Go (`CGO_ENABLED=0`)**, **Node.js (`v24`)**, and **Python (`3.14`)** across **runtime execution (`72/72` cells)** and **multi-model AI authoring, maintenance, and cross-ISA porting (`70/70` cells, `9,990/9,990` hidden tests, 12-run forensic purity audit)**. Full numbers and methodology live in [`references/BENCHMARKS.md`](./references/BENCHMARKS.md).

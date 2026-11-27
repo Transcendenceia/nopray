@@ -60,6 +60,10 @@ Todos los ejemplos viven en [`examples/`](./examples/) y **se reconstruyen byte 
 
 ---
 
+### 4. AgujaESP-NOPRAY · prueba de arranque ESP32-S3
+
+Una [imagen de 160 bytes escrita a mano](examples/agujaesp-nopray-s3/README.es.md) arranca desde la flash simulada en Espressif QEMU y escribe por UART. Incluye mapa, traza de MMIO y prueba de rechazo de checksum. **Solo emulación; sin Wi‑Fi, alta en la tailnet ni OTA.**
+
 ## La realidad de realidades: resultados empíricos sin maquillaje
 
 Comparamos **NOPRAY** frente a **C (`gcc 14.2 -O2 -static`)**, **Rust (`rustc --release`)**, **Go (`CGO_ENABLED=0`)**, **Node.js (`v24`)** y **Python (`3.14`)** en ejecución real (`72/72` celdas bajo carga moderada, limitada y pesada) y en autoría, mantenimiento y portado multi-modelo (`70/70` celdas, `9 990/9 990` pruebas ocultas y auditoría forense de 12 ejecuciones). Detalle íntegro en [`references/BENCHMARKS.md`](./references/BENCHMARKS.md).

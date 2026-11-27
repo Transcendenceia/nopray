@@ -1,0 +1,49 @@
+{
+  "tool": "nopray 1.1.0",
+  "app": "AgujaESP-NOPRAY",
+  "version": "0.1.0",
+  "size": 160,
+  "sha256": "2bac9d92778dc26866288ac50fc842654022dd02791322c122304c52b9b25b86",
+  "slots": [
+    {
+      "name": "esp_image_header",
+      "vaddr": "0x0",
+      "size": 32,
+      "used": 32,
+      "sha256_used": "b09153c0f1da934ebf9435a6c13e2e5f086b419926f739352373a27105cd8dae",
+      "sha256_padded": "b09153c0f1da934ebf9435a6c13e2e5f086b419926f739352373a27105cd8dae"
+    },
+    {
+      "name": "uart_literal",
+      "vaddr": "0x403c8700",
+      "size": 4,
+      "used": 4,
+      "sha256_used": "ca3076acbb6ec2b695ebf174caa57ef3f8421707948a72029cc3836b9572c9d7",
+      "sha256_padded": "ca3076acbb6ec2b695ebf174caa57ef3f8421707948a72029cc3836b9572c9d7"
+    },
+    {
+      "name": "_start",
+      "vaddr": "0x403c8704",
+      "size": 84,
+      "used": 84,
+      "sha256_used": "69e31087b39c1eaf72e7c5e8cb7c61c5e2c862f9d067243654c3b18d282fb997",
+      "sha256_padded": "69e31087b39c1eaf72e7c5e8cb7c61c5e2c862f9d067243654c3b18d282fb997"
+    },
+    {
+      "name": "checksum",
+      "vaddr": "0x78",
+      "size": 8,
+      "used": 8,
+      "sha256_used": "5bc67471c189d78c76461dcab6141a733bdab3799d1d69e0c419119c92e82b3d",
+      "sha256_padded": "5bc67471c189d78c76461dcab6141a733bdab3799d1d69e0c419119c92e82b3d"
+    },
+    {
+      "name": "image_digest",
+      "vaddr": "0x80",
+      "size": 32,
+      "used": 32,
+      "sha256_used": "f2589ff0a70fbc6520cf7432b5ce4a1d5001fd5f89a97c8111a6c0f17f9624fc",
+      "sha256_padded": "f2589ff0a70fbc6520cf7432b5ce4a1d5001fd5f89a97c8111a6c0f17f9624fc"
+    }
+  ]
+}

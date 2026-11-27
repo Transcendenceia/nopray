@@ -1,0 +1,39 @@
+# Data-only import. Not hand-authored; see [provenance].
+[app]
+name = "La Aguja IoT S3 otadata"
+version = "1.4.0"
+standard = "DMCS-1.1"
+tier = "L1"
+exposure = "local"
+description = "Byte-exact data import of ota_data_initial.bin; sha256 7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f."
+
+[target]
+isa = "xtensa"
+os = "bare-metal"
+format = "data"
+base = 0
+entry = "otadata"
+output = "ota_data_initial.bin"
+file_size = 0x2000
+
+[provenance]
+authored_by = "La Aguja IoT upstream build, not Angie"
+method = "Imported pre-existing build output as one data slot. SHA-256 7d2c7ac4888bfd75cd5f56e8d61f69595121183afc81556c876732fd3782c62f."
+date = "2026-11-27"
+
+[[segment]]
+name = "otadata"
+vaddr = 0x0
+offset = 0x0
+file_size = 0x2000
+mem_size = 0x2000
+perms = "r--"
+align = 1
+
+[[slot]]
+name = "otadata"
+kind = "rodata"
+vaddr = 0x0
+size = 0x2000
+file = "slots/000000_otadata.hex"
+purpose = "Initial OTA selection data: two erased 4 KiB sectors. Data only."

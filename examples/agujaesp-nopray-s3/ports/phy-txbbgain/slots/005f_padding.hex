@@ -1,0 +1,7 @@
+# nopray slot `alignment` · rodata · vaddr 0x403c873f · size 0x1 · used 1 bytes
+# purpose: Align the standalone routine.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# alignment:
+00           # 0x403c873f  |.|  #= alignment before gain_to_index

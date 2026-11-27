@@ -28,7 +28,8 @@ Status labels used below:
 | ESP32-C3 / C6 bare metal | `riscv32`, `bare-metal`, `raw` | flow (no syscalls; MMIO windows) | none (Espressif QEMU fork not installed) | header/watchdog facts **SOURCE**; no image yet |
 | RP2040 / RP2350 (Arm) | `thumb` | none (`X001`) | none | **DOC**, several **UNVERIFIED** |
 | Raspberry Pi bare metal | `aarch64`, `bare-metal`, `raw` | flow | `qemu-system-aarch64` not installed | **DOC**, entry state **UNVERIFIED** |
-| ESP32 / S3 (Xtensa), ATmega328P | `xtensa`, `avr` | none | none | out of scope until a decoder exists |
+| ESP32-S3 (Xtensa LX7), bare metal | `xtensa`, `bare-metal`, `raw` (+ `container = "esp-image"`), `data` | none (`X001`); external QEMU trace; ESP XOR/SHA-256 recomputed | Espressif QEMU `-M esp32s3` | **RUN**: simulated SPI ROM boot and physical ROM RAM load of the authored probe; physical cold SPI boot, Wi-Fi, Headscale and OTA of an imported, mapped flash set (`node/`) |
+| ESP32 classic, ATmega328P | `xtensa`, `avr` | none | not evaluated | no verified example |
 
 ## 2. Linux user space
 
@@ -147,9 +148,15 @@ space on a Pi until a bare-metal need is concrete.
 
 ## 6. Xtensa ESP32 / S3 and AVR
 
-Xtensa mixes 16- and 24-bit instructions with windowed registers and literal pools; AVR uses
-16-bit words, some instructions take two. Both need a decoder in `nopray` before NOPRAY can
-honestly audit them.
+Xtensa has variable-width instructions, windowed registers and literal pools; AVR uses
+16-bit words, some instructions take two. Both need a decoder in `nopray` for native code audit.
+
+The [AgujaESP-NOPRAY probe](../examples/agujaesp-nopray-s3/) boots in Espressif QEMU
+9.2.2 (S3 rev0 ROM). ROM reads the image at SPI flash offset `0x0`, validates the container
+and loads its single 88-byte segment at `0x403C8700`. Entry `0x403C8704` writes a 13-byte
+marker to UART0 FIFO at `0x60000000` (primary citations and negative checksum test in the example).
+The Xtensa decoder gap and writable/executable IRAM still fail strict audit. The emulator fixture
+is not a physical WROOM flash profile. The same payload ran on an N16R8 via ROM RAM load; neither that nor emulated Ethernet establishes Wi-Fi or cold SPI boot on hardware.
 
 ## 7. Tooling roadmap for microcontrollers
 
@@ -158,6 +165,6 @@ Allowed tooling never encodes instructions; it lays out, checksums and decodes.
 1. `nopray pack esp` (planned): wrap `raw` slots into `esp_image_header_t` + segments +
    checksum + optional SHA-256, with chip ID and revision fields from the manifest.
 2. Thumb decoder (planned; `yaxpeax-arm` has an ARMv7/Thumb decoder) to lift RP2040 from `X001`.
-3. Install the Espressif QEMU fork (needs approval) and record the exact command in this file.
+3. Prefer a pinned, digest-verified portable Espressif QEMU archive for lab validation; host installation needs approval. The S3 proof above records the exact version and invocation.
 4. First bare-metal app: ESP32-C3 "UART hello + LED blink", emulator first, then hardware with a
    firmware backup.

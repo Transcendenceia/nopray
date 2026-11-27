@@ -1,0 +1,180 @@
+# Container-granularity import: loader segments only, not hand-authored code.
+[app]
+name = "La Aguja IoT S3 second-stage bootloader"
+version = "1.4.0"
+standard = "DMCS-1.1"
+tier = "L1"
+exposure = "local"
+description = "Byte-exact loader-segment import of bootloader.bin; sha256 bd0d1ceda20d3e5159236358ce99228c52f73b1f2f9b329a3f4de60c1bd53ff6."
+
+[target]
+isa = "xtensa"
+os = "bare-metal"
+format = "raw"
+container = "esp-image"
+base = 0
+entry = "image_entry"
+output = "bootloader.bin"
+file_size = 0x4930
+
+[provenance]
+authored_by = "La Aguja IoT upstream build (ESP-IDF v5.5.6 bootloader), not Angie"
+method = "Imported pre-existing compilation; only loader-segment bounds are mapped. SHA-256 bd0d1ceda20d3e5159236358ce99228c52f73b1f2f9b329a3f4de60c1bd53ff6."
+date = "2026-11-27"
+
+[[segment]]
+name = "esp_header"
+vaddr = 0x0
+offset = 0x0
+file_size = 0x18
+mem_size = 0x18
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "descriptor_0"
+vaddr = 0x18
+offset = 0x18
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "seg0_dram"
+vaddr = 0x3fce2820
+offset = 0x20
+file_size = 0x1030
+mem_size = 0x1030
+perms = "rw-"
+align = 1
+
+[[segment]]
+name = "descriptor_1"
+vaddr = 0x1050
+offset = 0x1050
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "seg1_iram"
+vaddr = 0x403c8700
+offset = 0x1058
+file_size = 0xb30
+mem_size = 0xb30
+perms = "rwx"
+align = 1
+
+[[segment]]
+name = "descriptor_2"
+vaddr = 0x1b88
+offset = 0x1b88
+file_size = 0x8
+mem_size = 0x8
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "seg2_iram"
+vaddr = 0x403cb700
+offset = 0x1b90
+file_size = 0x2d70
+mem_size = 0x2d70
+perms = "rwx"
+align = 1
+
+[[segment]]
+name = "alignment_checksum"
+vaddr = 0x4900
+offset = 0x4900
+file_size = 0x10
+mem_size = 0x10
+perms = "r--"
+align = 1
+
+[[segment]]
+name = "appended_digest"
+vaddr = 0x4910
+offset = 0x4910
+file_size = 0x20
+mem_size = 0x20
+perms = "r--"
+align = 1
+
+[[slot]]
+name = "esp_header"
+kind = "header"
+vaddr = 0x0
+size = 0x18
+file = "slots/000000_esp_header.hex"
+purpose = "ESP image header and extended header. File coordinates only."
+
+[[slot]]
+name = "descriptor_0"
+kind = "header"
+vaddr = 0x18
+size = 0x8
+file = "slots/000018_descriptor_0.hex"
+purpose = "ESP segment descriptor. File coordinates only."
+
+[[slot]]
+name = "seg0_dram"
+kind = "data"
+vaddr = 0x3fce2820
+size = 0x1030
+file = "slots/000020_seg0_dram.hex"
+purpose = "Loader segment; function boundaries not recovered."
+
+[[slot]]
+name = "descriptor_1"
+kind = "header"
+vaddr = 0x1050
+size = 0x8
+file = "slots/001050_descriptor_1.hex"
+purpose = "ESP segment descriptor. File coordinates only."
+
+[[slot]]
+name = "seg1_iram"
+kind = "code"
+vaddr = 0x403c8700
+size = 0xb30
+file = "slots/001058_seg1_iram.hex"
+purpose = "Loader segment; function boundaries not recovered."
+[[slot.label]]
+name = "image_entry"
+offset = 0x1a4
+entry = true
+
+[[slot]]
+name = "descriptor_2"
+kind = "header"
+vaddr = 0x1b88
+size = 0x8
+file = "slots/001b88_descriptor_2.hex"
+purpose = "ESP segment descriptor. File coordinates only."
+
+[[slot]]
+name = "seg2_iram"
+kind = "code"
+vaddr = 0x403cb700
+size = 0x2d70
+file = "slots/001b90_seg2_iram.hex"
+purpose = "Loader segment; function boundaries not recovered."
+
+[[slot]]
+name = "alignment_checksum"
+kind = "rodata"
+vaddr = 0x4900
+size = 0x10
+file = "slots/004900_alignment_checksum.hex"
+purpose = "Padding and ESP segment-data XOR byte. File coordinates only."
+
+[[slot]]
+name = "appended_digest"
+kind = "rodata"
+vaddr = 0x4910
+size = 0x20
+file = "slots/004910_appended_digest.hex"
+purpose = "SHA-256 of the carrier through the XOR byte. File coordinates only."

@@ -1,0 +1,21 @@
+# nopray slot `test_inputs` · rodata · vaddr 0x403c8774 · size 0x38 · used 56 bytes
+# purpose: Seven aligned pairs (raw input, expected index) as little-endian u32.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# vector_0:
+#
+# test_inputs:
+00 00 00 00 00 00 00 00                          # 0x403c8774  |........ .......|  #= 0 -> 0
+20 00 00 00 03 00 00 00                          # 0x403c877c  (continued: an intent starts inside this item)  #= 32 -> 3
+#
+# vector_2:
+80 00 00 00 01 00 00 00                          # 0x403c8784  |................|  #= 128 -> 1
+a0 00 00 00 04 00 00 00                          # 0x403c878c  (continued: an intent starts inside this item)  #= 160 -> 4
+#
+# vector_4:
+00 01 00 00 02 00 00 00                          # 0x403c8794  |..........4.....|  #= 256 -> 2
+00 01 34 12 02 00 00 00                          # 0x403c879c  (continued: an intent starts inside this item)  #= 0x12340100 -> 2
+#
+# vector_6:
+81 00 ff ff 00 00 00 00                          # 0x403c87a4  |........|  #= 0xffff0081 -> 0
