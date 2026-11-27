@@ -1,6 +1,6 @@
 # AgujaESP-NOPRAY · live tailnet node on an ESP32-S3 N16R8
 
-[Español](README.es.md) · [Probe and design](../README.md) · [Evidence](../EVIDENCE.md#live-node-2026-11-27)
+[Español](README.es.md) · [Probe and design](../README.md) · [Evidence](../EVIDENCE.md#live-node--2026-11-27)
 
 ![Mapped flash set, live node and slot edit installed over the tailnet](flow.svg)
 

@@ -106,4 +106,6 @@ cd nopray
 - **`nopray context APP RANURA`:** contrato, llamadores a re-probar, estado, espacio libre y vecinas de una ranura, sin cargar todo el programa.
 - **`origin`/`evidence` por ranura:** la auditoría informa del porcentaje escrito a mano; una importación no se presenta como port.
 
+La skill enseña un método, no un catálogo de demos. [`SKILL.md`](./SKILL.md) es la puerta de entrada a [`book/`](./book/), nueve capítulos escritos como un libro de texto (en inglés): el mapa, la codificación, hablar con un sistema operativo, bare metal, portar, rendimiento, cambiar un programa, exposición y evidencia en hardware. Cada capítulo trae principio, procedimiento, trampas, ejemplos resueltos de este repositorio, problemas con criterios de aceptación y estado del conocimiento. Las aplicaciones de arriba son sus ejercicios resueltos. El libro crece después de cada trabajo ([`book/EDITIONS.md`](./book/EDITIONS.md)).
+
 Documentación detallada en español: [`references/MANUAL.md`](./references/MANUAL.md). Licencia MIT — © 2026 [TranscendenceIA](https://github.com/Transcendenceia).

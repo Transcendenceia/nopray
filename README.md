@@ -153,6 +153,13 @@ qemu-riscv64 examples/hello-riscv64-linux/build/hello-riscv64
 
 ### Using NOPRAY as an AI Agent Skill
 
+The skill teaches a method, not a catalogue of demos. [`SKILL.md`](./SKILL.md) is the entry to
+[`book/`](./book/), nine chapters written like a textbook: the map, encoding, talking to an
+OS, bare metal, porting, performance, changing a program, exposure, and hardware evidence.
+Each chapter has a principle, a procedure, traps, worked examples from this repository,
+problems with acceptance checks, and the state of knowledge. The applications above are its
+solved exercises. The book grows after every job ([`book/EDITIONS.md`](./book/EDITIONS.md)).
+
 Drop this repository into your agent's skills directory (OpenClaw, Claude Code, Codex, Antigravity, etc.) pointing to [`SKILL.md`](./SKILL.md), then prompt:
 
 > *"Use the `nopray` skill. Fingerprint the target and build `<application>` in hand-authored machine code, tier L2, exposure `local`. Deliver `nopray.toml`, slots with `#=` intents, a clean `audit --strict`, `MAP.md`, and live execution evidence."*
@@ -176,7 +183,8 @@ What the tool gives an agent (it never encodes an instruction):
 
 | Document | Language | Topic |
 | :--- | :---: | :--- |
-| [`SKILL.md`](./SKILL.md) | EN | Canonical AI agent instructions, non-negotiable rules, commands, decoder matrix |
+| [`SKILL.md`](./SKILL.md) | EN | Entry to the skill: how to study for a task, commandments, agent loop, tool and decoder appendices |
+| [`book/`](./book/) | EN | The method in nine chapters, with worked examples, problems and a growth protocol ([`EDITIONS.md`](./book/EDITIONS.md)) |
 | [`references/WORKFLOW.md`](./references/WORKFLOW.md) | EN | Step-by-step create / port / modify workflow, encoding traps (`REX.R/X/B`, AArch64 `Rn[9:5]`, `C017`) |
 | [`references/MANIFEST.md`](./references/MANIFEST.md) | EN | Complete `nopray.toml` schema, slot syntax, and every audit finding code (`R000`–`A001`, `C017`) |
 | [`references/BENCHMARKS.md`](./references/BENCHMARKS.md) | EN | Full empirical results vs C, Rust, Go, Node.js, and Python (execution + multi-model authoring) |
