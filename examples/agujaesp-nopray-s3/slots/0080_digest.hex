@@ -1,0 +1,8 @@
+# nopray slot `image_digest` · rodata · vaddr 0x80 · size 0x20 · used 32 bytes
+# purpose: SHA-256 over the image through its checksum byte; integrity only, not a signature.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# image_digest:
+5f c4 83 7a 75 31 8f a0 ce a0 d1 73 04 5a a4 9f  # 0x00000080  |_..zu1.....s.Z..|  #= container SHA-256
+19 c3 35 10 d1 46 bb db 60 f9 31 7d bd aa b9 3d  # 0x00000090  |..5..F..`.1}...=|

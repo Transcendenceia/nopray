@@ -1,0 +1,8 @@
+# nopray slot `checksum` · rodata · vaddr 0x78 · size 0x8 · used 8 bytes
+# purpose: Seven alignment bytes and one XOR checksum.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# checksum:
+00 00 00 00 00 00 00     # 0x00000078  |........|  #= checksum alignment padding
+12                       # 0x0000007f  (continued: an intent starts inside this item)  #= segment data XOR checksum

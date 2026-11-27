@@ -1,6 +1,6 @@
 ---
 name: nopray
-description: 'NOPRAY / DMCS-1.1: author, port, modify and audit native programs written directly as machine-code bytes (hex slots + executable headers) with no compiler, assembler, linker or SDK, using the `nopray` tool to lay out, decode, map and audit every byte. Use only when the user explicitly asks for NOPRAY, raw/hand-written machine code, hex-authored binaries, or "no programming language / no compiler" software; when porting an existing binary into a mapped NOPRAY app; when modifying or auditing an existing NOPRAY app; or when targeting bare metal (ESP32-C3/C6, RP2040, Raspberry Pi) this way. Ordinary requests for native programs, CLIs or services follow First Rust instead.'
+description: 'NOPRAY / DMCS-1.1: author, port, modify and audit native programs written directly as machine-code bytes (hex slots + executable headers) with no compiler, assembler, linker or SDK, using the `nopray` tool to lay out, decode, map and audit every byte. Use only when the user explicitly asks for NOPRAY, raw/hand-written machine code, hex-authored binaries, or "no programming language / no compiler" software; when porting an existing binary into a mapped NOPRAY app; when modifying or auditing an existing NOPRAY app; or when targeting bare metal (ESP32-C3/C6/S3, RP2040, Raspberry Pi) this way. Ordinary requests for native programs, CLIs or services follow First Rust instead.'
 metadata:
   icon: ./assets/icon.svg
 ---
@@ -82,7 +82,10 @@ Finding codes and the manifest format: [references/MANIFEST.md](references/MANIF
 | x86-64 | Full (16/32/64-bit `slot.bits`, AVX2/FMA/F16C, far-jump CFG, Multiboot 1 ELF32 bare metal, syscalls, contracts, `C017`) | calc, nopray3d, nopray-doom, nopray-httpd v2, qwen3-tts-baremetal: byte-identical maps, 0 errors |
 | AArch64 | Validity + flow + `svc`/`x8` syscalls + `adr`/literal refs | hello-aarch64: runs under `qemu-aarch64`, strict audit clean |
 | RISC-V 32/64 (+C) | Lengths, major-opcode validity, flow, `ecall`/`a7`; text via objdump | hello-riscv64: runs under `qemu-riscv64`, strict audit clean |
-| Thumb, Xtensa, AVR | None: bytes are opaque (`X001`), objdump text for annotation only | No example yet; needs external evidence |
+| Xtensa (ESP32-S3) | No built-in decoder (`X001`); QEMU trace is external evidence only | AgujaESP-NOPRAY: ROM boot and UART verified in QEMU, local L1 only |
+| Thumb, AVR | None: bytes are opaque (`X001`), objdump text for annotation only | Needs external evidence |
+
+For ROM-loaded microcontrollers, pin the SoC revision, image location and external ROM dependency. Exercise the stock ROM boot path with positive and malformed images. Verify I/O separately from instruction decoding. An emulated UART pass never establishes Wi-Fi, hardware timing or deployment suitability. For raw images the generic auditor does not validate the vendor container; validate the header, integrity fields and target load path separately.
 
 Targets, boot formats and what is verified vs documented: [references/TARGETS.md](references/TARGETS.md).
 
@@ -109,6 +112,7 @@ Each example directory is an app: `nopray.toml`, annotated `slots/`, and generat
 (`MAP.md`, `audit.json`, `manifest.lock.json`, binary). `tools/nopray/tests/examples.rs`
 rebuilds all of them and fails if any byte or audit result changes.
 
+- [`examples/agujaesp-nopray-s3/`](examples/agujaesp-nopray-s3/): hand-authored 160-byte S3 image with ROM-to-UART proof; no network or physical deployment.
 - `examples/hello-aarch64-linux/`, `examples/hello-riscv64-linux/`: minimal fully-intented apps; start here.
 - `examples/calc-x86_64-cachyos/`: 4,096-byte X11 calculator (tier L1, RWX by design, local only).
 - `examples/nopray3d-x86_64-cachyos/`: 8,192-byte W^X raycaster.

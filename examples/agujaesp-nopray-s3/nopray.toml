@@ -1,0 +1,104 @@
+[app]
+name = "AgujaESP-NOPRAY"
+version = "0.1.0"
+standard = "DMCS-1.1"
+tier = "L1"
+exposure = "local"
+description = "ESP32-S3 emulation-only ROM-to-UART boot probe; no network, no SDK or second-stage library."
+
+[target]
+isa = "xtensa"
+os = "bare-metal"
+format = "raw"
+base = 0
+entry = "_start"
+output = "agujaesp-s3-uart.bin"
+file_size = 0xa0
+# Raw ESP ROM container. Header/trailer addresses are file coordinates, not CPU mappings. L1 does not establish W^X or an Xtensa control-flow/MMIO audit. No flash-on-hardware claim.
+
+[provenance]
+authored_by = "Angie"
+method = "Every instruction authored as literal hex; QEMU only decodes/executes and the NOPRAY host tool only lays out/audits. XOR calculated over segment data."
+date = "2026-11-27"
+
+[[segment]]
+name = "container_header"
+vaddr = 0
+offset = 0
+file_size = 0x20
+mem_size = 0x20
+perms = "r--"
+align = 4
+
+[[segment]]
+name = "iram"
+vaddr = 0x403c8700
+offset = 0x20
+file_size = 0x58
+mem_size = 0x58
+perms = "rwx"
+align = 4
+
+[[segment]]
+name = "container_trailer"
+vaddr = 0x78
+offset = 0x78
+file_size = 0x28
+mem_size = 0x28
+perms = "r--"
+align = 4
+
+[[slot]]
+name = "esp_image_header"
+kind = "header"
+vaddr = 0
+size = 0x20
+file = "slots/0000_header.hex"
+purpose = "24-byte ESP image header plus 8-byte segment descriptor."
+
+[[slot]]
+name = "uart_literal"
+kind = "rodata"
+vaddr = 0x403c8700
+size = 4
+file = "slots/0020_literal.hex"
+purpose = "4-byte aligned UART0 FIFO address for L32R."
+[[slot.label]]
+name = "uart0_fifo_addr"
+offset = 0
+
+[[slot]]
+name = "_start"
+kind = "code"
+vaddr = 0x403c8704
+size = 0x54
+file = "slots/0024_start.hex"
+purpose = "Write the 13-byte fixed UART marker once, then spin. No stack, calls, or inputs."
+[slot.contract]
+clobbers = ["a2", "a3"]
+noreturn = true
+[[slot.label]]
+name = "stop"
+offset = 0x51
+
+[[slot]]
+name = "checksum"
+kind = "rodata"
+vaddr = 0x78
+size = 8
+file = "slots/0078_trailer.hex"
+purpose = "Seven alignment bytes and one XOR checksum."
+
+[[mmio]]
+name = "uart0_fifo"
+base = 0x60000000
+size = 4
+note = "Write-only for this probe; no status polling and no hardware UART timing claim."
+
+[[slot]]
+name = "image_digest"
+kind = "rodata"
+vaddr = 0x80
+size = 0x20
+file = "slots/0080_digest.hex"
+purpose = "SHA-256 over the image through its checksum byte; integrity only, not a signature."

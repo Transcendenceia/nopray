@@ -1,0 +1,38 @@
+# nopray slot `_start` · code · vaddr 0x403c8704 · size 0x54 · used 84 bytes
+# purpose: Write the 13-byte fixed UART marker once, then spin. No stack, calls, or inputs.
+# Hex bytes are authoritative; everything after `#` is ignored by `nopray build`.
+# Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+#
+# _start:
+21 ff ff                                         # 0x403c8704  |!..2.N2b.2.O2b.2|  #= l32r a2, 0x403c8700
+32 a0 4e                                         # 0x403c8707  (continued: an intent starts inside this item)  #= movi a3, 78 (N)
+32 62 00                                         # 0x403c870a  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+32 a0 4f                                         # 0x403c870d  (continued: an intent starts inside this item)  #= movi a3, 79 (O)
+32 62 00                                         # 0x403c8710  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+32                                               # 0x403c8713  (continued: an intent starts inside this item)  #= movi a3, 80 (P)
+a0 50                                            # 0x403c8714  |.P2b.2.R2b.2.A2b|
+32 62 00                                         # 0x403c8716  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+32 a0 52                                         # 0x403c8719  (continued: an intent starts inside this item)  #= movi a3, 82 (R)
+32 62 00                                         # 0x403c871c  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+32 a0 41                                         # 0x403c871f  (continued: an intent starts inside this item)  #= movi a3, 65 (A)
+32 62                                            # 0x403c8722  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+00                                               # 0x403c8724  |.2.Y2b.2.-2b.2.S|
+32 a0 59                                         # 0x403c8725  (continued: an intent starts inside this item)  #= movi a3, 89 (Y)
+32 62 00                                         # 0x403c8728  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+32 a0 2d                                         # 0x403c872b  (continued: an intent starts inside this item)  #= movi a3, 45 (-)
+32 62 00                                         # 0x403c872e  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+32 a0 53                                         # 0x403c8731  (continued: an intent starts inside this item)  #= movi a3, 83 (S)
+32 62 00                                         # 0x403c8734  |2b.2.32b.2. 2b.2|  #= s32i a3, a2, 0
+32 a0 33                                         # 0x403c8737  (continued: an intent starts inside this item)  #= movi a3, 51 (3)
+32 62 00                                         # 0x403c873a  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+32 a0 20                                         # 0x403c873d  (continued: an intent starts inside this item)  #= movi a3, 32 (space)
+32 62 00                                         # 0x403c8740  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+32                                               # 0x403c8743  (continued: an intent starts inside this item)  #= movi a3, 79 (O)
+a0 4f                                            # 0x403c8744  |.O2b.2.K2b.2..2b|
+32 62 00                                         # 0x403c8746  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+32 a0 4b                                         # 0x403c8749  (continued: an intent starts inside this item)  #= movi a3, 75 (K)
+32 62 00                                         # 0x403c874c  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+32 a0 0a                                         # 0x403c874f  (continued: an intent starts inside this item)  #= movi a3, 10 (LF)
+32 62                                            # 0x403c8752  (continued: an intent starts inside this item)  #= s32i a3, a2, 0
+00                                               # 0x403c8754  |....|
+06 ff ff                                         # 0x403c8755  (continued: an intent starts inside this item)  #= j 0x403c8755
