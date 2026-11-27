@@ -8,6 +8,10 @@ This **160-byte emulation probe** is written as literal Xtensa machine-code byte
 
 **Not a deployable tailnet node.** A separate UART test ran the same bytes on real silicon via the ROM RAM loader. No SPI boot claim on real hardware, RF association, WPA handshake, IP stack, Headscale registration, WireGuard, management service, or OTA. The DMCS L1 audit leaves `S001` (writable executable IRAM) and `X001` (opaque Xtensa code) open. QEMU decodes the 28 instructions and records observed writes, but does not replace a native audit. Do not flash this fixture: its 4 MiB/DIO configuration is for QEMU, not a WROOM module profile.
 
+> **Live node:** the board now runs as a Headscale node from a NOPRAY-mapped flash set, with a
+> slot edit installed over the tailnet. That deployment ports the La Aguja ESP-IDF build by
+> byte-identical import; it does not change what this 160-byte probe proves. See [node/](node/).
+
 ## Reproduce
 
 Run from the repository root on Linux. Use Espressif QEMU's [9.2.2 release dated 2026-11-09](https://github.com/espressif/qemu/releases/tag/esp-develop-9.2.2-20261109); extract the matching host archive into a scratch directory after checking the release digest. On Linux x86-64 the tested archive SHA-256 was `fbc3bffa9fa71192847969a627a584aabe2e86d85bed4902a096ff06c2b8a815`.

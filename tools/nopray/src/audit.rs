@@ -10,10 +10,11 @@ use std::fmt;
 use serde::Serialize;
 
 use crate::elf;
+use crate::esp;
 use crate::image::{Image, sha256_hex};
 use crate::intent;
 use crate::isa::{self, Coverage, DecodeOpts, Flow, Insn, SyscallReg};
-use crate::manifest::{AppDir, Exposure, Format, Isa, Os, Slot, SlotKind, Tier};
+use crate::manifest::{AppDir, Container, Exposure, Format, Isa, Os, Slot, SlotKind, Tier};
 use crate::syscalls;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
@@ -159,6 +160,9 @@ pub fn run(app: &AppDir, image: &Image, reference: Option<(&str, &[u8])>) -> Rep
         compare_reference(&mut cx, image, label, bytes);
     }
     check_format(&mut cx, &image.bytes);
+    if cx.app.manifest.target.container == Some(Container::EspImage) {
+        check_esp_image(&mut cx, &image.bytes);
+    }
     check_header_intents(&mut cx, image);
     check_policy(&mut cx);
     check_gaps(&mut cx, image);
@@ -370,6 +374,61 @@ fn compare_reference(cx: &mut Ctx<'_>, image: &Image, label: &str, bytes: &[u8])
     }
 }
 
+/// Recomputes the ESP loader's integrity fields so an edited slot cannot ship stale ones.
+fn check_esp_image(cx: &mut Ctx<'_>, bytes: &[u8]) {
+    let img = match esp::parse(bytes) {
+        Ok(img) => img,
+        Err(e) => {
+            cx.push(
+                Severity::Error,
+                "E014",
+                None,
+                None,
+                format!("ESP container unreadable: {e:#}"),
+            );
+            return;
+        }
+    };
+    if img.end != bytes.len() {
+        cx.push(
+            Severity::Error,
+            "E014",
+            None,
+            Some(img.end as u64),
+            format!(
+                "ESP container accounts for {} bytes but the image has {}",
+                img.end,
+                bytes.len()
+            ),
+        );
+    }
+    if img.stored_xor != img.computed_xor {
+        cx.push(
+            Severity::Error,
+            "E015",
+            None,
+            Some(img.xor_offset as u64),
+            format!(
+                "ESP segment-data XOR is {:#04x}, the bytes give {:#04x}",
+                img.stored_xor, img.computed_xor
+            ),
+        );
+    }
+    if let Some(d) = img.digest.filter(|d| d.stored != d.computed) {
+        cx.push(
+            Severity::Error,
+            "E016",
+            None,
+            Some(d.offset as u64),
+            format!(
+                "ESP appended SHA-256 is {}, the carrier hashes to {}",
+                hex::encode(d.stored),
+                hex::encode(d.computed)
+            ),
+        );
+    }
+}
+
 fn check_format(cx: &mut Ctx<'_>, bytes: &[u8]) {
     let m = &cx.app.manifest;
     match m.target.format {
@@ -385,6 +444,8 @@ fn check_format(cx: &mut Ctx<'_>, bytes: &[u8]) {
                 );
             }
         }
+        // Never executed: validation already rejects code slots and executable segments.
+        Format::Data => {}
         Format::Elf64 | Format::Elf32 => match elf::parse(bytes) {
             Err(e) => cx.push(
                 Severity::Error,

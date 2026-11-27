@@ -1,0 +1,58 @@
+diff -ruN -x build app-1.4.0/nopray.toml app-1.4.0-nopray.1/nopray.toml
+--- app-1.4.0/nopray.toml	2026-11-27 18:48:26.935375762 +0100
++++ app-1.4.0-nopray.1/nopray.toml	2026-11-27 18:48:27.359333111 +0100
+@@ -1,7 +1,7 @@
+ # Baseline map only. Not a hand-authored firmware and not a completed function-level port.
+ [app]
+-name = "La Aguja IoT S3 prebuilt reference"
+-version = "1.4.0"
++name = "AgujaESP-NOPRAY app"
++version = "1.4.0-nopray.1"
+ standard = "DMCS-1.1"
+ tier = "L1"
+ exposure = "local"
+diff -ruN -x build app-1.4.0/slots/000020_drom.hex app-1.4.0-nopray.1/slots/000020_drom.hex
+--- app-1.4.0/slots/000020_drom.hex	2026-11-27 18:35:05.171124596 +0100
++++ app-1.4.0-nopray.1/slots/000020_drom.hex	2026-11-27 18:44:23.811681012 +0100
+@@ -5,7 +5,7 @@
+ #
+ # drom:
+ 32 54 cd ab 00 00 00 00 00 00 00 00 00 00 00 00  # 0x3c0d0020  |2T..............|
+-31 2e 34 2e 30 00 00 00 00 00 00 00 00 00 00 00  # 0x3c0d0030  |1.4.0...........|
++31 2e 34 2e 30 2d 6e 6f 70 72 61 79 2e 31 00 00  # 0x3c0d0030  |1.4.0-nopray.1..|  #= esp_app_desc_t.version "1.4.0-nopray.1" NUL-padded (NOPRAY edit 1)
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  # 0x3c0d0040  |................|
+ 61 67 75 6a 61 5f 69 6f 74 00 00 00 00 00 00 00  # 0x3c0d0050  |aguja_iot.......|
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  # 0x3c0d0060  |................|
+@@ -9400,9 +9400,9 @@
+ 70 6f 72 74 27 20 63 6f 6e 74 65 6e 74 3d 27 77  # 0x3c0f4b30  |port' content='w|
+ 69 64 74 68 3d 64 65 76 69 63 65 2d 77 69 64 74  # 0x3c0f4b40  |idth=device-widt|
+ 68 2c 69 6e 69 74 69 61 6c 2d 73 63 61 6c 65 3d  # 0x3c0f4b50  |h,initial-scale=|
+-31 27 3e 3c 74 69 74 6c 65 3e 41 47 55 4a 41 2d  # 0x3c0f4b60  |1'><title>AGUJA-|
+-49 4f 54 20 2f 2f 20 58 49 41 4f 20 45 53 50 33  # 0x3c0f4b70  |IOT // XIAO ESP3|
+-32 2d 43 36 20 4f 70 73 3c 2f 74 69 74 6c 65 3e  # 0x3c0f4b80  |2-C6 Ops</title>|
++31 27 3e 3c 74 69 74 6c 65 3e 41 67 75 6a 61 45  # 0x3c0f4b60  |1'><title>AgujaE|  #= web UI <title> bytes 0-5 "AgujaE" (NOPRAY edit 2, same 30-byte length)
++53 50 2d 4e 4f 50 52 41 59 20 7c 20 45 53 50 33  # 0x3c0f4b70  |SP-NOPRAY | ESP3|  #= web UI <title> bytes 6-21 "SP-NOPRAY | ESP3"
++32 2d 53 33 20 4f 70 73 3c 2f 74 69 74 6c 65 3e  # 0x3c0f4b80  |2-S3 Ops</title>|  #= web UI <title> bytes 22-29 "2-S3 Ops" then </title>
+ 3c 73 74 79 6c 65 3e 3a 72 6f 6f 74 7b 2d 2d 62  # 0x3c0f4b90  |<style>:root{--b|
+ 67 3a 23 30 62 30 66 31 34 3b 2d 2d 63 61 72 64  # 0x3c0f4ba0  |g:.0b0f14;--card|
+ 3a 23 31 32 31 39 32 33 3b 2d 2d 62 64 3a 23 31  # 0x3c0f4bb0  |:.121923;--bd:.1|
+diff -ruN -x build app-1.4.0/slots/11d198_alignment_checksum.hex app-1.4.0-nopray.1/slots/11d198_alignment_checksum.hex
+--- app-1.4.0/slots/11d198_alignment_checksum.hex	2026-11-27 18:35:05.332131434 +0100
++++ app-1.4.0-nopray.1/slots/11d198_alignment_checksum.hex	2026-11-27 18:44:24.054671685 +0100
+@@ -4,4 +4,4 @@
+ # Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+ #
+ # alignment_checksum:
+-00 00 00 00 00 00 00 6b  # 0x0011d198  |.......k|
++00 00 00 00 00 00 00 1b  # 0x0011d198  |........|  #= padding, ESP segment-data XOR 0x1b after NOPRAY edits
+diff -ruN -x build app-1.4.0/slots/11d1a0_appended_digest.hex app-1.4.0-nopray.1/slots/11d1a0_appended_digest.hex
+--- app-1.4.0/slots/11d1a0_appended_digest.hex	2026-11-27 18:35:05.332188649 +0100
++++ app-1.4.0-nopray.1/slots/11d1a0_appended_digest.hex	2026-11-27 18:44:24.054671685 +0100
+@@ -4,5 +4,5 @@
+ # Comments are regenerated from the bytes by `nopray annotate`: edit bytes, then re-annotate and review.
+ #
+ # appended_digest:
+-60 5f ce 36 e4 10 6f 5d da d1 24 8b 61 05 49 0b  # 0x0011d1a0  |`_.6..o]..$.a.I.|
+-3f 54 23 98 fa d8 45 8a ec 0b 95 f6 73 5e 65 9e  # 0x0011d1b0  |?T....E.....s^e.|
++89 2a 7a 97 28 0e 1a 1b c1 42 11 df a1 92 30 82  # 0x0011d1a0  |.*z.(....B....0.|  #= SHA-256 of carrier through XOR byte, bytes 0-15
++b9 63 07 a7 d7 34 14 fd 54 42 9a ec 22 e6 1d 80  # 0x0011d1b0  |.c...4..TB.."...|  #= SHA-256 bytes 16-31

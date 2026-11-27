@@ -23,7 +23,8 @@ description = "optional"
 [target]
 isa = "aarch64"              # x86-64 | aarch64 | riscv64 | riscv32 | thumb | xtensa | avr
 os = "linux"                 # linux | bare-metal
-format = "elf64"             # elf64 | elf32 | raw
+format = "elf64"             # elf64 | elf32 | raw | data (non-executable: no code slots)
+container = "esp-image"      # optional: audit recomputes ESP XOR + appended SHA-256 (E014-E016)
 base = 0x400000              # vaddr of file offset 0 when no segment maps it (raw images)
 entry = "_start"             # slot or label name
 output = "hello-aarch64"     # file written to build/
@@ -120,7 +121,10 @@ Errors fail `audit`; warnings fail `audit --strict`.
 | E001-E004 | error | ELF unreadable, wrong class, wrong `e_machine`, `e_entry` != manifest entry |
 | E003 | warning | `e_type` is not `ET_EXEC` |
 | E005 | error | `PT_INTERP` or `PT_DYNAMIC` present |
-| E006 | error | Entry point is not inside a code slot |
+| E006 | error | Entry point is not inside a code slot (not checked for `format = "data"`) |
+| E014 | error | `container = "esp-image"` unreadable, truncated, or size differs from the image |
+| E015 | error | ESP segment-data XOR byte differs from the XOR of the segment bytes |
+| E016 | error | ESP appended SHA-256 differs from the hash of the carrier |
 | E007 | warning | Unexpected program header type |
 | E008 / E009 | error | `PT_LOAD` count or fields disagree with `[[segment]]` |
 | E010 | error | `p_vaddr` and `p_offset` not congruent modulo `p_align` |

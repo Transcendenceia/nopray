@@ -11,6 +11,7 @@ description = "Byte-exact loader-segment import of an ESP-IDF-built S3 applicati
 isa = "xtensa"
 os = "bare-metal"
 format = "raw"
+container = "esp-image"
 base = 0
 entry = "app_entry"
 output = "aguja-iot-s3-reference.bin"

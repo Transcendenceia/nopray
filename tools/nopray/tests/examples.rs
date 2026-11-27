@@ -170,8 +170,63 @@ fn unlabelled_data_interior_pointer_triggers_c017() {
         .expect("audit shifted");
     let out = String::from_utf8_lossy(&bad_audit.stdout);
     assert!(
-        !bad_audit.status.success() && out.contains("C017") && out.contains("nearest label `msg` is at 0x400140 (-2 byte(s))"),
+        !bad_audit.status.success()
+            && out.contains("C017")
+            && out.contains("nearest label `msg` is at 0x400140 (-2 byte(s))"),
         "off-by-2 interior data pointer must trigger C017:\n{out}"
+    );
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn data_images_skip_entry_checks_and_reject_code() {
+    let bin = env!("CARGO_BIN_EXE_nopray");
+    let dir = std::env::temp_dir().join(format!("nopray-data-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&dir);
+    fs::create_dir_all(dir.join("slots")).expect("scratch dir");
+    let manifest = |kind: &str, perms: &str| {
+        format!(
+            "[app]\nname = \"table\"\nversion = \"1\"\nstandard = \"DMCS-1.1\"\ntier = \"L1\"\nexposure = \"local\"\n\n\
+             [target]\nisa = \"xtensa\"\nos = \"bare-metal\"\nformat = \"data\"\nbase = 0\nentry = \"table\"\noutput = \"table.bin\"\nfile_size = 0x4\n\n\
+             [[segment]]\nname = \"table\"\nvaddr = 0x0\noffset = 0x0\nfile_size = 0x4\nmem_size = 0x4\nperms = \"{perms}\"\nalign = 1\n\n\
+             [[slot]]\nname = \"table\"\nkind = \"{kind}\"\nvaddr = 0x0\nsize = 0x4\nfile = \"slots/table.hex\"\npurpose = \"test\"\n"
+        )
+    };
+    fs::write(
+        dir.join("slots/table.hex"),
+        "aa 50 01 02  #= table magic and type\n",
+    )
+    .expect("slot");
+    fs::write(dir.join("nopray.toml"), manifest("rodata", "r--")).expect("manifest");
+    let ok = Command::new(bin)
+        .arg("build")
+        .arg(&dir)
+        .output()
+        .expect("build");
+    assert!(
+        ok.status.success(),
+        "{}",
+        String::from_utf8_lossy(&ok.stderr)
+    );
+    let audit = Command::new(bin)
+        .arg("audit")
+        .arg(&dir)
+        .output()
+        .expect("audit");
+    let text = String::from_utf8_lossy(&audit.stdout);
+    assert!(
+        audit.status.success() && !text.contains("E006"),
+        "data image must audit clean:\n{text}"
+    );
+    fs::write(dir.join("nopray.toml"), manifest("code", "r-x")).expect("manifest");
+    let bad = Command::new(bin)
+        .arg("build")
+        .arg(&dir)
+        .output()
+        .expect("build code");
+    assert!(
+        !bad.status.success() && String::from_utf8_lossy(&bad.stderr).contains("code slot"),
+        "a code slot in a data image must be rejected"
     );
     let _ = fs::remove_dir_all(&dir);
 }

@@ -15,7 +15,7 @@ or authority to alter code from this layout. Loader segment permissions are desc
 not runtime W^X proof. The entry is `0x4037582c`, inside `iram_main`. This app
 is not a standalone flash image: its source manifest specifies partition offset `0x20000`
 and separate bootloader, partition table, and OTA metadata. No provisioning data was read
-or copied to construct the map. Don't use it to overwrite a board.
+or copied to construct the map. On its own it is not a flash image; the complete flash set (bootloader, partition table, private NVS, `otadata`, app) that was flashed after owner approval is mapped in [`../node/`](../node/).
 
 With the named artifact available locally, from this directory:
 

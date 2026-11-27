@@ -1,6 +1,6 @@
 # Native-node design and acceptance gates
 
-**Owner:** Angie · **Scope:** NOPRAY example, map, workflow and emulator lab; no persistent writes to a real board, no writes to Headscale, ACLs or other hosts until the relevant gate is met. This is the work contract and handoff; unchecked rows below are not delivered features.
+**Owner:** Angie · **Scope:** NOPRAY example, map, workflow and emulator lab. On 2026-11-27 Marlon directed the live deployment: one owner-approved flash write to the N16R8 and one Headscale enrollment; no ACL or route changes. This is the work contract and handoff; unchecked rows below are not delivered features.
 
 **Behavior reference:** La Aguja [source at the observed upstream HEAD](https://github.com/Transcendenceia/La-Aguja/tree/52646207ec6063755b7b0a7a741e454eadd4c1c8/iot). Its S3 profile (`esp32s3-oct` for WROOM N16R8) shares the ESP-IDF/MicroLink firmware tree with C6. Its imager and board registry establish useful conventions, not evidence for NOPRAY or for a specific newly attached module.
 
@@ -23,10 +23,10 @@ A future hybrid using vendor wireless code is a separate provenance profile, not
 | Gate | Evidence required | Status |
 |---|---|---|
 | ROM boot / UART in lab | SPI ROM loading + byte-exact UART marker + MMIO trace; mutated checksum rejected | **PASS in Espressif QEMU** |
-| Physical bring-up | UART with actual Xtensa execution; distinguish ROM RAM load from cold SPI boot | **PASS for ROM RAM load** on the N16R8. Cold SPI boot not tested; no flash writes. |
-| Wi-Fi / IP | Supported radio boundary established; real association, authenticated network join, IP and recovery after reconnect | Not implemented |
-| Headscale / data | Own identity and node record, persistence on reboot, authorized traffic, denied peer | Not implemented |
-| Remote config / OTA | Authz, versioned config, image signature check, successful upgrade and previous-image rollback | Not implemented |
+| Physical bring-up | UART with actual Xtensa execution; distinguish ROM RAM load from cold SPI boot | **PASS** on the N16R8: ROM RAM load of the 160-byte probe, and cold SPI boot of the mapped [node flash set](node/) (owner-approved write; blank board backed up first). |
+| Wi-Fi / IP | Supported radio boundary established; real association, authenticated network join, IP and recovery after reconnect | **PASS (ported stack, by import)**: WPA2 association and DHCP on the home network. Reconnect and wrong-credential tests not run. Radio code is imported, not re-authored. |
+| Headscale / data | Own identity and node record, persistence on reboot, authorized traffic, denied peer | **PASS except denied peer**: node 47 `agujaesp-nopray`, identity kept across two reboots, direct WireGuard ping and API. Denied-peer test not run. |
+| Remote config / OTA | Authz, versioned config, image signature check, successful upgrade and previous-image rollback | **Partial**: token-authorized API (401 without token) and OTA of a NOPRAY slot edit, confirmed valid past the rollback window. No image signature; rollback not exercised. |
 | Release approval | Explicit production target, private provisioning, review of actual permissions/decoder coverage and deployment | Not authorized by a local successful boot |
 
 ## S3 open-MAC feasibility check

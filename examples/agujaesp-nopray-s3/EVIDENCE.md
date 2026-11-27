@@ -91,3 +91,43 @@ image before opening the port. Before repeating the hardware probe, the existing
 `verify-flash` confirmed the device digest matched the backup and a local SHA-256 self-check
 passed. The vendor read stub was only used for backup/verification, not for the NOPRAY probe.
 The backup may contain credentials; do not copy it into this repository or attach it to a PR.
+
+## Live node · 2026-11-27
+
+Hardware: the N16R8 above, on the CachyOS host's USB-UART port (`1a86:55d3`). The private 16 MiB
+backup taken earlier was entirely `0xFF`: the board was blank, so no firmware was replaced.
+
+**Flash set.** The four La Aguja 1.4.0 `esp32s3-oct` images (input SHA-256 pinned in
+[`node/reproduce.sh`](node/reproduce.sh)) were imported with `nopray import`, rebuilt and audited
+with `--binary` (`R000` for each). The private NVS was mapped as a `format = "data"` image and
+audited the same way. esptool wrote the NOPRAY build outputs with `--flash-mode/--flash-freq/--flash-size keep`
+(no header rewrite), reported `Hash of data verified` for all five regions, and a separate
+`read-flash` of every region compared identical to the staged files. The four public readbacks
+then passed `nopray audit --binary` with `R000`. No eFuse, secure-boot or flash-encryption
+command was issued.
+
+**Boot and enrollment (UART, 115200 on GPIO43/44).** `rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)`,
+app `aguja_iot` 1.4.0 on `ota_0`, `Config loaded from NVS: host=AgujaESP-NOPRAY ... exit=0`.
+Association with the home AP on channel 1 (WPA2-PSK), DHCP `192.168.1.71/24`. Control: TLS to the
+Headscale host, Noise IK handshake, `RegisterResponse`, 52,470-byte initial netmap with 18 peers,
+VPN IP `100.70.0.35`. Headscale: node 47, user `marlon`, single-use pre-auth key (2 h). Route
+`0.0.0.0/0` listed as available, **not approved**.
+
+**Traffic.** From `100.70.0.6`: `tailscale ping` → `pong ... via 192.168.1.71:51820 in 37ms`
+(direct). `GET /api/v1/health` → 200 `{"ok":true,"hostname":"AgujaESP-NOPRAY"}`.
+`GET /api/v1/status` without token → 401; with token → `state CONNECTED`, `peer_count 18`.
+
+**Slot edit over the tailnet.** [`edits/1.4.0-nopray.1.patch`](node/edits/1.4.0-nopray.1.patch)
+changes 27 data bytes in `drom` (app version → `1.4.0-nopray.1`, web title →
+`AgujaESP-NOPRAY | ESP32-S3 Ops`), the XOR byte (`0x6b` → `0x1b`) and the appended SHA-256. The integrity
+computation first reproduced the original fields exactly. `nopray diff` listed `drom`,
+`alignment_checksum` and `appended_digest`; audit 0 errors. With the old integrity slots the same
+edit fails with `E015` and `E016`. Upload: `POST /api/v1/ota`, HTTP 200, 1,167,808 bytes in 8.4 s;
+10 s later `fw_version 1.4.0-nopray.1` on `ota_1`, `CONNECTED`; still there at 195 s, beyond the
+180 s rollback window. A serial readback of `ota_1` matched the edited map (`R000`,
+SHA-256 `cdfca3e6...e882c`); `otadata` sequence 2 is in state `0x2` (valid). After that reset the
+node returned to `CONNECTED` on `ota_1`.
+
+Secrets: the Wi-Fi key, the pre-auth key and the API token were never printed or committed.
+The NVS image and its slot files were shredded after flashing; the token lives in a mode-0600
+operator config.

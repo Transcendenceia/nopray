@@ -7,6 +7,7 @@ mod annotate;
 mod audit;
 mod diff;
 mod elf;
+mod esp;
 mod hexfile;
 mod image;
 mod import;
@@ -70,6 +71,21 @@ enum Command {
         /// First address of read-only data inside the executable segment (hex).
         #[arg(long, value_parser = parse_hex)]
         code_end: Option<u64>,
+    },
+    /// Draft a container-granularity manifest for an ESP32-S3 loader image (`esp-image`).
+    ProposeEsp {
+        #[arg(long)]
+        binary: PathBuf,
+        #[arg(long)]
+        name: String,
+        #[arg(long, default_value = "0.0.0")]
+        version: String,
+        /// Who produced the bytes (recorded in `[provenance]`).
+        #[arg(long)]
+        authored_by: String,
+        /// Provenance date (YYYY-MM-DD).
+        #[arg(long)]
+        date: String,
     },
     /// Extract slot files from a binary using a manifest, and prove the rebuild is identical.
     Import {
@@ -215,6 +231,30 @@ fn run(cli: Cli) -> Result<ExitCode> {
                 code_end,
             };
             print!("{}", import::propose(&bytes, &opts)?);
+            Ok(ExitCode::SUCCESS)
+        }
+        Command::ProposeEsp {
+            binary,
+            name,
+            version,
+            authored_by,
+            date,
+        } => {
+            let bytes =
+                fs::read(&binary).with_context(|| format!("reading {}", binary.display()))?;
+            let output = binary
+                .file_name()
+                .context("binary path has no file name")?
+                .to_string_lossy()
+                .into_owned();
+            let opts = esp::ProposeOpts {
+                name,
+                version,
+                output,
+                authored_by,
+                date,
+            };
+            print!("{}", esp::propose(&bytes, &opts)?);
             Ok(ExitCode::SUCCESS)
         }
         Command::Import {
