@@ -82,10 +82,10 @@ Finding codes and the manifest format: [references/MANIFEST.md](references/MANIF
 | x86-64 | Full (16/32/64-bit `slot.bits`, AVX2/FMA/F16C, far-jump CFG, Multiboot 1 ELF32 bare metal, syscalls, contracts, `C017`) | calc, nopray3d, nopray-doom, nopray-httpd v2, qwen3-tts-baremetal: byte-identical maps, 0 errors |
 | AArch64 | Validity + flow + `svc`/`x8` syscalls + `adr`/literal refs | hello-aarch64: runs under `qemu-aarch64`, strict audit clean |
 | RISC-V 32/64 (+C) | Lengths, major-opcode validity, flow, `ecall`/`a7`; text via objdump | hello-riscv64: runs under `qemu-riscv64`, strict audit clean |
-| Xtensa (ESP32-S3) | No built-in decoder (`X001`); QEMU trace is external evidence only | AgujaESP-NOPRAY: ROM boot and UART verified in QEMU, local L1 only |
+| Xtensa (ESP32-S3) | No built-in decoder (`X001`); QEMU trace is external evidence only | AgujaESP-NOPRAY: simulated SPI boot and physical ROM-to-RAM UART verified, local L1 only |
 | Thumb, AVR | None: bytes are opaque (`X001`), objdump text for annotation only | Needs external evidence |
 
-For ROM-loaded microcontrollers, pin the SoC revision, image location and external ROM dependency. Exercise the stock ROM boot path with positive and malformed images. Verify I/O separately from instruction decoding. An emulated UART pass never establishes Wi-Fi, hardware timing or deployment suitability. For raw images the generic auditor does not validate the vendor container; validate the header, integrity fields and target load path separately.
+For ROM-loaded microcontrollers, pin the SoC revision, image location and external ROM dependency. Exercise the stock ROM boot path with positive and malformed images. Verify I/O separately from instruction decoding. An emulated UART pass never establishes Wi-Fi, hardware timing or deployment suitability. When available, use the stock ROM's volatile load path before touching flash, capture the external UART marker and report RAM execution separately from cold SPI boot. For raw images the generic auditor does not validate the vendor container; validate the header, integrity fields and target load path separately.
 
 Targets, boot formats and what is verified vs documented: [references/TARGETS.md](references/TARGETS.md).
 
@@ -112,7 +112,7 @@ Each example directory is an app: `nopray.toml`, annotated `slots/`, and generat
 (`MAP.md`, `audit.json`, `manifest.lock.json`, binary). `tools/nopray/tests/examples.rs`
 rebuilds all of them and fails if any byte or audit result changes.
 
-- [`examples/agujaesp-nopray-s3/`](examples/agujaesp-nopray-s3/): hand-authored 160-byte S3 image with ROM-to-UART proof; no network or physical deployment.
+- [`examples/agujaesp-nopray-s3/`](examples/agujaesp-nopray-s3/): hand-authored 160-byte S3 image with ROM-to-UART proof in QEMU and RAM-only proof on N16R8 hardware; no network or physical deployment.
 - `examples/hello-aarch64-linux/`, `examples/hello-riscv64-linux/`: minimal fully-intented apps; start here.
 - `examples/calc-x86_64-cachyos/`: 4,096-byte X11 calculator (tier L1, RWX by design, local only).
 - `examples/nopray3d-x86_64-cachyos/`: 8,192-byte W^X raycaster.

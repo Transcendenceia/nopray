@@ -28,7 +28,7 @@ Status labels used below:
 | ESP32-C3 / C6 bare metal | `riscv32`, `bare-metal`, `raw` | flow (no syscalls; MMIO windows) | none (Espressif QEMU fork not installed) | header/watchdog facts **SOURCE**; no image yet |
 | RP2040 / RP2350 (Arm) | `thumb` | none (`X001`) | none | **DOC**, several **UNVERIFIED** |
 | Raspberry Pi bare metal | `aarch64`, `bare-metal`, `raw` | flow | `qemu-system-aarch64` not installed | **DOC**, entry state **UNVERIFIED** |
-| ESP32-S3 (Xtensa LX7), bare metal | `xtensa`, `bare-metal`, `raw` | none (`X001`); external QEMU trace | Espressif QEMU `-M esp32s3` | **RUN (emulated)**: SPI ROM → IRAM → UART0; no Wi-Fi or hardware claim |
+| ESP32-S3 (Xtensa LX7), bare metal | `xtensa`, `bare-metal`, `raw` | none (`X001`); external QEMU trace | Espressif QEMU `-M esp32s3` | **RUN**: simulated SPI ROM boot and physical ROM RAM load; UART0 only |
 | ESP32 classic, ATmega328P | `xtensa`, `avr` | none | not evaluated | no verified example |
 
 ## 2. Linux user space
@@ -156,7 +156,7 @@ The [AgujaESP-NOPRAY probe](../examples/agujaesp-nopray-s3/) boots in Espressif 
 and loads its single 88-byte segment at `0x403C8700`. Entry `0x403C8704` writes a 13-byte
 marker to UART0 FIFO at `0x60000000` (primary citations and negative checksum test in the example).
 The Xtensa decoder gap and writable/executable IRAM still fail strict audit. The emulator fixture
-is not a physical WROOM profile. Neither the UART test nor emulated Ethernet establishes Wi-Fi.
+is not a physical WROOM flash profile. The same payload ran on an N16R8 via ROM RAM load; neither that nor emulated Ethernet establishes Wi-Fi or cold SPI boot on hardware.
 
 ## 7. Tooling roadmap for microcontrollers
 

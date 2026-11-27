@@ -4,9 +4,9 @@
 
 ![Mapa del arranque comprobado y del camino pendiente hasta la tailnet](flow.svg)
 
-La ROM del ESP32-S3 emulado cargó **160 bytes escritos a mano** y UART0 devolvió `NOPRAY-S3 OK`. La prueba también demuestra que la ROM rechaza la imagen al cambiar un bit de la suma de comprobación. Ni el auditor ni el emulador generan instrucciones para el firmware; la ROM de Espressif sí es un prerrequisito externo.
+La ROM del ESP32-S3 emulado cargó **160 bytes escritos a mano** y UART0 devolvió `NOPRAY-S3 OK`. En QEMU, la ROM también rechazó la imagen al cambiar un bit de la suma de comprobación. En el N16R8 físico, la ROM cargó esos mismos bytes **en RAM** y la UART devolvió el mismo marcador, sin sustituir el firmware instalado. Ni el auditor ni el emulador generan instrucciones para el firmware; la ROM de Espressif sí es un prerrequisito externo.
 
-**Este binario no se debe flashear**: la geometría de 4 MiB es del emulador. Falta la prueba física del módulo exacto y falta toda la conectividad. El auditor comprueba el mapa, pero **todavía no decodifica Xtensa**; la decodificación y los accesos de esta prueba vienen de QEMU.
+**Este binario no se debe flashear**: la geometría de 4 MiB es del emulador. Faltan la prueba de arranque desde flash en la placa y toda la conectividad. El auditor comprueba el mapa, pero **todavía no decodifica Xtensa**; la decodificación y los accesos de esta prueba vienen de QEMU.
 
 ## De La Aguja al S3, sin confundir los caminos
 

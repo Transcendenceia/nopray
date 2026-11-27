@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 720" role="img" aria-labelledby="title desc">
   <title id="title">AgujaESP-NOPRAY: ROM boot and future network boundaries</title>
-  <desc id="desc">A verified lane connects a hand-authored 160 byte ROM image, the emulated ESP32-S3 and UART evidence. A separate planned lane shows Wi-Fi, Headscale coordination, WireGuard peer traffic and signed updates.</desc>
+  <desc id="desc">A verified lane connects a hand-authored 160 byte image to emulated ESP32-S3 SPI boot and real-board RAM execution, both confirmed by UART. A separate planned lane shows Wi-Fi, Headscale coordination, WireGuard peer traffic and signed updates.</desc>
   <defs>
     <marker id="cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#28d9f7"/></marker>
     <marker id="violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#d9afff"/></marker>
@@ -23,7 +23,7 @@
   <text x="46" y="65" class="eyebrow" fill="#ffad8a">NOPRAY / ESP32-S3</text>
   <text x="46" y="121" class="heading">From hex to a tailnet node</text>
   <rect x="46" y="147" width="1008" height="188" rx="12" fill="#11141b"/>
-  <text x="70" y="184" class="eyebrow cyan">01 / VERIFIED IN QEMU</text>
+  <text x="70" y="184" class="eyebrow cyan">01 / VERIFIED: QEMU SPI BOOT + PHYSICAL RAM LOAD</text>
   <path d="M338 260H412" class="data"/>
   <path d="M682 260H756" class="data"/>
   <g class="box">
@@ -34,9 +34,9 @@
   <text x="94" y="250" class="label">160-byte image</text>
   <text x="94" y="279" class="body">Literal hex · mapped slots</text>
   <text x="438" y="250" class="label">Espressif ROM</text>
-  <text x="438" y="279" class="body">SPI flash → IRAM → entry</text>
+  <text x="438" y="279" class="body">SPI (QEMU) / RAM (board)</text>
   <text x="782" y="250" class="label">UART0 evidence</text>
-  <text x="782" y="279" class="body">Marker · 13 MMIO writes</text>
+  <text x="782" y="279" class="body">Same marker on both</text>
 
   <rect x="46" y="354" width="1008" height="316" rx="12" fill="#11141b"/>
   <text x="70" y="392" class="eyebrow violet">02 / DESIGN ONLY · NOT IMPLEMENTED</text>
@@ -60,5 +60,5 @@
   <text x="687" y="467" class="mini">control</text>
   <text x="589" y="559" class="mini">data path</text>
   <text x="70" y="640" class="mini">Release gate: signed firmware, A/B boot, rollback tested.</text>
-  <text x="46" y="699" class="mini">Solid: observed in emulation. Dashed: proposed; Headscale does not forward peer traffic.</text>
+  <text x="46" y="699" class="mini">Solid: observed. Dashed: proposed; Headscale does not forward peer traffic.</text>
 </svg>

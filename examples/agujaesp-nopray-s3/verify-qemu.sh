@@ -45,6 +45,12 @@ if grep -Fq 'SHA-256 comparison failed' "$out/good.uart"; then exit 1; fi
 [[ "$(grep -Fxc 'NOPRAY-S3 OK' "$out/good.uart")" == 1 ]]
 grep -Eq '^0x403c8704:[[:space:]]+l32r[[:space:]]+a2, 0x403c8700' "$out/good.trace"
 grep -Eq '^0x403c8755:[[:space:]]+j[[:space:]]+0x403c8755' "$out/good.trace"
+# Built-in NOPRAY coverage is None for Xtensa: compare each intent against the QEMU block.
+sed -En 's/^.*#= ([^(]+).*$/\1/p' "$app/slots/0024_start.hex" | sed -E 's/[[:space:]]+$//' > "$out/expected.instructions"
+grep -m1 -A27 '^0x403c8704:' "$out/good.trace" \
+  | sed -E 's/^0x[0-9a-f]+:[[:space:]]+//; s/[[:space:]]+/ /g' > "$out/observed.instructions"
+[[ "$(wc -l < "$out/observed.instructions")" == 28 ]]
+diff -u "$out/expected.instructions" "$out/observed.instructions"
 grep -F 'addr 0x60000000 value ' "$out/good.trace" | tail -n 13 \
   | sed -En "s/.* value 0x([0-9a-f]+) size 4 name 'esp_soc.uart'.*/0x\1/p" \
   | xargs printf '%02x' > "$out/good.marker.hex"

@@ -1,6 +1,6 @@
 # Native-node design and acceptance gates
 
-**Owner:** Angie · **Scope:** NOPRAY example, map, workflow and emulator lab; no writes to a real board, Headscale, ACLs or other hosts until the relevant gate is met. This is the work contract and handoff; unchecked rows below are not delivered features.
+**Owner:** Angie · **Scope:** NOPRAY example, map, workflow and emulator lab; no persistent writes to a real board, no writes to Headscale, ACLs or other hosts until the relevant gate is met. This is the work contract and handoff; unchecked rows below are not delivered features.
 
 **Behavior reference:** La Aguja [source at the observed upstream HEAD](https://github.com/Transcendenceia/La-Aguja/tree/52646207ec6063755b7b0a7a741e454eadd4c1c8/iot). Its S3 profile (`esp32s3-oct` for WROOM N16R8) shares the ESP-IDF/MicroLink firmware tree with C6. Its imager and board registry establish useful conventions, not evidence for NOPRAY or for a specific newly attached module.
 
@@ -23,8 +23,18 @@ A future hybrid using vendor wireless code is a separate provenance profile, not
 | Gate | Evidence required | Status |
 |---|---|---|
 | ROM boot / UART in lab | SPI ROM loading + byte-exact UART marker + MMIO trace; mutated checksum rejected | **PASS in Espressif QEMU** |
-| Physical bring-up | Exact memory profile + matching original flash backup and reachable recovery; UART after cold boot | ROM identification passed (N16R8 memory profile); no backup, flash write, or NOPRAY boot on hardware yet |
+| Physical bring-up | UART with actual Xtensa execution; distinguish ROM RAM load from cold SPI boot | **PASS for ROM RAM load** on the N16R8. Cold SPI boot not tested; no flash writes. |
 | Wi-Fi / IP | Supported radio boundary established; real association, authenticated network join, IP and recovery after reconnect | Not implemented |
 | Headscale / data | Own identity and node record, persistence on reboot, authorized traffic, denied peer | Not implemented |
 | Remote config / OTA | Authz, versioned config, image signature check, successful upgrade and previous-image rollback | Not implemented |
 | Release approval | Explicit production target, private provisioning, review of actual permissions/decoder coverage and deployment | Not authorized by a local successful boot |
+
+## S3 open-MAC feasibility check
+
+[Upstream esp-wifi-hal PR #23](https://github.com/esp32-open-mac/esp-wifi-hal/pull/23)
+(closed, not merged; head `909be7021787f0dfb074072a9ea8563c511ba137`) reports real S3 WPA2 and DHCP
+with a replacement MAC, but explicitly retains binary/ROM dependencies for PHY, automatic
+ACK rates and other helpers. This is third-party evidence, not reproduced here. Espressif also
+publishes [precompiled RF libraries](https://github.com/espressif/esp-phy-lib); their presence
+does not establish that an independently authored radio is impossible. No ROM-only S3 radio
+initialization and calibration contract has yet been validated for the NOPRAY image.

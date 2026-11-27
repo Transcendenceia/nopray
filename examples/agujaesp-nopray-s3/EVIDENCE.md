@@ -73,5 +73,21 @@ Read-only ROM commands with esptool 5.7.0, `--no-stub flash-id` and
 Observed: ESP32-S3 QFN56 rev v0.2, chip ID 9, 40 MHz crystal, 16 MB quad-SPI flash at 3.3 V,
 8 MB embedded PSRAM (AP_3v3), Secure Boot and Flash Encryption disabled.
 The memory profile matches N16R8 in the [Espressif WROOM-1/1U datasheet](https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf);
-this probe cannot distinguish the module's onboard-antenna versus external-antenna variant.
-No flash or eFuse writes, no backup, and no NOPRAY code executed on the real board.
+the serial probe does not distinguish antennas; photos separately show the PCB antenna pattern, microSD, camera flex connector and the labeled USB-UART/USB-OTG ports.
+No flash or eFuse writes during identification.
+
+### ROM RAM execution on the physical board
+
+The same 160-byte image (same SHA-256 above) was loaded with the ESP32-S3 ROM transport only
+(no stub). The ROM accepted 88 bytes at `0x403c8700` and transferred control to `0x403c8704`.
+UART over the board's USB-UART connector emitted `NOPRAY-S3 OK` followed by LF
+(hex `4e4f505241592d5333204f4b0a`). esptool then hard-reset via RTS without writing flash.
+No RF, network or cold SPI boot asserted. The QEMU block also matched all 28 authored instruction
+intents after whitespace normalization.
+
+The checked-in ROM verifier also passed independently. Its negative case rejected a different
+image before opening the port. Before repeating the hardware probe, the existing full
+16,777,216-byte flash was backed up privately on the hardware host (mode 0600); esptool
+`verify-flash` confirmed the device digest matched the backup and a local SHA-256 self-check
+passed. The vendor read stub was only used for backup/verification, not for the NOPRAY probe.
+The backup may contain credentials; do not copy it into this repository or attach it to a PR.

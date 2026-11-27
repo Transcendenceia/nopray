@@ -6,7 +6,7 @@
 
 This **160-byte emulation probe** is written as literal Xtensa machine-code bytes and ESP image fields. Espressif's pre-existing ROM loads it at power-on; it then writes `NOPRAY-S3 OK` once to UART0 and spins. No guest compiler, assembler, linker, SDK, vendor Wi-Fi blob, or programming-language source was used. The ROM is an external execution prerequisite. Authorship is an attestation, not something an auditor can prove. The host test harness and auditor are not part of the firmware.
 
-**Not a deployable tailnet node.** No real-board claim, RF association, WPA handshake, IP stack, Headscale registration, WireGuard, management service, or OTA. The DMCS L1 audit leaves `S001` (writable executable IRAM) and `X001` (opaque Xtensa code) open. QEMU decodes the 28 instructions and records observed writes, but does not replace a native audit. Do not flash this fixture: its 4 MiB/DIO configuration is for QEMU, not a WROOM module profile.
+**Not a deployable tailnet node.** A separate UART test ran the same bytes on real silicon via the ROM RAM loader. No SPI boot claim on real hardware, RF association, WPA handshake, IP stack, Headscale registration, WireGuard, management service, or OTA. The DMCS L1 audit leaves `S001` (writable executable IRAM) and `X001` (opaque Xtensa code) open. QEMU decodes the 28 instructions and records observed writes, but does not replace a native audit. Do not flash this fixture: its 4 MiB/DIO configuration is for QEMU, not a WROOM module profile.
 
 ## Reproduce
 
@@ -34,7 +34,7 @@ The script takes a **new** evidence directory. It verifies the stored XOR and SH
 | `78–7F` | 8 | Seven zeros and XOR `0x12` |
 | `80–9F` | 32 | SHA-256 of `00–7F` (integrity, not authenticity) |
 
-For an in-place edit, copy the sample first. To change the final `K` to `!`, hand-edit `32 a0 4b` → `32 a0 21` and update its intent; no address moves. XOR all bytes `20–77` starting at `0xEF` (the new checksum is `0x78` in this example). Recompute SHA-256 over bytes `00–7F` and store it as the last slot. Rebuild, compare with `nopray diff`, rerun, and check decoded instructions and the new UART marker. The supplied verifier intentionally pins the original marker and will not pass a changed image unchanged.
+For an in-place edit, copy the sample first. To change the final `K` to `!`, hand-edit `32 a0 4b` → `32 a0 21` and update its intent; no address moves. XOR all bytes `20–77` starting at `0xEF` (the new checksum is `0x78` in this example). Recompute SHA-256 over bytes `00–7F` and store it as the last slot. Rebuild, compare with `nopray diff`, rerun, and check decoded instructions and the new UART marker. Both verifiers intentionally pin the original marker and will not pass a changed image unchanged.
 
 ### Primary references
 
@@ -42,3 +42,11 @@ For an in-place edit, copy the sample first. To change the final `K` to `!`, han
 - [esptool ESP32-S3 chip ID and flash offset](https://github.com/espressif/esptool/blob/v5.1.0/esptool/targets/esp32s3.py); the image goes at `0x0` in the simulated flash.
 - [ESP-IDF S3 bootloader load region](https://github.com/espressif/esp-idf/blob/v5.5/components/bootloader/subproject/main/ld/esp32s3/bootloader.ld): derive `0x403C8700` from the start of `iram_seg`. This is a reference, not a linked input.
 - [S3 MMIO bases](https://github.com/espressif/esp-idf/blob/v5.5/components/soc/esp32s3/register/soc/reg_base.h), [UART registers](https://github.com/espressif/esp-idf/blob/v5.5/components/soc/esp32s3/register/soc/uart_reg.h), and [S3 Xtensa ISA tables used by the QEMU decoder](https://github.com/espressif/qemu/blob/esp-develop-9.2.2-20261109/target/xtensa/core-esp32s3/xtensa-modules.inc.c).
+
+## Physical RAM-only check
+
+On the N16R8 board, connect via USB-UART, check the port is idle and use
+`python verify-ram.py --port <device>` with the host esptool 5.7.0 environment.
+The utility accepts only the pinned image. It resets into download mode, uploads only the
+88-byte segment with the mask-ROM loader (no stub), checks UART at 115200 and hard-resets back
+to the existing boot path. It does not overwrite flash. This is not a cold-boot test from SPI.
